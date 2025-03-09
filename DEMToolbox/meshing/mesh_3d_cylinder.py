@@ -1,143 +1,193 @@
 import numpy as np
+import pandas as pd
 import warnings
-from collections import namedtuple
 
-def mesh_particles_3d_cylinder(particle_data, cylinder_data, mesh_resolution_3d, 
-                                mesh_constant="volume", start_rotation=0):
+def mesh_particles_3d_cylinder(particle_data, cylinder_data,
+                               resolution, mesh_constant="volume", 
+                               rotation=0, mesh_column="3D_mesh"):
+    """Split the particles into a 3D mesh in cylindrical coordinates.
 
-    # Check if the particles file has points
+    Split the particles into a cylindrical mesh for a cylinder container 
+    orientated in the z direction.
+
+    Parameters
+    ----------
+    particle_data : vtkPolyData
+        The particle vtk.
+    cylinder_data : vtkPolyData
+        The cylinder container vtk.
+    resolution : list
+        The resolution of the 3D mesh as [angular, radial, z].
+    mesh_constant : str, optional
+        The mesh constant to define the radial mesh spacing, 
+        by default "volume".
+    rotation : int or float, optional
+        The rotation of the mesh in radians, by default 0.
+    mesh_column : str, optional
+        The name of the mesh column in the particle data,
+        by default "3D_mesh".
+
+    Returns
+    -------
+    particle_data : vtkPolyData
+        The particle vtk with the mesh column added.
+    mesh_column : str
+        The name of the mesh column in the particle data.
+    mesh_df : pd.DataFrame
+        A dataframe containing the mesh id, lower bound, upper bound
+        and number of particles in the mesh element.
+    in_mesh_particles : int
+        The number of particles in the mesh elements.
+    out_of_mesh_particles : int
+        The number of particles out of the mesh elements.
+
+    Raises
+    ------
+    ValueError
+        If resolution is not a 3 element list of integers.
+    ValueError
+        If resolution is not a list of integers.
+    ValueError
+        If mesh_constant is not "radius" or "volume".
+    ValueError
+        If rotation is not an integer or float.
+    UserWarning
+        If the particle data has no points return unedited 
+        particle data an empty mesh dataframe and nan for
+        in_mesh_particles and out_of_mesh_particles.
+    UserWarning
+        If the container data has no points return unedited
+        particle data an empty mesh dataframe and nan for
+        in_mesh_particles and out_of_mesh_particles.
+    """
     if particle_data.n_points == 0:
-        warnings.warn("cannot mesh empty particles file")
-        return (), "3D_cylinder_mesh", np.nan, np.nan
+        warnings.warn("cannot mesh empty particles file", UserWarning)
+        mesh_df = pd.DataFrame(columns=["mesh id", "radial_lower_bound",
+                                        "radial_upper_bound",
+                                        "angular_lower_bound",
+                                        "angular_upper_bound",
+                                        "z_lower_bound",
+                                        "z_upper_bound",
+                                        "n_particles"])
+        return particle_data, mesh_df, np.nan, np.nan
+    
+    if cylinder_data.n_points == 0:
+        warnings.warn("cannot mesh empty container file", UserWarning)
+        mesh_df = pd.DataFrame(columns=["mesh id", "radial_lower_bound",
+                                        "radial_upper_bound",
+                                        "angular_lower_bound",
+                                        "angular_upper_bound",
+                                        "z_lower_bound",
+                                        "z_upper_bound",
+                                        "n_particles"])
+        return particle_data, mesh_df, np.nan, np.nan
+    
+    if len(resolution) != 3:
+        raise ValueError("resolution must be a list of 3 integers")
+    
+    if not all([isinstance(i, int) for i in resolution]):
+        raise ValueError("resolution must be a list of 3 integers")
+    
+    if not isinstance(rotation, (int, float)):
+        raise ValueError("rotation must be an integer or float")
 
-    # Perform checks on the input variables
-    if len(mesh_resolution_3d) != 3:
-        raise ValueError("mesh_resolution_3d must be a list of 3 integers")
+    ang_mesh = resolution[0]
+    rad_mesh = resolution[1]
+    z_mesh = resolution[2]
 
-    if not all([isinstance(i, int) for i in mesh_resolution_3d]):
-        raise ValueError("mesh_resolution_3d must be a list of 3 integers")
-
-    if not isinstance(start_rotation, (int, float)):
-        raise ValueError("start_rotation must be an integer or float")
-
-    # specify lacey mesh resolution
-    ang_mesh = mesh_resolution_3d[0]
-    rad_mesh = mesh_resolution_3d[1]
-    z_mesh = mesh_resolution_3d[2]
-
-    # sim.mesh_resolution_3d = mesh_resolution_3d
-
-    # determine the radius of the cylinder mesh
+    # Determine the radius of the cylinder mesh
     x_radii = abs(cylinder_data.bounds[1] - cylinder_data.bounds[0])/2
     y_radii = abs(cylinder_data.bounds[3] - cylinder_data.bounds[2])/2
+    radii = max(x_radii, y_radii)
 
-    # calculate the radial increments of the lacey meshing depending on a chosen constant
+    # Define the mesh bounds linearly along the resolved container
     if mesh_constant == "radius":
-        radial_mesh_boundaries = np.linspace(0, max(x_radii, y_radii), rad_mesh + 1)
-
+        radial_bounds = np.linspace(0, radii, rad_mesh + 1)
     elif mesh_constant == "volume":
-        max_radii_squared = max(x_radii, y_radii)**2
-        radial_mesh_boundaries = np.sqrt(
-            np.linspace(0, max_radii_squared, rad_mesh + 1)
-            )
-        
+        radial_bounds = np.sqrt(np.linspace(0, radii**2, rad_mesh + 1))
     else:
-        raise("Invalid mesh constant")
+        raise ValueError("Invalid mesh constant")
 
-    # calculate linearly spaced z mesh boundaries
-    z_mesh_boundaries = np.linspace(cylinder_data.bounds[4], 
-                                    cylinder_data.bounds[5], 
-                                    z_mesh + 1)
+    z_bounds = np.linspace(cylinder_data.bounds[4], 
+                           cylinder_data.bounds[5], 
+                           z_mesh + 1)
 
-    # calculate linearly spaced angular mesh boundaries
-    angular_mesh_boundaries = np.linspace(0, 2*np.pi, ang_mesh + 1)
-
-    # sim.mesh_bounds_3d_cylinder = (angular_mesh_boundaries, 
-    #                                 radial_mesh_boundaries, z_mesh_boundaries)
+    angular_bounds = np.linspace(0, 2*np.pi, ang_mesh + 1)
 
     x_center = cylinder_data.center[0]
     y_center = cylinder_data.center[1]
 
-    # calculate particle z positions
-    particle_z = particle_data.points[:,2]
+    particle_x_pos = particle_data.points[:,0]
+    particle_y_pos = particle_data.points[:,1]
+    particle_z_pos = particle_data.points[:,2]
 
-    # calculate particle radial positions
-    particle_radii = np.sqrt(
-        (particle_data.points[:, 0] - x_center)**2
-        + (particle_data.points[:, 1] - y_center)**2
-        )
+    # Calculate the radial position of the particles
+    particle_radial_pos = np.sqrt((particle_x_pos - x_center) ** 2
+                                  + (particle_y_pos - y_center) ** 2)
 
-    # calculate particle angular positions for x rotate by pi/6
-    resolved_angular_data = (
-        np.arctan2(
-            (particle_data.points[:,1] - y_center),
-            (particle_data.points[:,0] - x_center)
-        ) +
-        np.pi + start_rotation
-    ) % (2*np.pi)
+    # Calculate the angular position of the particles
+    resolved_angular_data = (np.arctan2(
+                                        (particle_y_pos - y_center),
+                                        (particle_x_pos - x_center)
+                                        ) 
+                            + np.pi + rotation) % (2*np.pi)
 
-    # Set up an nan list to hold particle mesh regions
-    mesh_elements = np.zeros(len(particle_data.points))
+    # Create the empty mesh elements array
+    mesh_elements = np.empty_like(particle_data.points)
     mesh_elements[:] = np.nan
 
-    # set mesh identifier counter
-    counter = 0
+    mesh_data = []
 
-    id_named_tuple = namedtuple("id_named_tuple",
-                                ["id", "ang_lower_bound", "ang_upper_bound",
-                                "rad_lower_bound", "rad_upper_bound",
-                                "z_lower_bound", "z_upper_bound"])
-    
-    id_bounds = []
+    mesh_id = 0
+    for k in range(len(z_bounds) - 1):
 
-    # Loop through the lacey mesh elements
-    for k in range(len(z_mesh_boundaries) - 1):
+        above_lower_z = particle_z_pos >= z_bounds[k]
+        below_upper_z = particle_z_pos < z_bounds[k+1]
 
-        # Particle above lower z boundary
-        above_lower_z = particle_z >= z_mesh_boundaries[k]
-        # Particle below upper z boundary
-        below_upper_z = particle_z < z_mesh_boundaries[k+1]
+        for i in range(len(radial_bounds) - 1):
 
-        for i in range(len(radial_mesh_boundaries) - 1):
+            above_lower_r = particle_radial_pos >= radial_bounds[i]
+            below_upper_r = particle_radial_pos < radial_bounds[i+1]
 
-            # Particle above lower radial boundary
-            above_lower_r = particle_radii >= radial_mesh_boundaries[i]
+            for j in range(len(angular_bounds) - 1):
 
-            # Particle below upper radial boundary
-            below_upper_r = particle_radii < radial_mesh_boundaries[i+1]
+                above_lower_angle = resolved_angular_data >= angular_bounds[j]
+                below_upper_angle = resolved_angular_data < angular_bounds[j+1]
 
-            for j in range(len(angular_mesh_boundaries) - 1):
-
-                # Particle above lower angular boundary
-                above_lower_angle = resolved_angular_data >= angular_mesh_boundaries[j]
-                # Particle below upper angular boundary
-                below_upper_angle = resolved_angular_data < angular_mesh_boundaries[j+1]
-
-                # pyvista_ndarray boolean mask outlining if a point lies within this
-                # given mesh elemnent
+                # Boolean array of particles in the mesh element
                 mesh_element = (
-                    (above_lower_z & below_upper_z) &
-                    (above_lower_r & below_upper_r) &
-                    (above_lower_angle & below_upper_angle)
+                    (above_lower_z & below_upper_z) 
+                    & (above_lower_r & below_upper_r) 
+                    & (above_lower_angle & below_upper_angle)
                 )
 
-                # Write mesh identifier to particles inside the mesh element
-                mesh_elements[mesh_element] = counter
+                # Write mesh identifier to particles inside the 
+                # mesh element
+                mesh_elements[mesh_element] = mesh_id
 
-                id_bounds.append(id_named_tuple(counter, angular_mesh_boundaries[j],
-                                                angular_mesh_boundaries[j+1],
-                                                radial_mesh_boundaries[i], 
-                                                radial_mesh_boundaries[i+1],
-                                                z_mesh_boundaries[k], z_mesh_boundaries[k+1])
-                )
-
-                counter += 1
-
-    mesh_column = "3D_cylinder_mesh"
+                # Store the mesh element id, bounds and number of 
+                # particles
+                mesh_data.append((mesh_id, radial_bounds[i],
+                                  radial_bounds[i+1], angular_bounds[j],
+                                  angular_bounds[j+1], z_bounds[k],
+                                  z_bounds[k+1], sum(mesh_element)))
+                
+                mesh_id += 1
+    
+    mesh_df = pd.DataFrame(mesh_data, columns=["mesh id", "radial_lower_bound",
+                                               "radial_upper_bound",
+                                               "angular_lower_bound",
+                                               "angular_upper_bound",
+                                               "z_lower_bound",
+                                               "z_upper_bound",
+                                               "n_particles"])
+    
+    # Add the mesh elements to the particle data
     particle_data[mesh_column] = mesh_elements
 
+    # Count the number of particles in and out of the mesh elements
     out_of_mesh_particles = sum(np.isnan(mesh_elements))
     in_mesh_particles = len(mesh_elements) - out_of_mesh_particles
 
-    return (particle_data, cylinder_data, id_bounds, mesh_column, 
+    return (particle_data, mesh_column, mesh_df, 
             in_mesh_particles, out_of_mesh_particles)

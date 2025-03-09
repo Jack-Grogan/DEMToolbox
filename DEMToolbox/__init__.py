@@ -1,4 +1,3 @@
-from DEMToolbox.classes.process_simulation_timestep import ProcessSimulationTimestep
 import DEMToolbox.meshing
 import DEMToolbox.mixing
 import DEMToolbox.segregation
