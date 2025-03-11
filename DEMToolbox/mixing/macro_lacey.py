@@ -77,18 +77,18 @@ def macro_scale_lacey_mixing(particle_data, split_column, mesh_column,
         return unedited particle data and a lacey of NaN.
     """
     if particle_data.n_points == 0:
-        warnings.warn("Cannot calculate Lacey mixing index "
-                      "for empty particle file", UserWarning)
+        warnings.warn(("Cannot calculate Lacey mixing index "
+                      "for empty particle file"), UserWarning)
         return particle_data, np.nan, cell_conc_column
     
     if split_column not in particle_data.point_data.keys():
-        warnings.warn(f"{split_column} not found in particle file, "
-                      "returning NaN", UserWarning)
+        warnings.warn((f"{split_column} not found in particle file, "
+                      "returning NaN"), UserWarning)
         return particle_data, np.nan, cell_conc_column
     
     if mesh_column not in particle_data.point_data.keys():
-        warnings.warn(f"{mesh_column} not found in particle file, "
-                      "returning NaN", UserWarning)
+        warnings.warn((f"{mesh_column} not found in particle file, "
+                      "returning NaN"), UserWarning)
         return particle_data, np.nan, cell_conc_column
 
     if len(np.unique(particle_data[split_column])) != 2:
@@ -113,11 +113,11 @@ def macro_scale_lacey_mixing(particle_data, split_column, mesh_column,
         mesh_boolean_mask = mesh == ids
         mesh_id_booleans.append(mesh_boolean_mask)
 
-    class_0_mesh_volume = np.zeros_like(mesh_ids)
-    class_1_mesh_volume = np.zeros_like(mesh_ids)
-    total_mesh_volume = np.zeros_like(mesh_ids)
+    class_0_mesh_volume = np.zeros(len(mesh_ids))
+    class_1_mesh_volume = np.zeros(len(mesh_ids))
+    total_mesh_volume = np.zeros(len(mesh_ids))
 
-    particles_concentration = np.empty_like(particle_data.points)
+    particles_concentration = np.empty(particle_data.n_points)
     particles_concentration[:] = np.nan
 
     for i, mesh_element in enumerate(mesh_id_booleans):
@@ -168,7 +168,7 @@ def macro_scale_lacey_mixing(particle_data, split_column, mesh_column,
     elif sum(class_0_mesh_volume) == 0 or sum(class_1_mesh_volume) == 0:
         warnings.warn(
             (f"Only one particle type present in the mesh at this timestep."
-            "Setting Lacey to NaN."),
+            " Setting Lacey to NaN."),
             UserWarning,
         )
         lacey = np.nan
@@ -213,7 +213,6 @@ def macro_scale_lacey_mixing(particle_data, split_column, mesh_column,
                   / (mixed_variance - unmixed_variance))
 
         if verbose:
-            print((f"lacey =  {variance} - {unmixed_variance}"
-                f" / {mixed_variance} - {unmixed_variance} = {lacey}"))
-
+            print(f"Lacey mixing index: {lacey}")
+            
     return particle_data, cell_conc_column, lacey

@@ -39,3 +39,10 @@ Thumbs.db
 # __pycache__ files #
 #####################
 __pycache__
+
+# Generated example files #
+##########################
+examples/meshing_analysis/*
+examples/mixing_analysis/*
+examples/segregation_analysis/*
+examples/velocity_analysis/*

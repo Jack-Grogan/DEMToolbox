@@ -73,7 +73,8 @@ def velocity_vector_field(particle_data, container_data, point, mesh_vec_x,
         velocity_mag = np.zeros((resolution[1], resolution[0]))
         velocity_mag[:] = np.nan
         
-        return velocity_vectors, velocity_mag
+        return (particle_data, (mesh_column, slice_column, velocity_column,
+                velocity_vectors, velocity_mag))
 
     mesh_vec_x = np.asarray(mesh_vec_x)
     mesh_vec_y = np.asarray(mesh_vec_y)
@@ -85,11 +86,12 @@ def velocity_vector_field(particle_data, container_data, point, mesh_vec_x,
     normal = normal / np.linalg.norm(normal)
 
     # Mesh the particles in 2D
-    particle_data, mesh_column, _, _, _ = mesh_particles_2d(particle_data, 
-                                                            container_data, 
-                                                            mesh_vec_x, 
-                                                            mesh_vec_y, 
-                                                            resolution)
+    particle_data, mesh_output = mesh_particles_2d(particle_data,
+                                                  container_data, 
+                                                  mesh_vec_x, 
+                                                  mesh_vec_y, 
+                                                  resolution)
+    mesh_column = mesh_output[0]
     mesh = particle_data[mesh_column]
 
     # Slice the particles
@@ -101,12 +103,11 @@ def velocity_vector_field(particle_data, container_data, point, mesh_vec_x,
     p_slice = particle_data[slice_column]
 
     # Get the mesh ids and the number of mesh elements
-    mesh_ids = np.unique(mesh)
-    mesh_ids = mesh_ids[~np.isnan(mesh_ids)].astype(int)
-    n_mesh_elements = len(mesh_ids)
+
+    n_mesh_elements = (resolution[0] * resolution[1])
 
     mesh_id_booleans = []
-    for ids in mesh_ids:
+    for ids in range(n_mesh_elements):
         mesh_boolean_mask = mesh == ids
         mesh_id_booleans.append(mesh_boolean_mask)
 
@@ -134,11 +135,11 @@ def velocity_vector_field(particle_data, container_data, point, mesh_vec_x,
 
             resolved_velocity_vector = (mean_resolved_vec_1_velocity 
                                         * mesh_vec_x 
-                                        +mean_resolved_vec_2_velocity 
+                                        + mean_resolved_vec_2_velocity 
                                         * mesh_vec_y)
 
-            velocity_vectors[i] = np.array((mean_resolved_vec_1_velocity,
-                                             mean_resolved_vec_2_velocity))
+            velocity_vectors[i] = np.array([mean_resolved_vec_1_velocity,
+                                             mean_resolved_vec_2_velocity])
             velocity_mag[i] = np.linalg.norm([mean_resolved_vec_1_velocity, 
                                               mean_resolved_vec_2_velocity])
             cell_velocity[mesh_particles] = resolved_velocity_vector
@@ -156,9 +157,9 @@ def velocity_vector_field(particle_data, container_data, point, mesh_vec_x,
                                          / np.linalg.norm([x_vector, 
                                                            y_vector]))
 
-    velocity_mag = np.flipud(velocity_mag)
-    velocity_vectors = np.flipud(velocity_vectors)
+    # velocity_mag = np.flipud(velocity_mag)
+    # velocity_vectors = np.flipud(velocity_vectors)
     particle_data["mean_resolved_velocity"] = cell_velocity
 
-    return (particle_data, mesh_column, slice_column, velocity_column, 
-            velocity_vectors, velocity_mag)
+    return (particle_data, (mesh_column, slice_column, velocity_column, 
+            velocity_vectors, velocity_mag))

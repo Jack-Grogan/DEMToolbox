@@ -3,7 +3,7 @@ import pandas as pd
 import warnings
 
 def mesh_particles_3d(particle_data, container_data, vector_1, 
-                      vector_2, vector_3, resolution, column_name="3D_mesh"):
+                      vector_2, vector_3, resolution, mesh_column="3D_mesh"):
     """Split the particles into a 3D Cartesian mesh.
 
     Split the particles into a n x m x o mesh elements linearly along the
@@ -23,7 +23,7 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
         The third mesh vector to split the particles along.
     resolution : list
         The resolution of the 3D mesh.
-    column_name : str, optional
+    mesh_column : str, optional
         The name of the mesh column in the particle data,
         by default "3D_mesh".
         
@@ -31,16 +31,12 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
     -------
     particle_data : vtkPolyData
         The particle vtk with the mesh column added.
-    column_name : str
-        The name of the mesh column in the particle data.
-    mesh_df : pd.DataFrame
-        A dataframe containing the mesh id, lower bound, upper bound
-        and number of particles in the mesh element.
-    in_mesh_particles : int
-        The number of particles in the mesh elements.
-    out_of_mesh_particles : int
-        The number of particles out of the mesh elements.
-
+    mesh_attributes : tuple
+        A tuple containing the mesh column, a dataframe containing the
+        mesh id, lower bound, upper bound and number of particles in the
+        mesh element, the number of particles in the mesh elements and
+        the number of particles out of the mesh elements.
+    
     Raises
     ------
     ValueError
@@ -69,7 +65,7 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
                                         "vec_3_lower_bound",
                                         "vec_3_upper_bound",
                                         "n_particles"])
-        return particle_data, mesh_df, np.nan, np.nan
+        return (particle_data, (mesh_column, mesh_df, np.nan, np.nan))
     
     if container_data.n_points == 0:
         warnings.warn("cannot mesh empty container file", UserWarning)
@@ -80,7 +76,7 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
                                         "vec_3_lower_bound",
                                         "vec_3_upper_bound",
                                         "n_particles"])
-        return particle_data, mesh_df, np.nan, np.nan
+        return (particle_data, (mesh_column, mesh_df, np.nan, np.nan))
     
     if len(vector_1) != 3 or len(vector_2) != 3 or len(vector_3) != 3:
         raise ValueError("vectors must be 3 element lists")
@@ -132,12 +128,12 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
                                     resolution[2] + 1)
     
     # Create the empty mesh elements array
-    mesh_elements = np.empty_like(particle_data.points)
+    mesh_elements = np.empty(particle_data.n_points)
     mesh_elements[:] = np.nan
 
     mesh_data = []
 
-    mesh_id = 0
+    mesh_id = int(0)
     for i in range(len(vec_3_mesh_bounds) - 1):
         
         above_lower_vec_3 = (resolved_particles_vec_3 
@@ -166,7 +162,7 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
 
                 # Assign the mesh element id to the particles 
                 # in the mesh element
-                mesh_elements[mesh_element] = mesh_id
+                mesh_elements[mesh_element] = int(mesh_id)
 
                 # Store the mesh element id, bounds and number of particles
                 mesh_data.append((mesh_id, vec_1_mesh_bounds[k],
@@ -174,7 +170,7 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
                                 vec_2_mesh_bounds[j+1], vec_3_mesh_bounds[i],
                                 vec_3_mesh_bounds[i+1], sum(mesh_element)))
                 
-                mesh_id += 1
+                mesh_id += int(1)
 
     mesh_df = pd.DataFrame(mesh_data, columns=["mesh id", "vec_1_lower_bound",
                                                "vec_1_upper_bound",
@@ -185,11 +181,13 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
                                                "n_particles"])
 
     # Add the mesh elements to the particle data
-    particle_data[column_name] = mesh_elements
+    particle_data[mesh_column] = mesh_elements
 
     # Count the number of particles in and out of the mesh elements
     out_of_mesh_particles = sum(np.isnan(mesh_elements))
     in_mesh_particles = len(mesh_elements) - out_of_mesh_particles
 
-    return (particle_data, column_name, mesh_df, 
-            in_mesh_particles, out_of_mesh_particles)
+    mesh_attributes = (mesh_column, mesh_df, in_mesh_particles,
+                       out_of_mesh_particles)
+
+    return (particle_data, mesh_attributes)

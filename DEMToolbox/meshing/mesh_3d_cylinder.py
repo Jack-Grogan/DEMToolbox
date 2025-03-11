@@ -31,16 +31,12 @@ def mesh_particles_3d_cylinder(particle_data, cylinder_data,
     -------
     particle_data : vtkPolyData
         The particle vtk with the mesh column added.
-    mesh_column : str
-        The name of the mesh column in the particle data.
-    mesh_df : pd.DataFrame
-        A dataframe containing the mesh id, lower bound, upper bound
-        and number of particles in the mesh element.
-    in_mesh_particles : int
-        The number of particles in the mesh elements.
-    out_of_mesh_particles : int
-        The number of particles out of the mesh elements.
-
+    mesh_attributes : tuple
+        A tuple containing the mesh column, a dataframe containing the
+        mesh id, lower bound, upper bound and number of particles in the
+        mesh element, the number of particles in the mesh elements and
+        the number of particles out of the mesh elements.
+    
     Raises
     ------
     ValueError
@@ -69,7 +65,7 @@ def mesh_particles_3d_cylinder(particle_data, cylinder_data,
                                         "z_lower_bound",
                                         "z_upper_bound",
                                         "n_particles"])
-        return particle_data, mesh_df, np.nan, np.nan
+        return (particle_data, (mesh_column, mesh_df, np.nan, np.nan))
     
     if cylinder_data.n_points == 0:
         warnings.warn("cannot mesh empty container file", UserWarning)
@@ -80,7 +76,7 @@ def mesh_particles_3d_cylinder(particle_data, cylinder_data,
                                         "z_lower_bound",
                                         "z_upper_bound",
                                         "n_particles"])
-        return particle_data, mesh_df, np.nan, np.nan
+        return (particle_data, (mesh_column, mesh_df, np.nan, np.nan))
     
     if len(resolution) != 3:
         raise ValueError("resolution must be a list of 3 integers")
@@ -133,12 +129,12 @@ def mesh_particles_3d_cylinder(particle_data, cylinder_data,
                             + np.pi + rotation) % (2*np.pi)
 
     # Create the empty mesh elements array
-    mesh_elements = np.empty_like(particle_data.points)
+    mesh_elements = np.empty(particle_data.n_points)
     mesh_elements[:] = np.nan
 
     mesh_data = []
 
-    mesh_id = 0
+    mesh_id = int(0)
     for k in range(len(z_bounds) - 1):
 
         above_lower_z = particle_z_pos >= z_bounds[k]
@@ -163,7 +159,7 @@ def mesh_particles_3d_cylinder(particle_data, cylinder_data,
 
                 # Write mesh identifier to particles inside the 
                 # mesh element
-                mesh_elements[mesh_element] = mesh_id
+                mesh_elements[mesh_element] = int(mesh_id)
 
                 # Store the mesh element id, bounds and number of 
                 # particles
@@ -172,7 +168,7 @@ def mesh_particles_3d_cylinder(particle_data, cylinder_data,
                                   angular_bounds[j+1], z_bounds[k],
                                   z_bounds[k+1], sum(mesh_element)))
                 
-                mesh_id += 1
+                mesh_id += int(1)
     
     mesh_df = pd.DataFrame(mesh_data, columns=["mesh id", "radial_lower_bound",
                                                "radial_upper_bound",
@@ -189,5 +185,7 @@ def mesh_particles_3d_cylinder(particle_data, cylinder_data,
     out_of_mesh_particles = sum(np.isnan(mesh_elements))
     in_mesh_particles = len(mesh_elements) - out_of_mesh_particles
 
-    return (particle_data, mesh_column, mesh_df, 
-            in_mesh_particles, out_of_mesh_particles)
+    mesh_attributes = (mesh_column, mesh_df, 
+                       in_mesh_particles, out_of_mesh_particles)
+
+    return (particle_data, mesh_attributes)
