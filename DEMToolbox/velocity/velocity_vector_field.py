@@ -1,8 +1,9 @@
 import numpy as np
 import warnings
 
-from DEMToolbox.meshing import mesh_particles_2d
-from DEMToolbox.meshing import particle_slice
+from ..meshing.mesh_2d import mesh_particles_2d
+from ..meshing.slice import particle_slice
+from ..classes.velocity_class import VelocityField
 
 def velocity_vector_field(particle_data, container_data, point, mesh_vec_x, 
                           mesh_vec_y, resolution, plane_thickness, 
@@ -48,22 +49,23 @@ def velocity_vector_field(particle_data, container_data, point, mesh_vec_x,
     -------
     particle_data : vtkPolyData
         The particle vtk with the velocity column added.
-    mesh_column : str
-        The name of the mesh column in the particle data.
-    slice_column : str
-        The name of the slice column in the particle data.
-    velocity_column : str
-        The name of the velocity column in the particle data.
-    velocity_vectors : np.ndarray
-        The velocity vectors of the mesh elements in the form
-        [n, m, 2]. n is the number of rows and m is the number
-        of columns. n = 0 represents the top row and m = 0 
-        represents the left column.
-    velocity_mag : np.ndarray
-        The magnitude of the velocity vectors of the mesh elements
-        in the form [n, m]. n is the number of rows and m is the
-        number of columns. n = 0 represents the top row and m = 0
-        represents the left column.
+    velocity_field : VelocityField
+        A velocity field object containing the mesh column, the slice
+        column, the velocity column, the velocity vectors and the
+        velocity magnitude.
+
+    Raises
+    ------
+    ValueError
+        If point, mesh_vec_x or mesh_vec_y are not 3 element lists.
+    ValueError
+        If resolution is not a 2 element list.
+    ValueError
+        If plane_thickness is not an integer or float.
+    UserWarning
+        If the particle data has no points return unedited
+        particle data and nan matrices for velocity vectors and velocity
+        magnitude.
     """
     if particle_data.n_points == 0:
         warnings.warn("cannot mesh empty particles file", UserWarning)
@@ -72,9 +74,12 @@ def velocity_vector_field(particle_data, container_data, point, mesh_vec_x,
         velocity_vectors[:] = np.nan
         velocity_mag = np.zeros((resolution[1], resolution[0]))
         velocity_mag[:] = np.nan
+
+        velocity_field = VelocityField(mesh_column, slice_column, 
+                                       velocity_column, velocity_vectors,
+                                       velocity_mag)
         
-        return (particle_data, (mesh_column, slice_column, velocity_column,
-                velocity_vectors, velocity_mag))
+        return (particle_data, velocity_field)
 
     mesh_vec_x = np.asarray(mesh_vec_x)
     mesh_vec_y = np.asarray(mesh_vec_y)
@@ -86,26 +91,21 @@ def velocity_vector_field(particle_data, container_data, point, mesh_vec_x,
     normal = normal / np.linalg.norm(normal)
 
     # Mesh the particles in 2D
-    particle_data, mesh_output = mesh_particles_2d(particle_data,
-                                                  container_data, 
-                                                  mesh_vec_x, 
-                                                  mesh_vec_y, 
-                                                  resolution)
-    mesh_column = mesh_output[0]
-    mesh = particle_data[mesh_column]
+    particle_data, mesh_2d = mesh_particles_2d(particle_data,
+                                            container_data, 
+                                            mesh_vec_x, 
+                                            mesh_vec_y, 
+                                            resolution)
+    mesh = particle_data[mesh_2d.name]
 
     # Slice the particles
-    particle_data, slice_column = particle_slice(particle_data, 
-                                                 point, 
-                                                 normal, 
-                                                 plane_thickness,
-                                                 slice_column)
-    p_slice = particle_data[slice_column]
-
-    # Get the mesh ids and the number of mesh elements
+    particle_data, p_slice = particle_slice(particle_data, 
+                                                   point, 
+                                                   normal, 
+                                                   plane_thickness,
+                                                   slice_column)
 
     n_mesh_elements = (resolution[0] * resolution[1])
-
     mesh_id_booleans = []
     for ids in range(n_mesh_elements):
         mesh_boolean_mask = mesh == ids
@@ -121,7 +121,7 @@ def velocity_vector_field(particle_data, container_data, point, mesh_vec_x,
 
     for i, mesh_element in enumerate(mesh_id_booleans):
 
-        mesh_particles = (p_slice & mesh_element).astype(bool)
+        mesh_particles = (particle_data[p_slice.name] & mesh_element).astype(bool)
 
         if sum(mesh_particles) > 10:
 
@@ -161,5 +161,8 @@ def velocity_vector_field(particle_data, container_data, point, mesh_vec_x,
     # velocity_vectors = np.flipud(velocity_vectors)
     particle_data["mean_resolved_velocity"] = cell_velocity
 
-    return (particle_data, (mesh_column, slice_column, velocity_column, 
-            velocity_vectors, velocity_mag))
+    velocity_field = VelocityField(mesh_column, slice_column,
+                                   velocity_column, velocity_vectors,
+                                   velocity_mag)
+
+    return (particle_data, velocity_field)

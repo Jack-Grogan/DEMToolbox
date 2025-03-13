@@ -44,15 +44,15 @@ for i, particle_file in enumerate(tqdm(files)):
     cylinder_data = pv.read(cylinder_file)
 
     # Mesh the particles
-    particle_data, mesh_output = mesh_particles_1d(particle_data, 
+    particle_data, mesh = mesh_particles_1d(particle_data, 
                                                    cylinder_data, 
                                                    vector_1d, 
                                                    resolution_1d, 
                                                    mesh_column_1d)
     
-    particle_data, mesh_mean_radii_df = mean_mesh_element_radii(particle_data,
-                                                                mesh_output[0],
-                                                                mesh_output[1])
+    particle_data, mesh_mean_radii_df = mean_mesh_element_radii(particle_data, 
+                                                                mesh.name, 
+                                                                mesh.mesh_df)
     
     save_csv = os.path.join(csv_dir, f"mesh_{file_name_id}.csv")
     mesh_mean_radii_df.to_csv(save_csv, index=False)

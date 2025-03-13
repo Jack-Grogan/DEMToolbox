@@ -1,6 +1,8 @@
 import numpy as np
 import warnings
 
+from ..classes.slice_class import Slice
+
 def particle_slice(particle_data, point, normal, plane_thickness, slice_column=None):
     """Identify particles that lie within a planar slice."
 
@@ -26,8 +28,10 @@ def particle_slice(particle_data, point, normal, plane_thickness, slice_column=N
     -------
     particle_data : vtkPolyData
         The particle vtk with the slice column added.
-    slice_column : str
-        The name of the slice column in the particle data.
+    particle_slice : Slice
+        A slice object containing the slice column, the number of
+        particles in the slice, the normal vector, the point on the
+        plane and the plane thickness
 
     Raises
     ------
@@ -41,7 +45,9 @@ def particle_slice(particle_data, point, normal, plane_thickness, slice_column=N
     """
     if particle_data.n_points == 0:
         warnings.warn("cannot slice empty particles file", UserWarning)
-        return particle_data, None
+        particle_slice = Slice(slice_column, 0, 0, 
+                               normal, point, plane_thickness)
+        return particle_data, particle_slice
     
     if len(point) != 3 or len(normal) != 3:
         raise ValueError("point and normal must be 3 element lists")
@@ -71,4 +77,11 @@ def particle_slice(particle_data, point, normal, plane_thickness, slice_column=N
     slice_boolean_mask = bottom_plane & top_plane
     particle_data[slice_column] = slice_boolean_mask.astype(int)
 
-    return particle_data, slice_column
+    n_inside_particles = np.sum(slice_boolean_mask)
+    n_outside_particles = np.sum(~slice_boolean_mask)
+
+    particle_slice = Slice(slice_column, n_inside_particles, 
+                           n_outside_particles, normal, point, 
+                           plane_thickness)
+    
+    return particle_data, particle_slice

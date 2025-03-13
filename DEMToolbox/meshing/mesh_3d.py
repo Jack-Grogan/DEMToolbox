@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import warnings
 
+from ..classes.mesh_class import Mesh
+
 def mesh_particles_3d(particle_data, container_data, vector_1, 
                       vector_2, vector_3, resolution, mesh_column="3D_mesh"):
     """Split the particles into a 3D Cartesian mesh.
@@ -31,12 +33,14 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
     -------
     particle_data : vtkPolyData
         The particle vtk with the mesh column added.
-    mesh_attributes : tuple
-        A tuple containing the mesh column, a dataframe containing the
-        mesh id, lower bound, upper bound and number of particles in the
-        mesh element, the number of particles in the mesh elements and
-        the number of particles out of the mesh elements.
-    
+    mesh : Mesh
+        A mesh object containing the mesh column, a list of mesh 
+        elements, a list of occupied mesh elements, the number of 
+        particles in the mesh elements, the number of particles out 
+        of the mesh elements and a dataframe containing the mesh id, 
+        lower bound, upper bound and number of particles in the mesh 
+        element.
+
     Raises
     ------
     ValueError
@@ -50,11 +54,11 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
     UserWarning
         If the particle data has no points return unedited
         particle data an empty mesh dataframe and nan for
-        in_mesh_particles and out_of_mesh_particles.
+        n_meshed_particles and n_unmeshed_particles.
     UserWarning
         If the container data has no points return unedited
         particle data an empty mesh dataframe and nan for
-        in_mesh_particles and out_of_mesh_particles.
+        n_meshed_particles and n_unmeshed_particles.
     """
     if particle_data.n_points == 0:
         warnings.warn("cannot mesh empty particles file", UserWarning)
@@ -65,7 +69,8 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
                                         "vec_3_lower_bound",
                                         "vec_3_upper_bound",
                                         "n_particles"])
-        return (particle_data, (mesh_column, mesh_df, np.nan, np.nan))
+        mesh = Mesh(mesh_column, [], [], 0, 0, mesh_df)
+        return (particle_data, mesh)
     
     if container_data.n_points == 0:
         warnings.warn("cannot mesh empty container file", UserWarning)
@@ -76,7 +81,8 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
                                         "vec_3_lower_bound",
                                         "vec_3_upper_bound",
                                         "n_particles"])
-        return (particle_data, (mesh_column, mesh_df, np.nan, np.nan))
+        mesh = Mesh(mesh_column, [], [], 0, 0, mesh_df)
+        return (particle_data, mesh)
     
     if len(vector_1) != 3 or len(vector_2) != 3 or len(vector_3) != 3:
         raise ValueError("vectors must be 3 element lists")
@@ -131,6 +137,8 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
     mesh_elements = np.empty(particle_data.n_points)
     mesh_elements[:] = np.nan
 
+    cells = []
+    occupied_cells = []
     mesh_data = []
 
     mesh_id = int(0)
@@ -164,6 +172,10 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
                 # in the mesh element
                 mesh_elements[mesh_element] = int(mesh_id)
 
+                cells.append(mesh_id)
+                if sum(mesh_element) > 0:
+                    occupied_cells.append(mesh_id)
+
                 # Store the mesh element id, bounds and number of particles
                 mesh_data.append((mesh_id, vec_1_mesh_bounds[k],
                                 vec_1_mesh_bounds[k+1], vec_2_mesh_bounds[j],
@@ -184,10 +196,10 @@ def mesh_particles_3d(particle_data, container_data, vector_1,
     particle_data[mesh_column] = mesh_elements
 
     # Count the number of particles in and out of the mesh elements
-    out_of_mesh_particles = sum(np.isnan(mesh_elements))
-    in_mesh_particles = len(mesh_elements) - out_of_mesh_particles
+    n_unmeshed_particles = sum(np.isnan(mesh_elements))
+    n_meshed_particles = len(mesh_elements) - n_unmeshed_particles
 
-    mesh_attributes = (mesh_column, mesh_df, in_mesh_particles,
-                       out_of_mesh_particles)
+    mesh = Mesh(mesh_column, cells, occupied_cells, n_meshed_particles,
+                n_unmeshed_particles, mesh_df)
 
-    return (particle_data, mesh_attributes)
+    return (particle_data, mesh)

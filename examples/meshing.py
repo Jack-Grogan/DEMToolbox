@@ -68,45 +68,40 @@ for particle_file in tqdm(files):
     cylinder_data = pv.read(cylinder_file)
 
     # Mesh the particles 1D
-    particle_data, output_1d = mesh_particles_1d(particle_data, cylinder_data,
-                                                 vector_1d, resolution_1d, 
-                                                 mesh_column_1d)
-    mesh_df_1d = output_1d[1]
-    in_mesh_particles_1d = output_1d[2]
-    out_of_mesh_particles_1d = output_1d[3]
-    in_out_mesh_1d.append([in_mesh_particles_1d, out_of_mesh_particles_1d])
+    particle_data, mesh_1d = mesh_particles_1d(particle_data, cylinder_data,
+                                               vector_1d, resolution_1d, 
+                                               mesh_column_1d)
+
+    in_out_mesh_1d.append([mesh_1d.n_meshed_particles, 
+                           mesh_1d.n_unmeshed_particles])
 
     # Mesh the particles 2D
-    particle_data, output_2d = mesh_particles_2d(particle_data, cylinder_data, 
-                                                 vector_1_2d, vector_2_2d, 
-                                                 resolution_2d, mesh_column_2d)
-    mesh_df_2d = output_2d[1]
-    in_mesh_particles_2d = output_2d[2]
-    out_of_mesh_particles_2d = output_2d[3]
-    in_out_mesh_2d.append([in_mesh_particles_2d, out_of_mesh_particles_2d])
+    particle_data, mesh_2d = mesh_particles_2d(particle_data, cylinder_data, 
+                                               vector_1_2d, vector_2_2d, 
+                                               resolution_2d, mesh_column_2d)
+    
+    in_out_mesh_2d.append([mesh_2d.n_meshed_particles,
+                           mesh_2d.n_unmeshed_particles])
 
     # Mesh the particles 3D
-    particle_data, output_3d = mesh_particles_3d(particle_data, cylinder_data, 
-                                                 vector_1_3d, vector_2_3d, 
-                                                 vector_3_3d, resolution_3d,
-                                                 mesh_column_3d)
-    mesh_df_3d = output_3d[1]
-    in_mesh_particles_3d = output_3d[2]
-    out_of_mesh_particles_3d = output_3d[3]
-    in_out_mesh_3d.append([in_mesh_particles_3d, out_of_mesh_particles_3d])
-
+    particle_data, mesh_3d = mesh_particles_3d(particle_data, cylinder_data, 
+                                               vector_1_3d, vector_2_3d, 
+                                               vector_3_3d, resolution_3d,
+                                               mesh_column_3d)
+    
+    in_out_mesh_3d.append([mesh_3d.n_meshed_particles,
+                           mesh_3d.n_unmeshed_particles])
+    
     # Mesh the particles 3D Cylinder
-    particle_data, output_3d_cylinder = mesh_particles_3d_cylinder(
+    particle_data, mesh_3d_cylinder = mesh_particles_3d_cylinder(
                                                     particle_data, 
                                                     cylinder_data, 
                                                     resolution_3d_cylinder, 
                                                     mesh_constant, rotation, 
                                                     mesh_column_3d_cylinder)
-    mesh_df_3d_cylinder = output_3d_cylinder[1]
-    in_mesh_particles_3d_cylinder = output_3d_cylinder[2]
-    out_of_mesh_particles_3d_cylinder = output_3d_cylinder[3]
-    in_out_mesh_3d_cylinder.append([in_mesh_particles_3d_cylinder,
-                                    out_of_mesh_particles_3d_cylinder])
+
+    in_out_mesh_3d_cylinder.append([mesh_3d_cylinder.n_meshed_particles,
+                                    mesh_3d_cylinder.n_unmeshed_particles])
     
     vtk_file = os.path.join(vtk_dir,
                             ("meshed_particles_" + file_name_id + '.vtk'))
@@ -132,9 +127,11 @@ output_3d_cylinder_df.to_csv(os.path.join(save_dir,
                                           index=False)
 
 # Save dataframes of mesh data at the end of the simulation
-mesh_df_1d.to_csv(os.path.join(save_dir, "final_mesh_df_1d.csv"), index=False)
-mesh_df_2d.to_csv(os.path.join(save_dir, "final_mesh_df_2d.csv"), index=False)
-mesh_df_3d.to_csv(os.path.join(save_dir, "final_mesh_df_3d.csv"), index=False)
-mesh_df_3d_cylinder.to_csv(os.path.join(save_dir, 
-                                        "final_mesh_df_3d_cylinder.csv"), 
-                                        index=False)
+mesh_1d.mesh_df.to_csv(
+    os.path.join(save_dir, "final_mesh_df_1d.csv"), index=False)
+mesh_2d.mesh_df.to_csv(
+    os.path.join(save_dir, "final_mesh_df_2d.csv"), index=False)
+mesh_3d.mesh_df.to_csv(
+    os.path.join(save_dir, "final_mesh_df_3d.csv"), index=False)
+mesh_3d_cylinder.mesh_df.to_csv(
+    os.path.join(save_dir, "final_mesh_df_3d_cylinder.csv"), index=False)

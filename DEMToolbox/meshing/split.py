@@ -1,6 +1,8 @@
 import numpy as np
 import warnings
 
+from ..classes.split_class import Split
+
 def split_particles(particle_data, split_dimension):
     """Split the particles into two classes based on a dimension."
 
@@ -17,8 +19,9 @@ def split_particles(particle_data, split_dimension):
 
     Returns
     -------
-    split_array : np.ndarray
-        An array containing the particle id and the class.
+    split : Split
+        A split object containing the split dimension and an array
+        of particle ids and class.
 
     Raises
     ------
@@ -29,7 +32,8 @@ def split_particles(particle_data, split_dimension):
     """
     if particle_data.n_points == 0:
         warnings.warn("cannot split empty particles file", UserWarning)
-        return np.array([])
+        split = Split(np.asarray([[None, None]]), split_dimension)
+        return split
 
     if split_dimension == "x":
         split_class  = np.asarray(particle_data.points[:, 0]
@@ -64,5 +68,7 @@ def split_particles(particle_data, split_dimension):
 
     split_array = np.asarray([[i,j] for i, j in zip(particle_data["id"], 
                                                     split_class)])
+    
+    split = Split(split_array, split_dimension)
 
-    return split_array
+    return split
