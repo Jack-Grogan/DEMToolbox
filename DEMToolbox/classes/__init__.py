@@ -1,4 +1,2 @@
-from .mesh_class import Mesh
-from .velocity_class import VelocityField
-from .slice_class import Slice
-from .split_class import Split
+from .particle_attribute import ParticleAttribute
+from .particle_samples import ParticleSamples
