@@ -4,9 +4,6 @@ from natsort import natsorted
 from tqdm import tqdm
 import re
 import os
-import sys
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from DEMToolbox.particle_sampling import mesh_particles_1d
 from DEMToolbox.mixing import mean_mesh_element_radii

@@ -1,9 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-import sys
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from DEMToolbox.mixing import lacey_mixing_curve_fit
 

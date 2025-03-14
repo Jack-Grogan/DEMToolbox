@@ -1,7 +1,4 @@
 import os
-import sys
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from DEMToolbox.particle_sampling import sample_3d_cylinder
 from DEMToolbox.particle_attributes import split_particles
