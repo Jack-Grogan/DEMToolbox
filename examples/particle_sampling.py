@@ -3,11 +3,11 @@ import sys
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from DEMToolbox.particle_sampling import sample_1d 
-from DEMToolbox.particle_sampling import sample_2d
-from DEMToolbox.particle_sampling import sample_2d_slice
-from DEMToolbox.particle_sampling import sample_3d
-from DEMToolbox.particle_sampling import sample_3d_cylinder
+from DEMToolkit.particle_sampling import sample_1d 
+from DEMToolkit.particle_sampling import sample_2d
+from DEMToolkit.particle_sampling import sample_2d_slice
+from DEMToolkit.particle_sampling import sample_3d
+from DEMToolkit.particle_sampling import sample_3d_cylinder
 
 from natsort import natsorted
 import glob
