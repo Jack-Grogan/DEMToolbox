@@ -3,10 +3,10 @@ import sys
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from DEMToolkit.particle_sampling import sample_3d_cylinder
-from DEMToolkit.particle_attributes import split_particles
-from DEMToolkit.utilities import append_attribute
-from DEMToolkit.mixing import macro_scale_lacey_mixing
+from DEMToolbox.particle_sampling import sample_3d_cylinder
+from DEMToolbox.particle_attributes import split_particles
+from DEMToolbox.utilities import append_attribute
+from DEMToolbox.mixing import macro_scale_lacey_mixing
 
 from natsort import natsorted
 import glob

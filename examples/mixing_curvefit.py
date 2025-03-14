@@ -5,7 +5,7 @@ import sys
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from DEMToolkit.mixing import lacey_mixing_curve_fit
+from DEMToolbox.mixing import lacey_mixing_curve_fit
 
 
 def plot_fit(x, y, fit_x, fit_y, popt, r2, dimension, save_path):

@@ -10,7 +10,7 @@ import sys
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from DEMToolkit.velocity import velocity_vector_field
+from DEMToolbox.velocity import velocity_vector_field
 
 # Mesh 2D
 vector_1 = [0, 1, 0]
