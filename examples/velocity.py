@@ -6,9 +6,6 @@ import numpy as np
 from tqdm import tqdm
 import re
 import os
-import sys
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from DEMToolbox.velocity import velocity_vector_field
 
