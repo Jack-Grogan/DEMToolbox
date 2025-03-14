@@ -1,1 +1,1 @@
-from .append_column import append_on_id
+from .append_attribute import append_attribute

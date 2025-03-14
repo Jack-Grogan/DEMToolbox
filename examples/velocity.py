@@ -52,9 +52,17 @@ for i, particle_file in enumerate(tqdm(files)):
     particle_data = pv.read(particle_file)
     cylinder_data = pv.read(cylinder_file)
 
-    particle_data, velocity = velocity_vector_field(particle_data, cylinder_data, 
-                                                point, vector_1, vector_2, 
-                                                resolution, plane_thickness)
+    particle_data, velocity = velocity_vector_field(particle_data, 
+                                                    cylinder_data, 
+                                                    point, 
+                                                    vector_1, 
+                                                    vector_2, 
+                                                    plane_thickness,
+                                                    resolution, 
+                                                    )
+    
+    mags = velocity[0]
+    vecs = velocity[1]
     
     save_vtk = os.path.join(
         vtk_dir,("velocity_" + os.path.basename(particle_file)))
@@ -81,12 +89,12 @@ for i, particle_file in enumerate(tqdm(files)):
     ax.set_title(f"Velocity Vector Field")
     ax.set_aspect('equal')
 
-    if not np.isnan(velocity.velocity_magnitude).all(): 
+    if not np.isnan(mags).all(): 
 
-        X = np.linspace(-0.03, 0.03, 2 * np.shape(velocity.velocity_vectors)[1] + 1)[1:-1:2]
-        Y = np.linspace(0, 0.08, 2 * np.shape(velocity.velocity_vectors)[0] + 1)[1:-1:2]
-        U = velocity.velocity_vectors[:,:,0]
-        V = velocity.velocity_vectors[:,:,1]
+        X = np.linspace(-0.03, 0.03, 2 * np.shape(vecs)[1] + 1)[1:-1:2]
+        Y = np.linspace(0, 0.08, 2 * np.shape(vecs)[0] + 1)[1:-1:2]
+        U = vecs[:,:,0]
+        V = vecs[:,:,1]
 
         q = ax.quiver(X, Y, U, V, units='width', pivot='mid', angles='xy')
 
@@ -95,8 +103,8 @@ for i, particle_file in enumerate(tqdm(files)):
         ymin = 0
         ymax = 0.08
 
-    im = ax.imshow(np.flipud(velocity.velocity_magnitude), cmap='viridis', 
-                extent=[xmin, xmax, ymin, ymax], vmin=0, vmax=0.5)
+    im = ax.imshow(np.flipud(mags), cmap='viridis', 
+                   extent=[xmin, xmax, ymin, ymax], vmin=0, vmax=0.5)
 
 
     fig.colorbar(im, orientation='vertical', label='Velocity Magnitude (m/s)')

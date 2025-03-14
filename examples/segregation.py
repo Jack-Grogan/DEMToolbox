@@ -8,8 +8,8 @@ import sys
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from DEMToolbox.meshing import mesh_particles_1d
-from DEMToolbox.segregation import mean_mesh_element_radii
+from DEMToolbox.particle_sampling import mesh_particles_1d
+from DEMToolbox.mixing import mean_mesh_element_radii
 
 # Mesh 1D
 vector_1d = [0, 0, 1]

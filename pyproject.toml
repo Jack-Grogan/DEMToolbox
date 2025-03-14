@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "DEMToolbox"
+version = "0.0.1"
+authors = [
+  { name="Jack R Grogan", email="***REMOVED***" },
+]
+maintainers = [
+  { name="Jack R Grogan", email="***REMOVED***" },
+]
+description = "A set of tools for post processing DEM Simulation data."
+keywords = ["DEM", "Post Processing", "Simulation"]
+license = {file = "LICENSE.txt"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy >= 2.2.0",
+    "pandas >= 2.2.0",
+    "scipy >= 1.15.0",
+    "scikit-learn >= 1.6.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+]
+
+
+[project.optional-dependencies]
+dependencies = [
+    "matplotlib >= 3.10.0",
+    "natsort >= 8.4.0",
+    "tqdm >= 4.67.0",
+    "pyvista >= 0.44.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Jack-Grogan/DEMToolbox/"
+Issues = "https://github.com/Jack-Grogan/DEMToolbox/issues"

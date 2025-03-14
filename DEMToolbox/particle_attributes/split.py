@@ -1,10 +1,11 @@
 import numpy as np
 import warnings
 
-from ..classes.split_class import Split
+from ..classes.particle_attribute import ParticleAttribute
 
-def split_particles(particle_data, split_dimension):
-    """Split the particles into two classes based on a dimension."
+def split_particles(particle_data, split_dimension, 
+                    field_column="id", attribute_column=None):
+    """Split the particles into two classes based on a dimension.
 
     Split the particles into two classes along a dimension. The 
     dimension can be x, y, z, r or radius. The particles are split into
@@ -15,24 +16,34 @@ def split_particles(particle_data, split_dimension):
     particle_data : vtkPolyData
         The particle vtk.
     split_dimension : str
-        The dimension to split the particles along.
+        The dimension to split the particles along. Can be x, y, z, r or
+        radius.
+    field_column : str, optional
+        The name of the field column in the particle data, by default "id".
+    attribute_column : str, optional
+        The name of the attribute column in the particle data, by default
+        None. If None, the column name will be "{split_dimension}_class".
 
     Returns
     -------
-    split : Split
-        A split object containing the split dimension and an array
-        of particle ids and class.
+    particle_data : vtkPolyData
+        The particle vtk with the attribute column added.
+    split : ParticleAttribute
+        A particle attribute object containing the field column, the 
+        attribute column and the split array.
 
     Raises
     ------
     ValueError
-        If split_dimension is not x, y, z, r or radius.
+        If split_dimension is not a recognised split dimension.
     UserWarning
-        If the particle data has no points return an empty array.
+        If the particle data has no points return nan for split array.
     """
     if particle_data.n_points == 0:
-        warnings.warn("cannot split empty particles file", UserWarning)
-        split = Split(np.asarray([[None, None]]), split_dimension)
+        warnings.warn("Cannot split empty particles file", UserWarning)
+        split = ParticleAttribute(field_column, 
+                                  attribute_column, 
+                                  [[None, None]])
         return split
 
     if split_dimension == "x":
@@ -50,11 +61,10 @@ def split_particles(particle_data, split_dimension):
     elif split_dimension == "r":
         median_r2 = np.median(particle_data.points[:, 0] ** 2 
                               + particle_data.points[:, 1] ** 2)
-        
         settled_r2 = (particle_data.points[:, 0] ** 2 
                       + particle_data.points[:, 1] ** 2)
-        
         split_class  = np.asarray(settled_r2 >= median_r2).astype(int)
+
     elif split_dimension == "radius":
         radii = np.unique(particle_data["radius"])
         split_class = np.zeros(particle_data.n_points)
@@ -62,13 +72,20 @@ def split_particles(particle_data, split_dimension):
         for i, radius in enumerate(radii):
             boolean_mask = [particle_data["radius"] == radius]
             split_class[boolean_mask] = i
+
     else:
         raise ValueError(
             f"{split_dimension} is not a recognised split dimension")
-
-    split_array = np.asarray([[i,j] for i, j in zip(particle_data["id"], 
-                                                    split_class)])
     
-    split = Split(split_array, split_dimension)
+    if attribute_column is None:
+        attribute_column = split_dimension + "_class"
 
-    return split
+    particle_data[attribute_column] = split_class
+
+    split_array = np.asarray([[i,j] for i, j in 
+                              zip(particle_data[field_column], 
+                              split_class)])
+    
+    split = ParticleAttribute(field_column, attribute_column, split_array)
+
+    return particle_data, split

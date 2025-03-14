@@ -1,2 +1,2 @@
 # DEMToolbox
-Tools for post processing of DEM vtk outputs
+## Post Processing Tools for Analysis of DEM Simulations

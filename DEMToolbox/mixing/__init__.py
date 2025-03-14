@@ -1,1 +1,2 @@
-from .macro_lacey import macro_scale_lacey_mixing
+from .lacey_mixing_index import macro_scale_lacey_mixing
+from .lacey_mixing import lacey_mixing_curve, lacey_mixing_curve_fit
