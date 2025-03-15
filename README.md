@@ -3,3 +3,8 @@
 # DEMToolbox
 ## Post Processing Tools for Analysis of DEM Simulations
 
+## Installation
+
+```zsh
+pip install git+https://github.com/Jack-Grogan/DEMToolbox/
+```
