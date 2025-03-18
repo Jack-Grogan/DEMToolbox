@@ -65,7 +65,7 @@ for particle_file in tqdm(files):
     split_lacey = []
     for split in splits:
         particle_data = append_attribute(particle_data, split)
-        particle_data, _, lacey = macro_scale_lacey_mixing(
+        particle_data, lacey = macro_scale_lacey_mixing(
                                                 particle_data, split, samples)
         split_lacey.append(lacey)
         
