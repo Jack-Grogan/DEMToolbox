@@ -46,3 +46,4 @@ examples/sample_analysis/*
 examples/mixing_analysis/*
 examples/segregation_analysis/*
 examples/velocity_analysis/*
+examples/mixing_rate_analysis/*

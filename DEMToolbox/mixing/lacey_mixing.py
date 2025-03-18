@@ -131,7 +131,7 @@ def lacey_mixing_curve_fit(time, m, t0=0, tend=None):
     t0 : int or float
         The time at which mixing begins by default 0.
     tend : int or float, optional
-        The time at which mixing ends, by default None. If None, the
+        The time at which mixing ends, by default None. If None, then
         all the time data from the start time will be used.
 
     Returns

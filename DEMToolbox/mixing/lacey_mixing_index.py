@@ -146,6 +146,10 @@ def macro_scale_lacey_mixing(particle_data,
     # Boolean mask for class 1 particles
     class_1_split = particle_data[attribute.attribute].astype(int)
 
+    # Calculate the mean volume of the particles
+    particle_volumes = 4/3 * np.pi * particle_data["radius"]
+    mean_paricle_volume = np.mean(particle_volumes)
+
     # Create a boolean mask for each Lacey sample
     sample_id_booleans = []
     for ids in samples.occupied_cells:
@@ -170,7 +174,7 @@ def macro_scale_lacey_mixing(particle_data,
         # Calculate the volume of particles of class 0 sample 
         class_0_radii = particle_data["radius"][particles_class_0.astype(bool)]
         class_0_volume = 4/3 * np.pi * class_0_radii**3
-
+        
         # Calculate the volume of particles of class 1 sample
         class_1_radii = particle_data["radius"][particles_class_1.astype(bool)]
         class_1_volume = 4/3 * np.pi * class_1_radii**3
@@ -238,16 +242,11 @@ def macro_scale_lacey_mixing(particle_data,
 
         # Calculate the unmixed variance / segregated variance
         unmixed_variance = bulk_concentration * (1 - bulk_concentration)
-
-        # mean radii of the particles
-        mean_particle_radii = np.mean(particle_data["radius"])
-        mean_paricle_volume = 4/3 * np.pi * mean_particle_radii**3
-
-        # mean volume of the particles in the cell
-        mean_cell_volume = np.mean(total_sample_volume)
-
+        
+        # Calculate the perfectly mixed variance
         mixed_variance = (unmixed_variance
-                           / (mean_cell_volume / mean_paricle_volume))
+                           / (np.mean(total_sample_volume) 
+                              / mean_paricle_volume))
 
         lacey = ((variance - unmixed_variance)
                   / (mixed_variance - unmixed_variance))
