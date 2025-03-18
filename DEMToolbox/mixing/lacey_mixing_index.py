@@ -252,6 +252,7 @@ def macro_scale_lacey_mixing(particle_data,
                   / (mixed_variance - unmixed_variance))
 
     if verbose:
-        print(f"Lacey mixing index: {lacey}")
+        print(f"Lacey mixing index: {variance} - {unmixed_variance} " 
+              f"/ {mixed_variance} - {unmixed_variance} = {lacey}")
             
     return particle_data, lacey
