@@ -147,7 +147,7 @@ def macro_scale_lacey_mixing(particle_data,
     class_1_split = particle_data[attribute.attribute].astype(int)
 
     # Calculate the mean volume of the particles
-    particle_volumes = 4/3 * np.pi * particle_data["radius"]
+    particle_volumes = 4/3 * np.pi * particle_data["radius"] ** 3
     mean_paricle_volume = np.mean(particle_volumes)
 
     # Create a boolean mask for each Lacey sample
@@ -173,11 +173,11 @@ def macro_scale_lacey_mixing(particle_data,
 
         # Calculate the volume of particles of class 0 sample 
         class_0_radii = particle_data["radius"][particles_class_0.astype(bool)]
-        class_0_volume = 4/3 * np.pi * class_0_radii**3
+        class_0_volume = 4/3 * np.pi * class_0_radii ** 3
         
         # Calculate the volume of particles of class 1 sample
         class_1_radii = particle_data["radius"][particles_class_1.astype(bool)]
-        class_1_volume = 4/3 * np.pi * class_1_radii**3
+        class_1_volume = 4/3 * np.pi * class_1_radii ** 3
 
         # Total volume of particles in the sample 
         class_0_sample_volume[i] = sum(class_0_volume)
