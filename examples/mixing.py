@@ -13,7 +13,7 @@ from tqdm import tqdm
 import pandas as pd
 
 # Sample parameters
-cylinder_prefix = "_"
+cylinder_prefix = "mesh_"
 split_dimensions = ["x", "y", "z", "r"]
 sample_resolution = [8,6,20]
 sample_constant = "volume"
@@ -48,7 +48,7 @@ for particle_file in tqdm(files):
 
     # Retrieve corresponding cylinder file for each particle file
     file_name_id = re.search(r'particles_(.*).vtk', particle_file).group(1)
-    cylinder_name = "sample_" + file_name_id + '.vtk'
+    cylinder_name = cylinder_prefix + file_name_id + '.vtk'
     time = float(file_name_id) * timestep
     cylinder_file = os.path.join(os.path.dirname(particle_file), cylinder_name)
     
@@ -66,7 +66,11 @@ for particle_file in tqdm(files):
     for split in splits:
         particle_data = append_attribute(particle_data, split)
         particle_data, lacey = macro_scale_lacey_mixing(
-                                                particle_data, split, samples)
+                                                        particle_data, 
+                                                        split, 
+                                                        samples,
+                                                        verbose=True,
+                                                        )
         split_lacey.append(lacey)
         
     # Save the particle data
