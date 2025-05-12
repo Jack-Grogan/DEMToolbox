@@ -40,8 +40,9 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
     particle_data : vtkPolyData
         The particle vtk with the mean resolved velocity column added.
     velocity_vectors : tuple
-        A tuple containing the magnitude and direction of the mean resolved
-        velocity vector field.
+        An array of the mean resolved velocity vectors for particles in the
+        sample space.
+
 
     Raises
     ------
@@ -61,26 +62,22 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
         If vectors are not orthogonal.
     UserWarning
         If the particle data has no points return unedited particle data
-        and NaN arrays for the velocity vectors.
+        and NaN array for the velocity vectors.
     UserWarning
         If the container data has no points return unedited particle data
-        and NaN arrays for the velocity vectors.
+        and NaN array for the velocity vectors.
     """
     if particle_data.n_points == 0:
         warnings.warn("Cannot sample empty particles file.", UserWarning)
         velocity_vectors = np.zeros((resolution[1], resolution[0], 2))
         velocity_vectors[:] = np.nan
-        velocity_mag = np.zeros((resolution[1], resolution[0]))
-        velocity_mag[:] = np.nan
-        return (particle_data, (velocity_mag, velocity_vectors))
+        return particle_data, velocity_vectors
     
     if container_data.n_points == 0:
         warnings.warn("Cannot sample empty container file.", UserWarning)
         velocity_vectors = np.zeros((resolution[1], resolution[0], 2))
         velocity_vectors[:] = np.nan
-        velocity_mag = np.zeros((resolution[1], resolution[0]))
-        velocity_mag[:] = np.nan
-        return (particle_data, (velocity_mag, velocity_vectors))
+        return particle_data, velocity_vectors
     
     vector_1 = vector_1 / np.linalg.norm(vector_1)
     vector_2 = vector_2 / np.linalg.norm(vector_2)
@@ -116,23 +113,12 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
 
         velocity_vectors[i] = np.array([mean_res_vec_1_vel, 
                                         mean_res_vec_2_vel])
-        velocity_mag[i] = np.linalg.norm([mean_res_vec_1_vel, 
-                                            mean_res_vec_2_vel])
+        
         cell_velocity[sample] = resolved_velocity_vector
 
-    velocity_mag = velocity_mag.reshape(resolution[1], resolution[0])
     velocity_vectors = velocity_vectors.reshape(resolution[1],
                                                 resolution[0], 2)
 
-    for i, velocity_vector in enumerate(velocity_vectors):
-        for j, (x_vector, y_vector) in enumerate(velocity_vector):
-            velocity_vectors[i, j][0] = (x_vector 
-                                         / np.linalg.norm([x_vector, 
-                                                           y_vector]))
-            velocity_vectors[i, j][1] = (y_vector
-                                         / np.linalg.norm([x_vector, 
-                                                           y_vector]))
-
     particle_data[append_column] = cell_velocity
 
-    return (particle_data, (velocity_mag, velocity_vectors))
+    return particle_data, velocity_vectors
