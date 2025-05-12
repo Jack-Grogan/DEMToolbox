@@ -6,8 +6,7 @@ import numpy as np
 from tqdm import tqdm
 import re
 import os
-
-from DEMToolbox.velocity import velocity_vector_field
+from DEMToolbox.velocity import velocity_vector_field 
 
 # Mesh 2D
 vector_1 = [0, 1, 0]

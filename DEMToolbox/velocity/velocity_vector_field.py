@@ -66,17 +66,20 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
         If the container data has no points return unedited particle data
         and NaN arrays for the velocity vectors.
     """
-    velocity_vectors = np.zeros((resolution[1], resolution[0], 2))
-    velocity_vectors[:] = np.nan
-    velocity_mag = np.zeros((resolution[1], resolution[0]))
-    velocity_mag[:] = np.nan
-
     if particle_data.n_points == 0:
         warnings.warn("Cannot sample empty particles file.", UserWarning)
+        velocity_vectors = np.zeros((resolution[1], resolution[0], 2))
+        velocity_vectors[:] = np.nan
+        velocity_mag = np.zeros((resolution[1], resolution[0]))
+        velocity_mag[:] = np.nan
         return (particle_data, (velocity_mag, velocity_vectors))
     
     if container_data.n_points == 0:
         warnings.warn("Cannot sample empty container file.", UserWarning)
+        velocity_vectors = np.zeros((resolution[1], resolution[0], 2))
+        velocity_vectors[:] = np.nan
+        velocity_mag = np.zeros((resolution[1], resolution[0]))
+        velocity_mag[:] = np.nan
         return (particle_data, (velocity_mag, velocity_vectors))
     
     vector_1 = vector_1 / np.linalg.norm(vector_1)
@@ -94,6 +97,11 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
 
     cell_velocity = np.zeros((particle_data.n_points, 3))
     cell_velocity[:] = np.nan
+
+    velocity_vectors = np.zeros((resolution[1] * resolution[0], 2))
+    velocity_vectors[:] = np.nan
+    velocity_mag = np.zeros(resolution[1] * resolution[0])
+    velocity_mag[:] = np.nan
 
     for i, sample in enumerate(sample_id_booleans):
         particle_velocities = particle_data.point_data[velocity_column][sample]
