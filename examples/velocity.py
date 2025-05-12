@@ -6,6 +6,9 @@ import numpy as np
 from tqdm import tqdm
 import re
 import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from DEMToolbox.velocity import velocity_vector_field 
 
 # Mesh 2D
@@ -48,7 +51,7 @@ for i, particle_file in enumerate(tqdm(files)):
     particle_data = pv.read(particle_file)
     cylinder_data = pv.read(cylinder_file)
 
-    particle_data, velocity = velocity_vector_field(particle_data, 
+    particle_data, vectors = velocity_vector_field(particle_data, 
                                                     cylinder_data, 
                                                     point, 
                                                     vector_1, 
@@ -57,8 +60,21 @@ for i, particle_file in enumerate(tqdm(files)):
                                                     resolution, 
                                                     )
     
-    mags = velocity[0]
-    vecs = velocity[1]
+    vecs = np.empty_like(vectors)
+    mags = np.empty(np.shape(vectors)[0:2])
+    vecs[:] = np.nan
+    mags[:] = np.nan
+
+    if all(np.isnan(vectors.flatten())):
+        print(f"Velocity vectors are all NaN for file id {file_name_id}.")
+    else:
+        for i in range(np.shape(vectors)[0]):
+            for j in range(np.shape(vectors)[1]):
+                vecs[i, j, 0] = (vectors[i, j, 0] 
+                                 / np.linalg.norm(vectors[i, j, :]))
+                vecs[i, j, 1] = (vectors[i, j, 1] 
+                                 / np.linalg.norm(vectors[i, j, :]))
+                mags[i, j] = np.linalg.norm(vectors[i, j, :])
     
     save_vtk = os.path.join(
         vtk_dir,("velocity_" + os.path.basename(particle_file)))
