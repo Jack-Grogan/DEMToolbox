@@ -91,7 +91,7 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
                                              sample_column)
     
     sample_id_booleans = []
-    for ids in range(samples.n_cells):
+    for ids in samples.occupied_cells:
         sample_boolean_mask = particle_data[samples.name] == ids
         sample_id_booleans.append(sample_boolean_mask)
 
