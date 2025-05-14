@@ -42,6 +42,10 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
     velocity_vectors : tuple
         An array of the mean resolved velocity vectors for particles in the
         sample space.
+    samples : ParticleSamples
+        The samples object containing the sample information that was
+        used to calculate the velocity vector field. if no particles
+        are in the sample space, the samples object will be None.
 
 
     Raises
@@ -71,13 +75,13 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
         warnings.warn("Cannot sample empty particles file.", UserWarning)
         velocity_vectors = np.zeros((resolution[1], resolution[0], 2))
         velocity_vectors[:] = np.nan
-        return particle_data, velocity_vectors
+        return particle_data, velocity_vectors, None
     
     if container_data.n_points == 0:
         warnings.warn("Cannot sample empty container file.", UserWarning)
         velocity_vectors = np.zeros((resolution[1], resolution[0], 2))
         velocity_vectors[:] = np.nan
-        return particle_data, velocity_vectors
+        return particle_data, velocity_vectors, None
     
     vector_1 = vector_1 / np.linalg.norm(vector_1)
     vector_2 = vector_2 / np.linalg.norm(vector_2)
@@ -121,4 +125,4 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
 
     particle_data[append_column] = cell_velocity
 
-    return particle_data, velocity_vectors
+    return particle_data, velocity_vectors, samples
