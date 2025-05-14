@@ -23,9 +23,9 @@ class ParticleSamples():
                  particles, n_sampled_particles, n_unsampled_particles, 
                  sample_df = None):
         self.name = name
-        self.cells = cells
-        self.occupied_cells = occupied_cells
-        self.particles = particles
+        self.cells = np.asarray(cells)
+        self.occupied_cells = np.asarray(occupied_cells)
+        self.particles = np.asarray(particles)
         self.n_cells = np.size(cells)
         self.n_occupied_cells = np.size(occupied_cells)
         self.n_sampled_particles = n_sampled_particles
