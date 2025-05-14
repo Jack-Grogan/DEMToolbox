@@ -51,7 +51,7 @@ for i, particle_file in enumerate(tqdm(files)):
     particle_data = pv.read(particle_file)
     cylinder_data = pv.read(cylinder_file)
 
-    particle_data, vectors = velocity_vector_field(particle_data, 
+    particle_data, vectors, _ = velocity_vector_field(particle_data, 
                                                     cylinder_data, 
                                                     point, 
                                                     vector_1, 
@@ -75,7 +75,7 @@ for i, particle_file in enumerate(tqdm(files)):
                 vecs[i, j, 1] = (vectors[i, j, 1] 
                                  / np.linalg.norm(vectors[i, j, :]))
                 mags[i, j] = np.linalg.norm(vectors[i, j, :])
-    
+
     save_vtk = os.path.join(
         vtk_dir,("velocity_" + os.path.basename(particle_file)))
     particle_data.save(save_vtk)
