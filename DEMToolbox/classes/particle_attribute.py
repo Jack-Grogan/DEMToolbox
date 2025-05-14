@@ -1,3 +1,4 @@
+import numpy as np
 class ParticleAttribute():
     """Class to store particle attribute data
     
@@ -14,4 +15,4 @@ class ParticleAttribute():
     def __init__(self, field, attribute, data):
         self.field = field
         self.attribute = attribute
-        self.data = data
+        self.data = np.asarray(data)
