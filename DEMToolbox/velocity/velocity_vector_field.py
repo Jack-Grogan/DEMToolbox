@@ -91,21 +91,16 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
                                              plane_thickness, resolution, 
                                              sample_column)
     
-    sample_id_booleans = []
-    for ids in samples.occupied_cells:
-        sample_boolean_mask = particle_data[samples.name] == ids
-        sample_id_booleans.append(sample_boolean_mask)
-
     cell_velocity = np.zeros((particle_data.n_points, 3))
     cell_velocity[:] = np.nan
 
     velocity_vectors = np.zeros((resolution[1] * resolution[0], 2))
     velocity_vectors[:] = np.nan
-    velocity_mag = np.zeros(resolution[1] * resolution[0])
-    velocity_mag[:] = np.nan
+    
+    for ids in samples.occupied_cells:
+        sample_boolean_mask = particle_data[samples.name] == ids
 
-    for i, sample in enumerate(sample_id_booleans):
-        particle_velocities = particle_data.point_data[velocity_column][sample]
+        particle_velocities = particle_data.point_data[velocity_column][sample_boolean_mask]
         mean_velocity_vector = np.mean(particle_velocities, axis=0)
         mean_res_vec_1_vel = np.dot(mean_velocity_vector, vector_1)
         mean_res_vec_2_vel = np.dot(mean_velocity_vector, vector_2)
@@ -115,10 +110,10 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
                                     + mean_res_vec_2_vel 
                                     * vector_2)
 
-        velocity_vectors[i] = np.array([mean_res_vec_1_vel, 
+        velocity_vectors[ids] = np.array([mean_res_vec_1_vel, 
                                         mean_res_vec_2_vel])
         
-        cell_velocity[sample] = resolved_velocity_vector
+        cell_velocity[sample_boolean_mask] = resolved_velocity_vector
 
     velocity_vectors = velocity_vectors.reshape(resolution[1],
                                                 resolution[0], 2)
