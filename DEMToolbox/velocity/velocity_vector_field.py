@@ -4,8 +4,10 @@ import warnings
 from ..particle_sampling.sample_2d_slice import sample_2d_slice
 
 def velocity_vector_field(particle_data, container_data, point, vector_1, 
-                          vector_2, plane_thickness, resolution, 
-                          sample_column=None, velocity_column="v",
+                          vector_2, plane_thickness, resolution,
+                          bounds=None,
+                          sample_column=None, 
+                          velocity_column="v",
                           append_column="mean_resolved_velocity"):
     """Calculate the velocity vector field of a 2D slice of particles.
 
@@ -25,6 +27,11 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
         The thickness of the plane.
     resolution : list
         The resolution of the 2D sample space in the form [m, n].
+    bounds : list, optional
+        The bounds of the sample space in the form [vec_1_lower_bound,
+        vec_1_upper_bound, vec_2_lower_bound, vec_2_upper_bound].
+        If None, the bounds will be determined from the container data,
+        by default None.
     sample_column : str, optional
         The name of the samples column to append to the particle data,
         by default None. If None, the column name will be
@@ -88,8 +95,9 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
 
     particle_data, samples = sample_2d_slice(particle_data, container_data, 
                                              point, vector_1, vector_2,
-                                             plane_thickness, resolution, 
-                                             sample_column)
+                                             plane_thickness, resolution,
+                                             bounds=bounds,
+                                             append_column=sample_column)
     
     cell_velocity = np.zeros((particle_data.n_points, 3))
     cell_velocity[:] = np.nan
