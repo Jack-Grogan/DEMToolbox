@@ -22,6 +22,18 @@ def mean_velocity_vector_field(velocity_vectors, occupancies):
     np.ndarray
         An array of the mean velocity vectors for each point in the 
         sample space. Shape will be (resolution[1], resolution[0], 2).
+
+    Raises
+    ------
+    ValueError
+        If the velocity_vectors or occupancies do not have the correct 
+        shape or dimensions.
+    ValueError
+        If the velocity_vectors and occupancies do not have the same 
+        shape for the first three dimensions.
+    ValueError
+        If the velocity_vectors is not a 4D array with the last dimension 
+        being of size 2.
     """
     velocity_vectors = np.asarray(velocity_vectors)
     occupancies = np.asarray(occupancies)
@@ -30,7 +42,7 @@ def mean_velocity_vector_field(velocity_vectors, occupancies):
         raise ValueError("velocity_vectors must be a 4D array with shape "
                          "(n_frames, resolution[1], resolution[0], 2).")
     
-    if occupancies.ndim != 3 or occupancies.shape[-1] != 1:
+    if occupancies.ndim != 3:
         raise ValueError("occupancies must be a 3D array with shape "
                          "(n_frames, resolution[1], resolution[0]).")
     
