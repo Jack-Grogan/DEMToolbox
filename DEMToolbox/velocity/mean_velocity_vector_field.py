@@ -9,11 +9,11 @@ def mean_velocity_vector_field(velocity_vectors, occupancies):
 
     Parameters
     ----------
-    velocity_vectors : np.ndarray
+    velocity_vectors : np.ndarray, list
         An array of the velocity vectors for particles in the sample 
         space. Shape should be (n_frames, resolution[1], 
         resolution[0], 2).
-    occupancies : np.ndarray
+    occupancies : np.ndarray, list
         An array of the occupancy values for each point in the sample 
         space. Shape should be (n_frames, resolution[1], resolution[0]).
 
@@ -23,6 +23,9 @@ def mean_velocity_vector_field(velocity_vectors, occupancies):
         An array of the mean velocity vectors for each point in the 
         sample space. Shape will be (resolution[1], resolution[0], 2).
     """
+    velocity_vectors = np.asarray(velocity_vectors)
+    occupancies = np.asarray(occupancies)
+
     if velocity_vectors.ndim != 4 or velocity_vectors.shape[-1] != 2:
         raise ValueError("velocity_vectors must be a 4D array with shape "
                          "(n_frames, resolution[1], resolution[0], 2).")
@@ -34,9 +37,6 @@ def mean_velocity_vector_field(velocity_vectors, occupancies):
     if velocity_vectors.shape[:3] != occupancies.shape:
         raise ValueError("velocity_vectors and occupancies must have the same "
                          "shape for the first three dimensions.")
-
-    velocity_vectors = np.asarray(velocity_vectors)
-    occupancies = np.asarray(occupancies)
 
     mean_velocity = np.zeros_like(velocity_vectors[0])
     mean_velocity[:] = np.nan
