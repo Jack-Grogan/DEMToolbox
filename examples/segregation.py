@@ -5,6 +5,9 @@ from tqdm import tqdm
 import re
 import os
 import pandas as pd
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                os.pardir)))
 
 from DEMToolbox.particle_sampling import sample_1d
 from DEMToolbox.mixing import homogeneity_index

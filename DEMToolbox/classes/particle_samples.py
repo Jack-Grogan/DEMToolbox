@@ -1,4 +1,6 @@
 import numpy as np
+from .particle_attribute import ParticleAttribute
+
 class ParticleSamples():
     """Class to store particle sample information.
 
@@ -6,6 +8,9 @@ class ParticleSamples():
     ----------
     name: (str)
         Name of the samples column
+    sample_attribute: (ParticleAttribute)
+        ParticleAttribute object containing the particle ids and their
+        corresponding sample ids
     cells: (np.ndarray)
         Array of possible cell ids
     occupied_cells: (np.ndarray)
@@ -16,13 +21,20 @@ class ParticleSamples():
         Number of particles in the sampled cells
     n_unsampled_particles: (int)
         Number of particles not in the sampled cells
-    sample_df: (pd.DataFrame) optional
-        DataFrame containing the sample information. Default is None.
+    data: (np.ndarray)
+        Array of particle ids and their corresponding sample ids
     """
-    def __init__(self, name, cells, occupied_cells,
-                 particles, n_sampled_particles, n_unsampled_particles, 
-                 sample_df = None):
+    def __init__(self, 
+                 name, 
+                 sample_attribute:ParticleAttribute, 
+                 cells, 
+                 occupied_cells,
+                 particles, 
+                 n_sampled_particles, 
+                 n_unsampled_particles):
+        
         self.name = name
+        self.attribute = sample_attribute
         self.cells = np.asarray(cells)
         self.occupied_cells = np.asarray(occupied_cells)
         self.particles = np.asarray(particles)
@@ -30,4 +42,3 @@ class ParticleSamples():
         self.n_occupied_cells = np.size(occupied_cells)
         self.n_sampled_particles = n_sampled_particles
         self.n_unsampled_particles = n_unsampled_particles
-        self.sample_df = sample_df

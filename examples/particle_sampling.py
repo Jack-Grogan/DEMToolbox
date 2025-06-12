@@ -1,4 +1,7 @@
 import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                os.pardir)))
 
 from DEMToolbox.particle_sampling import sample_1d 
 from DEMToolbox.particle_sampling import sample_2d
@@ -97,7 +100,7 @@ for particle_file in tqdm(files):
                                                    vector_2_2d_slice,
                                                    plane_thickness, 
                                                    resolution_2d_slice, 
-                                                   mesh_column_2d_slice
+                                                   append_column = mesh_column_2d_slice
                                                    )
     
     samples_2d_slice.append([mesh_2d_slice.n_sampled_particles,
@@ -126,30 +129,3 @@ for particle_file in tqdm(files):
     vtk_file = os.path.join(vtk_dir,
                             ("meshed_particles_" + file_name_id + '.vtk'))
     particle_data.save(vtk_file)
-
-# Save the mesh dataframes
-col_names = ["in_sample", "out_of_sample"]
-output_1d_df = pd.DataFrame(samples_1d, columns=col_names)
-output_2d_df = pd.DataFrame(samples_2d, columns=col_names)
-output_2d_slice_df = pd.DataFrame(samples_2d_slice, columns=col_names)
-output_3d_df = pd.DataFrame(samples_3d, columns=col_names)
-output_3d_cylinder_df = pd.DataFrame(samples_3d_cylinder, columns=col_names)
-                                     
-# Save the dataframes of Lacey mixing indices 
-output_1d_df.to_csv(os.path.join(save_dir, "samples_1d.csv"))
-output_2d_df.to_csv(os.path.join(save_dir, "samples_2d.csv"))
-output_2d_slice_df.to_csv(os.path.join(save_dir, "samples_2d_slice.csv"))
-output_3d_df.to_csv(os.path.join(save_dir, "samples_3d.csv"),)
-output_3d_cylinder_df.to_csv(os.path.join(save_dir, "samples_3d_cylinder.csv"))
-
-# Save dataframes of mesh data at the end of the simulation
-mesh_1d.sample_df.to_csv(
-    os.path.join(save_dir, "final_sample_df_1d.csv"))
-mesh_2d.sample_df.to_csv(
-    os.path.join(save_dir, "final_sample_df_2d.csv"))
-mesh_2d_slice.sample_df.to_csv(
-    os.path.join(save_dir, "final_sample_df_2d_slice.csv"))
-mesh_3d.sample_df.to_csv(
-    os.path.join(save_dir, "final_sample_df_3d.csv"))
-mesh_3d_cylinder.sample_df.to_csv(
-    os.path.join(save_dir, "final_sample_df_3d_cylinder.csv"))

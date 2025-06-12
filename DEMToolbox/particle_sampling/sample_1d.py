@@ -1,11 +1,15 @@
 import numpy as np
 import warnings 
-import pandas as pd
 
 from ..classes.particle_samples import ParticleSamples
+from ..classes.particle_attribute import ParticleAttribute
 
-def sample_1d(particle_data, container_data, vector, resolution,
-              append_column="1D_samples"):
+def sample_1d(particle_data, 
+              container_data,
+              vector, 
+              resolution,
+              append_column="1D_samples",
+              particle_id_column="id"):
     """Split the particles into samples split along 1 dimension.
 
     Split the particles into a 1D samples along a user defined vector to
@@ -25,19 +29,21 @@ def sample_1d(particle_data, container_data, vector, resolution,
     append_column : str, optional
         The name of the samples column to append to the particle data, 
         by default "1D_samples".
+    particle_id_column : str, optional
+        The name of the particle id column in the particle data, by
+        default "id".
 
     Returns
     -------
     particle_data : vtkPolyData
         The particle vtk with the samples column added.
     samples : ParticleSamples
-        A ParticleSamples object containing the samples column name, a 
-        list of sample elements, a list of occupied sample elements, 
-        a list of the number of particles in the sample elements, the
-        number of particles in the sample elements, the number of 
-        sampled and unsampled particles and a dataframe containing the
-        sample id, lower bound, upper bound and number of particles in
-        the sample element.
+        A ParticleSamples object containing the samples column name,
+        the particle ids and their corresponding sample ids stored in a
+        ParticleAttribute object, a list of sample elements, a list of
+        occupied sample elements, a list of the number of particles in
+        the sample elements, the number of particles in the sample
+        elements, the number of sampled and unsampled particles.
 
     Raises
     ------
@@ -54,16 +60,6 @@ def sample_1d(particle_data, container_data, vector, resolution,
         If the container data has no points return unedited particle
         data and an empty samples object.
     """
-    if particle_data.n_points == 0:
-        warnings.warn("Cannot sample empty particles file.", UserWarning)
-        samples = ParticleSamples(append_column, [], [], [], 0, 0)
-        return (particle_data, samples)
-    
-    if container_data.n_points == 0:
-        warnings.warn("Cannot sample empty container file.", UserWarning)
-        samples = ParticleSamples(append_column, [], [], [], 0, 0)
-        return (particle_data, samples)
-    
     if len(vector) != 3:
         raise ValueError("Vector must be a 3 element list.")
     
@@ -72,6 +68,24 @@ def sample_1d(particle_data, container_data, vector, resolution,
     
     if resolution <= 0:
         raise ValueError("Resolution must be greater than 0.")
+    
+    if particle_data.n_points == 0:
+        warnings.warn("Cannot sample empty particles file.", UserWarning)
+        sample_attribute = ParticleAttribute(particle_id_column, 
+                                        append_column,
+                                        np.empty((0, 2)))
+        samples = ParticleSamples(
+            append_column, sample_attribute, [], [], [], 0, 0)
+        return (particle_data, samples)
+    
+    if container_data.n_points == 0:
+        warnings.warn("Cannot sample empty container file.", UserWarning)
+        sample_attribute = ParticleAttribute(particle_id_column, 
+                                        append_column,
+                                        np.empty((0, 2)))
+        samples = ParticleSamples(
+            append_column, sample_attribute, [], [], [], 0, 0)
+        return (particle_data, samples)
     
     # Normalise the vector
     vector = vector / np.linalg.norm(vector)
@@ -91,7 +105,6 @@ def sample_1d(particle_data, container_data, vector, resolution,
     
     cells = []
     occupied_cells = []
-    sample_data = []
     cell_particles = []
 
     sample_id = int(0)
@@ -111,27 +124,29 @@ def sample_1d(particle_data, container_data, vector, resolution,
         if sum(sample_element) > 0:
             occupied_cells.append(sample_id)
 
-        # Store the sample element id, bounds and number of particles
-        sample_data.append((sample_id, sample_bounds[i], 
-                            sample_bounds[i+1], sum(sample_element)))
-        
         sample_id += int(1)
-
-    sample_df = pd.DataFrame(sample_data, 
-                             columns=["sample id", "lower_bound",
-                                      "upper_bound", "n_particles"],
-                            )
 
     # Add the sample column to the particle data
     particle_data[append_column] = sample_elements
+
+    # Create an array of particle ids and their corresponding sample ids
+    sample_data = np.array([particle_data["id"], sample_elements]).T
+    sample_attribute = ParticleAttribute(particle_id_column, 
+                                         append_column,
+                                         sample_data)
 
     # Count the number of sampled and unsampled particles
     n_unsampled_particles = sum(np.isnan(sample_elements))
     n_sampled_particles = len(sample_elements) - n_unsampled_particles
 
     # Create the ParticleSamples object to store data about the samples
-    samples = ParticleSamples(append_column, cells, occupied_cells, 
-                              cell_particles, n_sampled_particles, 
-                              n_unsampled_particles, sample_df)
+    samples = ParticleSamples(append_column, 
+                              sample_attribute,
+                              cells, 
+                              occupied_cells, 
+                              cell_particles, 
+                              n_sampled_particles, 
+                              n_unsampled_particles, 
+                              )
 
     return (particle_data, samples)

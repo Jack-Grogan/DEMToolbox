@@ -1,7 +1,11 @@
 import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
+                os.pardir)))
 
 from DEMToolbox.particle_sampling import sample_3d_cylinder
-from DEMToolbox.particle_attributes import split_particles
+from DEMToolbox.particle_sampling import sample_1d_volume
+from DEMToolbox.classes.particle_attribute import ParticleAttribute
 from DEMToolbox.utilities import append_attribute
 from DEMToolbox.mixing import macro_scale_lacey_mixing
 
@@ -11,11 +15,14 @@ import re
 import pyvista as pv
 from tqdm import tqdm
 import pandas as pd
+import numpy as np
 
 # Sample parameters
 cylinder_prefix = "mesh_"
-split_dimensions = ["x", "y", "z", "r"]
+split_dimensions = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]  # Split along x, y, z axes
+split_columns = ["x_class", "y_class", "z_class"]
 sample_resolution = [8,6,20]
+split_resolution = 2
 sample_constant = "volume"
 
 # Simulation parameters
@@ -39,10 +46,13 @@ files = natsorted([f for f in glob.glob(glob_input) if "boundingBox" not in f])
 # Split the particles at the settled time
 settled_file = pv.read(files[round(settled_time/dumpstep)])
 splits = []
-for split_dimension in split_dimensions:
-    _, split = split_particles(settled_file, split_dimension)
-    splits.append(split)
-
+for split_dimension, split_column in zip(split_dimensions, split_columns):
+    settled_file, split = sample_1d_volume(settled_file, 
+                                split_dimension,
+                                n_samples=split_resolution, 
+                                append_column=split_column)
+    splits.append(split.attribute)
+    
 results = []
 for particle_file in tqdm(files):
 
@@ -65,8 +75,7 @@ for particle_file in tqdm(files):
     split_lacey = []
     for split in splits:
         particle_data = append_attribute(particle_data, split)
-        particle_data, lacey = macro_scale_lacey_mixing(
-                                                        particle_data, 
+        particle_data, lacey = macro_scale_lacey_mixing(particle_data, 
                                                         split, 
                                                         samples,
                                                         verbose=True,
@@ -84,7 +93,7 @@ for particle_file in tqdm(files):
 # Save the results to a csv file in the save directory
 results_df = pd.DataFrame(results,
                           columns=["time", 
-                                   *[i + "_lacey" for i in split_dimensions],
+                                   *[i + "_lacey" for i in split_columns],
                                    "n_sampled_particles",
                                    "n_unsampled_particles"]
                           )

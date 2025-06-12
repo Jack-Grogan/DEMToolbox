@@ -4,8 +4,10 @@ import pandas as pd
 
 from ..classes.particle_samples import ParticleSamples
 
-def homogeneity_index(particle_data, attribute_column, 
-                      samples:ParticleSamples, homogeniety_column=None, 
+def homogeneity_index(particle_data, 
+                      attribute_column, 
+                      samples:ParticleSamples, 
+                      homogeniety_column=None, 
                       verbose=False):
     """ Calculate the homogeneity index of the particle data.
 
