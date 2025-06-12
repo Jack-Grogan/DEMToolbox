@@ -8,7 +8,8 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
                           bounds=None,
                           sample_column=None, 
                           velocity_column="v",
-                          append_column="mean_resolved_velocity"):
+                          append_column="mean_resolved_velocity",
+                          particle_id_column="id"):
     """Calculate the velocity vector field of a 2D slice of particles.
 
     Parameters
@@ -41,6 +42,9 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
     append_column : str, optional
         The name of the column to append to the particle data, by default
         "mean_resolved_velocity".
+    particle_id_column : str, optional
+        The name of the particle id column in the particle data, by
+        default "id".
 
     Returns
     -------
@@ -93,11 +97,17 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
     vector_1 = vector_1 / np.linalg.norm(vector_1)
     vector_2 = vector_2 / np.linalg.norm(vector_2)
 
-    particle_data, samples = sample_2d_slice(particle_data, container_data, 
-                                             point, vector_1, vector_2,
-                                             plane_thickness, resolution,
-                                             bounds=bounds,
-                                             append_column=sample_column)
+    particle_data, samples = sample_2d_slice(particle_data, 
+                                        container_data, 
+                                        point, 
+                                        vector_1, 
+                                        vector_2,
+                                        plane_thickness, 
+                                        resolution,
+                                        bounds=bounds,
+                                        append_column=sample_column,
+                                        particle_id_column=particle_id_column
+                                        )
     
     cell_velocity = np.zeros((particle_data.n_points, 3))
     cell_velocity[:] = np.nan

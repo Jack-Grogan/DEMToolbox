@@ -1,2 +1,1 @@
-from .split import split_particles
 from .mean_sample_attribute import mean_sample_attribute

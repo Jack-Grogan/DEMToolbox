@@ -47,3 +47,5 @@ examples/mixing_analysis/*
 examples/segregation_analysis/*
 examples/velocity_analysis/*
 examples/mixing_rate_analysis/*
+examples/equal_volume_sampling_analysis/*
+examples/equal_volume_sampling_cylinder_analysis/*
