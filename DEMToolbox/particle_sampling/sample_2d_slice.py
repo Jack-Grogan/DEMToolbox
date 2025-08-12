@@ -188,43 +188,34 @@ def sample_2d_slice(particle_data,
                  >= 0)
 
     slice_boolean_mask = bottom_plane & top_plane
-    
-    # Create the empty sample elements array
-    sample_elements = np.empty(particle_data.n_points)
-    sample_elements[:] = np.nan
 
-    cells = []
-    occupied_cells = []
-    cell_particles = []
+    # Bin index for each particle in each dimension
+    bin_idx_vec1 = np.digitize(resolved_particles_vec_1, vec_1_sample_bounds) - 1
+    bin_idx_vec2 = np.digitize(resolved_particles_vec_2, vec_2_sample_bounds) - 1
 
-    sample_id = int(0)
-    for i in range(len(vec_2_sample_bounds) - 1):
+    # Mask out particles outside the valid bin range
+    valid_mask = (
+        (bin_idx_vec1 >= 0) & (bin_idx_vec1 < len(vec_1_sample_bounds) - 1) &
+        (bin_idx_vec2 >= 0) & (bin_idx_vec2 < len(vec_2_sample_bounds) - 1) &
+        slice_boolean_mask
+    )
 
-        above_lower_vec_2 = (resolved_particles_vec_2 
-                             >= vec_2_sample_bounds[i])
-        below_upper_vec_2 = (resolved_particles_vec_2 
-                             < vec_2_sample_bounds[i+1])
+    bin_idx_vec1 = bin_idx_vec1[valid_mask]
+    bin_idx_vec2 = bin_idx_vec2[valid_mask]
 
-        for j in range(len(vec_1_sample_bounds) - 1):
+    # Assign unique IDs: row-major order
+    n_bins_vec1 = len(vec_1_sample_bounds) - 1
+    sample_id = bin_idx_vec2 * n_bins_vec1 + bin_idx_vec1
 
-            above_lower_vec_1 = (resolved_particles_vec_1 
-                                 >= vec_1_sample_bounds[j])
-            below_upper_vec_1 = (resolved_particles_vec_1 
-                                 < vec_1_sample_bounds[j+1])
+    # Fill sample_elements array (preallocate first)
+    sample_elements = np.full(len(resolved_particles_vec_1), -1, dtype=int)
+    sample_elements[valid_mask] = sample_id
 
-            # Boolean array of particles in the sample element
-            sample_element = ((above_lower_vec_1 & below_upper_vec_1) 
-                            & (above_lower_vec_2 & below_upper_vec_2)
-                            & slice_boolean_mask)
+    # Count particles per cell
+    cell_particles = np.bincount(sample_id, minlength=n_bins_vec1 * (len(vec_2_sample_bounds) - 1))
 
-            # Assign the sample element id to the particles in the sample
-            sample_elements[sample_element] = int(sample_id)
-            cells.append(sample_id)
-            cell_particles.append(sum(sample_element))
-            if sum(sample_element) > 0:
-                occupied_cells.append(sample_id)
-            
-            sample_id += int(1)
+    # Occupied cells
+    occupied_cells = np.nonzero(cell_particles)[0]
 
     # Add the sample elements to the particle data
     particle_data[append_column] = sample_elements
@@ -241,7 +232,7 @@ def sample_2d_slice(particle_data,
 
     samples = ParticleSamples(append_column, 
                               sample_attribute,
-                              cells, 
+                              np.arange(n_bins_vec1 * (len(vec_2_sample_bounds) - 1)), 
                               occupied_cells, 
                               cell_particles, 
                               n_sampled_particles, 
