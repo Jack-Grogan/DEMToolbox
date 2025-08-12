@@ -109,29 +109,49 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
                                         particle_id_column=particle_id_column
                                         )
     
-    cell_velocity = np.zeros((particle_data.n_points, 3))
-    cell_velocity[:] = np.nan
 
-    velocity_vectors = np.zeros((resolution[1] * resolution[0], 2))
-    velocity_vectors[:] = np.nan
+    # points_in_sample = particle_data[particle_data[samples.name] != -1]
+    # cell_velocity = np.zeros((points_in_sample.n_points, 3))
+    # cell_velocity[:] = np.nan
+
+    # velocity_vectors = np.zeros((resolution[1] * resolution[0], 2))
+    # velocity_vectors[:] = np.nan
     
-    for ids in samples.occupied_cells:
-        sample_boolean_mask = particle_data[samples.name] == ids
+    cell_ids = particle_data[samples.name].astype(int)
+    velocities = particle_data.point_data[velocity_column]
 
-        particle_velocities = particle_data.point_data[velocity_column][sample_boolean_mask]
-        mean_velocity_vector = np.mean(particle_velocities, axis=0)
-        mean_res_vec_1_vel = np.dot(mean_velocity_vector, vector_1)
-        mean_res_vec_2_vel = np.dot(mean_velocity_vector, vector_2)
+    # Filter out -1 IDs
+    valid_mask = cell_ids != -1
+    cell_ids_valid = cell_ids[valid_mask]
+    velocities_valid = velocities[valid_mask]
 
-        resolved_velocity_vector = (mean_res_vec_1_vel 
-                                    * vector_1 
-                                    + mean_res_vec_2_vel 
-                                    * vector_2)
+    # Compute sums per cell
+    sum_vel = np.zeros((resolution[1] * resolution[0], 3))
+    np.add.at(sum_vel, cell_ids_valid, velocities_valid)
 
-        velocity_vectors[ids] = np.array([mean_res_vec_1_vel, 
-                                        mean_res_vec_2_vel])
-        
-        cell_velocity[sample_boolean_mask] = resolved_velocity_vector
+    # np.add.at(cell_velocity, cell_ids, velocities)
+    mean_vel = np.zeros_like(sum_vel)
+    mean_vel[samples.occupied_cells] = ( 
+                    sum_vel[samples.occupied_cells] 
+                    / samples.particles[samples.occupied_cells, None]
+                    )
+
+    # Project onto vector_1 and vector_2
+    mean_res_vec_1 = mean_vel @ vector_1
+    mean_res_vec_2 = mean_vel @ vector_2
+
+    resolved_velocity_vector = (
+        mean_res_vec_1[:, None] * vector_1 +
+        mean_res_vec_2[:, None] * vector_2
+    )
+
+    # Store results
+    velocity_vectors = np.column_stack([mean_res_vec_1, mean_res_vec_2])
+    cell_velocity = resolved_velocity_vector[cell_ids]
+
+    # Set invalid cells to NaN
+    cell_velocity[~valid_mask] = [np.nan, np.nan, np.nan]  # Set invalid cells to NaN
+
 
     velocity_vectors = velocity_vectors.reshape(resolution[1],
                                                 resolution[0], 2)
