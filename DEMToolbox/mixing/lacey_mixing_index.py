@@ -9,33 +9,37 @@ def macro_scale_lacey_mixing(particle_data,
                              samples:ParticleSamples,
                              append_column=None,
                              verbose=False):
-    """Calculate the macro scale Lacey mixing index.
+    r"""Calculate the macro scale Lacey mixing index.
     
     The Lacey mixing index is a measure of the sample variance of a 
     target particle types concentration in a binary particle system.
     This is a macro scale version of the Lacey mixing index that uses 
     samples to calculate the variance. The contribution of each sample 
     to the variance is weighted by the volume of articles in the sample 
-    in line with the work of Chandratilleke et al. [1]. The sample 
+    in line with the work of Chandratilleke et al. [1]_ . The sample 
     concentration is calculated as on a volume basis. The perfectly 
     mixed variance is calculated on the assumption that samples in a
     perfectly mixed system would have concentrations following a 
-    binomial distribution [2]. The unmixed variance is calculated as 
+    binomial distribution [2]_ . The unmixed variance is calculated as 
     the variance of the bulk concentration of the target particle type.
 
     The Lacey mixing index is calculated as:
 
     .. math::
-        M = \\frac{\\sigma^2 - \\sigma_0^2}{\\sigma_r^2 - \\sigma_0^2}
+
+        M = \frac{\sigma^2 - \sigma_0^2}{\sigma_r^2 - \sigma_0^2}
 
     .. math::
-        \\sigma_0^2 = P_0(1 - P_0)
+
+        \sigma_0^2 = P_0(1 - P_0)
 
     .. math::
-        \\sigma_r^2 = \\frac{P_0(1 - P_0)}{\\bar{n}_0 + \\bar{n}_1}
+
+        \sigma_r^2 = \frac{P_0(1 - P_0)}{\bar{n}_0 + \bar{n}_1}
 
     .. math::
-        \\sigma^2 = \sum_{i=1}^{N_s} \\frac{v_i}{V} (p_{0,i} - \\bar{p}_0)^2
+
+        \sigma^2 = \sum_{i=1}^{N_s} \frac{v_i}{V} (p_{0,i} - \bar{p}_0)^2
 
     where :math:`\sigma^2` is the sample variance of the concentration
     of the target particle type in the samples, :math:`\sigma_0^2`
@@ -45,11 +49,11 @@ def macro_scale_lacey_mixing(particle_data,
     :math:`P_0`: 
         Bulk concentration of the target particle type
 
-    :math:`\\bar{n}_0`: 
+    :math:`\bar{n}_0`: 
         Mean number of particles of the target particle type in the 
         samples
 
-    :math:`\\bar{n}_1`:
+    :math:`\bar{n}_1`:
         Mean number of particles of the non-target particle type in
         the samples
 
@@ -62,7 +66,7 @@ def macro_scale_lacey_mixing(particle_data,
     :math:`p_{0,i}`:
         Volume fraction of the target particle type in sample :math:`i`
 
-    :math:`\\bar{p}_0`:
+    :math:`\bar{p}_0`:
         Mean volume fraction of the target particle type in the samples
 
     :math:`N_s`:
@@ -119,6 +123,9 @@ def macro_scale_lacey_mixing(particle_data,
     UserWarning
         If only one particle type is present in the samples at this
         timestep return unedited particle data and NaN for Lacey.
+    UserWarning
+        If the mixed variance is equal to the unmixed variance,
+        return NaN for Lacey.
     """
     if particle_data.n_points == 0:
         warnings.warn(("Cannot calculate Lacey mixing " 
@@ -247,9 +254,17 @@ def macro_scale_lacey_mixing(particle_data,
         mixed_variance = (unmixed_variance
                            / (np.mean(total_sample_volume) 
                               / mean_paricle_volume))
-
-        lacey = ((variance - unmixed_variance)
-                  / (mixed_variance - unmixed_variance))
+        
+        if mixed_variance == unmixed_variance:
+            warnings.warn(
+                ("Mixed variance is equal to unmixed variance, "
+                 "setting Lacey to NaN."),
+                UserWarning,
+            )
+            lacey = np.nan
+        else:
+            lacey = ((variance - unmixed_variance)
+                    / (mixed_variance - unmixed_variance))
 
     if verbose:
         print(f"Lacey mixing index: {variance} - {unmixed_variance} " 

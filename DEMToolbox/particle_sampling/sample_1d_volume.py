@@ -116,7 +116,7 @@ def sample_1d_volume(particle_data,
     for i in range(n_samples - 1):
         split_index = np.searchsorted(cumulative_volume, 
                                         (i + 1) * target_volume)
-        samples_column[sorted_indices[current_index:split_index]] = i
+        samples_column[sorted_indices[current_index:split_index + 1]] = i
         current_index = split_index
 
     # Add the samples column to the particle data

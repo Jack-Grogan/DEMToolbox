@@ -34,7 +34,7 @@ class ParticleSamples():
                  n_unsampled_particles):
         
         self.name = name
-        self.attribute = sample_attribute
+        self.ParticleAttribute = sample_attribute
         self.cells = np.asarray(cells)
         self.occupied_cells = np.asarray(occupied_cells)
         self.particles = np.asarray(particles)
