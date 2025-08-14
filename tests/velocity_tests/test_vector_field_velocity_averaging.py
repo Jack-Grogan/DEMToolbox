@@ -91,22 +91,21 @@ class TestVectorFields(unittest.TestCase):
                                                       resolution[0])
 
     def test_vector_field_shape(self):
-        self.assertEqual(np.shape(self.velocity_vectors),
-                         (self.resolution[1], self.resolution[0], 2))
+        assert (np.shape(self.velocity_vectors) 
+                == (self.resolution[1], self.resolution[0], 2))
         
     def test_velocity_vectors_values(self):
         expected_value = [0, 0]
         for i in range(self.resolution[1]):
             for j in range(self.resolution[0]):
-                self.assertTrue(np.all(self.velocity_vectors[i, j] == 
-                                       expected_value))
+                assert np.all(self.velocity_vectors[i, j] == expected_value)
         
     def test_occupancy_shape(self):
-        self.assertEqual(np.shape(self.occupancy),
-                         (self.resolution[1], self.resolution[0]))
+        assert (np.shape(self.occupancy) 
+                == (self.resolution[1], self.resolution[0]))
         
     def test_occupancy_values(self):
-        self.assertTrue(np.all(self.occupancy == 4))
+        assert np.all(self.occupancy == 4)
 
 
 if __name__ == "__main__":
