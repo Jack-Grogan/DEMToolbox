@@ -34,7 +34,6 @@ def create_particle_grid(positions, radii=None, velocities=None):
 
     return particle_data
 
-
 class TestVectorFields(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -80,24 +79,27 @@ class TestVectorFields(unittest.TestCase):
         cls.occupancy = cls.samples.particles.reshape(resolution[1], 
                                                       resolution[0])
 
+
     def test_vector_field_shape(self):
-        self.assertEqual(np.shape(self.velocity_vectors),
-                         (self.resolution[1], self.resolution[0], 2))
-        
+        """Test the shape of the velocity vectors."""
+        assert np.shape(self.velocity_vectors) == (
+            self.resolution[1], self.resolution[0], 2)
+
+
     def test_velocity_vectors_values(self):
+        """Test the values of the velocity vectors."""
         expected_velocity = np.zeros((self.resolution[1], 
                                       self.resolution[0], 2))
         expected_velocity[10:, :2, :] = [[0., -0.003], [0., -0.003]]
-        self.assertTrue(np.all(self.velocity_vectors == expected_velocity))        
         
+        assert np.all(self.velocity_vectors == expected_velocity)     
+        
+
     def test_occupancy_shape(self):
-        self.assertEqual(np.shape(self.occupancy),
-                         (self.resolution[1], self.resolution[0]))
-        
+        """Test the shape of the occupancy."""
+        assert np.shape(self.occupancy) == (
+            self.resolution[1], self.resolution[0])
+
     def test_occupancy_values(self):
         upper_corner = self.occupancy[10:, :2]
-        self.assertTrue(np.all(upper_corner == 1))
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert np.all(upper_corner == 1)

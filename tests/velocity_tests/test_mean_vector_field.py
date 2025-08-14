@@ -51,7 +51,7 @@ class TestVectorFields(unittest.TestCase):
         expected_velocity = np.zeros((10, 10, 2))
         expected_velocity[:, :, :] = [0., -0.003]
 
-        self.assertTrue(np.all(mean_velocity_vectors == expected_velocity))
+        assert np.all(mean_velocity_vectors == expected_velocity)
 
     def test_mean_velocity_vector_field_2(self):
         """Test the mean velocity vector field calculation with different occupancy."""
@@ -78,7 +78,7 @@ class TestVectorFields(unittest.TestCase):
         expected_velocity = np.zeros((10, 10, 2))
         expected_velocity[:, :, :] = [0.004, -0.002]
 
-        self.assertTrue(np.all(mean_velocity_vectors == expected_velocity))
+        assert np.all(mean_velocity_vectors == expected_velocity)
 
 if __name__ == "__main__":
     unittest.main()
