@@ -79,6 +79,3 @@ class TestVectorFields(unittest.TestCase):
         expected_velocity[:, :, :] = [0.004, -0.002]
 
         assert np.all(mean_velocity_vectors == expected_velocity)
-
-if __name__ == "__main__":
-    unittest.main()

@@ -96,7 +96,3 @@ class TestVectorFields(unittest.TestCase):
         
     def test_occupancy_values(self):
         assert np.all(self.occupancy == 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

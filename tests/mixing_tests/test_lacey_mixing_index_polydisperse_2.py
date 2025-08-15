@@ -49,7 +49,11 @@ class TestVectorFields(unittest.TestCase):
         x, y, z = np.meshgrid(x_range, y_range, z_range)
 
         positions = np.column_stack((x.ravel(), y.ravel(), z.ravel()))
-        radii = [0.0005]*len(positions)
+        radii = np.digitize(positions[:, 2], np.linspace(0, 0.08, 11)) / 4000
+
+        # Add a particle to the grid at cell boundary
+        positions = np.vstack([positions, [-0.018001, -0.018001, 0.015999]])
+        radii = np.append(radii, 0.005)
 
         particle_data = create_particle_grid(positions, radii=radii)
         cylinder_data = create_cylinder(
@@ -74,7 +78,7 @@ class TestVectorFields(unittest.TestCase):
                                                         split,
                                                         samples,
                                                         )
-
+        
         # Store results
         cls.particle_data = particle_data
         cls.samples = samples
@@ -86,13 +90,71 @@ class TestVectorFields(unittest.TestCase):
     def test_lacey_mixing_index(self):
         """Test value of the Lacey mixing index."""
 
-        # 50% of particles in the bulk are of target particle type
-        unmixed_variance = 0.5 * (1 - 0.5)
-        # 2 particles in each of the 125 samples
-        mixed_variance = unmixed_variance / 2
-        # Equal volume sampling all samples perfectly mixed
-        variance = 0
+        # Number of particles in a row
+        n_particles = 25
+        r_1 = 0.00025
+        r_insert = 0.005
+        r_2 = 0.0005
 
+        row_1_volume_1_1 = [(np.pi * r_1**3 * 4/3 
+                             + np.pi * r_insert**3 * 4/3),
+                            np.pi * r_2**3 * 4/3]
+        row_1_volume = [(n_particles - 1) * np.pi * r_1**3 * 4/3, 
+                        (n_particles - 1) * np.pi * r_2**3 * 4/3]
+        
+        r_3 = 0.00075
+        r_4 = 0.001
+        row_2_volume = [n_particles * np.pi * r_3**3 * 4/3, 
+                        n_particles * np.pi * r_4**3 * 4/3]
+        
+        r_5 = 0.00125
+        r_6 = 0.0015
+        row_3_volume = [n_particles * np.pi * r_5**3 * 4/3, 
+                        n_particles * np.pi * r_6**3 * 4/3]
+        
+        r_7 = 0.00175
+        r_8 = 0.002
+        row_4_volume = [n_particles * np.pi * r_7**3 * 4/3, 
+                        n_particles * np.pi * r_8**3 * 4/3]
+        
+        r_9 = 0.00225
+        r_10 = 0.0025
+        row_5_volume = [n_particles * np.pi * r_9**3 * 4/3, 
+                        n_particles * np.pi * r_10**3 * 4/3]
+        
+        type_0_volume = (row_1_volume_1_1[0]
+                         + row_1_volume[0]
+                         + row_2_volume[0]
+                         + row_3_volume[0]
+                         + row_4_volume[0]
+                         + row_5_volume[0])
+        
+        type_1_volume = (row_1_volume_1_1[1]
+                         + row_1_volume[1]
+                         + row_2_volume[1]
+                         + row_3_volume[1]
+                         + row_4_volume[1]
+                         + row_5_volume[1])
+        
+        total_volume = type_0_volume + type_1_volume
+
+        bulk_conc = type_0_volume / total_volume
+        unmixed_variance = bulk_conc * (1 - bulk_conc)
+
+        mean_particle_volume = total_volume / 251
+        mean_samples_volume = total_volume / 125
+        particles_per_sample = mean_samples_volume / mean_particle_volume
+
+        mixed_variance = unmixed_variance / particles_per_sample
+
+        variance = 0
+        for row in [row_1_volume_1_1, row_1_volume,
+                    row_2_volume, row_3_volume,
+                    row_4_volume, row_5_volume]:
+            row_sum = sum(row)
+            variance += (row_sum / total_volume 
+                         * (row[0] / row_sum - bulk_conc) ** 2)
+            
         expected_value = ((variance - unmixed_variance)
                           / (mixed_variance - unmixed_variance))
 

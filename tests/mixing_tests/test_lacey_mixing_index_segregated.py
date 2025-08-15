@@ -88,6 +88,3 @@ class TestVectorFields(unittest.TestCase):
 
         expected_value = 0
         assert np.isclose(self.lacey, expected_value, atol=1e-10)
-
-if __name__ == "__main__":
-    unittest.main()
