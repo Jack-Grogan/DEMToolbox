@@ -6,16 +6,17 @@ from ..classes.particle_attribute import ParticleAttribute
 
 def sample_1d_volume(particle_data, 
                      sample_vector, 
-                     n_samples=2, 
+                     resolution=2, 
                      append_column=None,
                      particle_id_column="id"):
     """Sample the particles into equal volume samples along a specified vector.
 
     This function samples the particles into equal volume samples along a
     specified vector. The vector is normalised and the particles are split
-    into n_samples along the vector based on their volume. The resulting
-    particle data will have a new column added with the sample class for
-    each particle, and a ParticleSamples object will be returned containing
+    into n_samples defined by the resolution parameter. The particles are
+    sampled along the vector based on their volume. The resulting particle 
+    data will have a new column added with the sample class for each 
+    particle, and a ParticleSamples object will be returned containing
     the sample information.
 
     Parameters
@@ -25,7 +26,7 @@ def sample_1d_volume(particle_data,
     sample_vector : list or np.ndarray
         The vector along which to sample the particles, specified as a
         3-element list [x, y, z].
-    n_samples : int, optional
+    resolution : int, optional
         The number of samples to create along the specified vector, by
         default 2. Must be greater than or equal to 2 and less than or
         equal to the number of particles in the particle data.
@@ -52,13 +53,13 @@ def sample_1d_volume(particle_data,
     Raises
     ------
     ValueError
-        If n_samples is less than 2.
+        If resolution is less than 2.
     ValueError
         If sample_vector is not a 3-element list.
     ValueError
-        If n_samples is not an integer.
+        If resolution is not an integer.
     ValueError
-        If n_samples is greater than the number of particles in the
+        If resolution is greater than the number of particles in the
         particle data.
     UserWarning
         If the particle data has no points, a warning is issued and
@@ -67,11 +68,11 @@ def sample_1d_volume(particle_data,
     if len(sample_vector) != 3:
         raise ValueError("sample_vector must be a 3 element list.")
     
-    if n_samples < 2:
-        raise ValueError("n_samples must be greater than or equal to 2.")
+    if resolution < 2:
+        raise ValueError("resolution must be greater than or equal to 2.")
     
-    if not np.issubdtype(type(n_samples), np.integer):
-        raise ValueError("n_samples must be an integer.")
+    if not np.issubdtype(type(resolution), np.integer):
+        raise ValueError("resolution must be an integer.")
     
     sample_vector = np.asarray(sample_vector)
     sample_vector = sample_vector/np.linalg.norm(sample_vector)
@@ -88,8 +89,8 @@ def sample_1d_volume(particle_data,
             append_column, sample_attribute, [], [], [], 0, 0)
         return particle_data, samples
     
-    if n_samples > particle_data.n_points:
-        raise ValueError("n_samples must be less than or equal to the "
+    if resolution > particle_data.n_points:
+        raise ValueError("resolution must be less than or equal to the "
                          "number of particles in the particle data.")
     
     # Calculate equal volume samples along the specified vector
@@ -104,16 +105,16 @@ def sample_1d_volume(particle_data,
     sorted_volume = particle_data.point_data["volume"][sorted_indices]
     cumulative_volume = np.cumsum(sorted_volume)
     total_volume = np.sum(sorted_volume)
-    target_volume = total_volume / n_samples
+    target_volume = total_volume / resolution
 
     samples_column = np.zeros(particle_data.n_points, dtype=int)
 
     # Assign the last sample to all remaining particles
-    samples_column[:] = n_samples - 1
+    samples_column[:] = resolution - 1
 
     # loop through the samples and assign the class
     current_index = 0
-    for i in range(n_samples - 1):
+    for i in range(resolution - 1):
         split_index = np.searchsorted(cumulative_volume, 
                                         (i + 1) * target_volume)
         samples_column[sorted_indices[current_index:split_index + 1]] = i
@@ -130,9 +131,9 @@ def sample_1d_volume(particle_data,
 
     samples = ParticleSamples(append_column,
                               sample_attribute,
-                              list(range(n_samples)),
-                              list(range(n_samples)),
-                              [np.sum(samples_column == i) for i in range(n_samples)],
+                              list(range(resolution)),
+                              list(range(resolution)),
+                              [np.sum(samples_column == i) for i in range(resolution)],
                               particle_data.n_points,
                               0,
                               )

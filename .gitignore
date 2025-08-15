@@ -49,4 +49,18 @@ examples/velocity_analysis/*
 examples/mixing_rate_analysis/*
 examples/equal_volume_sampling_analysis/*
 examples/equal_volume_sampling_cylinder_analysis/*
-prototyping
+
+# Prototyping files #
+######################
+# These files are for testing and prototyping purposes and should not 
+# be included in the main repository they are not part of the final 
+# codebase and are used for development and experimentation
+prototyping/
+
+# vscode workspace files #
+##########################
+.vscode/
+
+# Pytest cache files #
+##########################
+.pytest_cache/

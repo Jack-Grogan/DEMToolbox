@@ -94,14 +94,14 @@ def sample_2d(particle_data,
             append_column, sample_attribute, [], [], [], 0, 0)
         return (particle_data, samples)
     
-    # Normalise the vectors
-    vector_1 = vector_1 / np.linalg.norm(vector_1)
-    vector_2 = vector_2 / np.linalg.norm(vector_2)
-
     # Check the vectors are orthogonal
     dot_product = np.dot(vector_1, vector_2)
     if dot_product != 0:
         raise ValueError("Sample vectors must be orthogonal to each other.")
+
+    # Normalise the vectors
+    vector_1 = vector_1 / np.linalg.norm(vector_1)
+    vector_2 = vector_2 / np.linalg.norm(vector_2)
 
     # Resolve the particles and container along the vectors
     resolved_particles_vec_1 = np.dot(particle_data.points,  vector_1)

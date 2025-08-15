@@ -37,7 +37,7 @@ def create_particle_grid(positions, radii=None, velocities=None):
     return particle_data
 
 
-class TestVectorFields(unittest.TestCase):
+class TestLaceyMixingIndex(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
@@ -83,7 +83,7 @@ class TestVectorFields(unittest.TestCase):
         cls.split = split
         cls.cylinder_data = cylinder_data
 
-    def test_lacey_mixing_index(self):
+    def test_lacey_mixing_index_polydisperse(self):
         """Test value of the Lacey mixing index."""
 
         # Number of particles in a row

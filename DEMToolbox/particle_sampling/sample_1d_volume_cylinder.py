@@ -7,14 +7,15 @@ from ..classes.particle_attribute import ParticleAttribute
 def sample_1d_volume_cylinder(particle_data, 
                               point, 
                               sample_vector, 
-                              n_samples=2, 
+                              resolution=2, 
                               append_column=None,
                               particle_id_column="id"):
     """Sample the particles into equal volume samples cylindrically.
 
     This function samples the particles into equal volume samples radially 
     around a specified cylinder axis defined by a point and a vector.
-    The vector is normalised and the particles are split into n_samples
+    The vector is normalised and the particles are split into n_samples 
+    defined by the resolution parameter. The particles are sampled radially
     along the cylinder axis based on their volume. The resulting particle
     data will have a new column added with the sample class for each
     particle, and a ParticleSamples object will be returned containing
@@ -30,7 +31,7 @@ def sample_1d_volume_cylinder(particle_data,
     point : list or np.ndarray
         A point on the cylinder axis, specified as a
         3-element list [x, y, z].
-    n_samples : int, optional
+    resolution : int, optional
         The number of samples to create along the specified vector, by
         default 2. Must be greater than or equal to 2 and less than or
         equal to the number of particles in the particle data.
@@ -57,13 +58,13 @@ def sample_1d_volume_cylinder(particle_data,
     Raises
     ------
     ValueError
-        If n_samples is less than 2.
+        If resolution is less than 2.
     ValueError
         If sample_vector is not a 3-element list.
     ValueError
-        If n_samples is not an integer.
+        If resolution is not an integer.
     ValueError
-        If n_samples is greater than the number of particles in the
+        If resolution is greater than the number of particles in the
         particle data.
     UserWarning
         If the particle data has no points, a warning is issued and
@@ -87,12 +88,12 @@ def sample_1d_volume_cylinder(particle_data,
             append_column, sample_attribute, [], [], [], 0, 0)        
         return particle_data, samples
     
-    if n_samples < 2:
-        raise ValueError("n_samples must be greater than or equal to 2.")
-    if not np.issubdtype(type(n_samples), np.integer):
-        raise ValueError("n_samples must be an integer.")
-    if n_samples > particle_data.n_points:
-        raise ValueError("n_samples must be less than or equal to the "
+    if resolution < 2:
+        raise ValueError("resolution must be greater than or equal to 2.")
+    if not np.issubdtype(type(resolution), np.integer):
+        raise ValueError("resolution must be an integer.")
+    if resolution > particle_data.n_points:
+        raise ValueError("resolution must be less than or equal to the "
                          "number of particles in the particle data.")
     
     # Calculate equal volume samples along the specified vector
@@ -111,16 +112,16 @@ def sample_1d_volume_cylinder(particle_data,
     cumulative_volume = np.cumsum(sorted_volume)
 
     total_volume = np.sum(sorted_volume)
-    target_volume = total_volume / n_samples
+    target_volume = total_volume / resolution
 
     samples_column = np.zeros(particle_data.n_points, dtype=int)
 
     # Assign the last sample to all remaining particles
-    samples_column[:] = n_samples - 1
+    samples_column[:] = resolution - 1
 
     # loop through the samples and assign the class
     current_index = 0
-    for i in range(n_samples - 1):
+    for i in range(resolution - 1):
         split_index = np.searchsorted(cumulative_volume, 
                                         (i + 1) * target_volume)
         samples_column[sorted_indices[current_index:split_index + 1]] = i
@@ -137,9 +138,9 @@ def sample_1d_volume_cylinder(particle_data,
 
     samples = ParticleSamples(append_column,
                               sample_attribute,
-                              list(range(n_samples)),
-                              list(range(n_samples)),
-                              [np.sum(samples_column == i) for i in range(n_samples)],
+                              list(range(resolution)),
+                              list(range(resolution)),
+                              [np.sum(samples_column == i) for i in range(resolution)],
                               particle_data.n_points,
                               0,
                               )

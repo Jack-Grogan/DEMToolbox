@@ -98,11 +98,6 @@ def sample_3d(particle_data,
             append_column, sample_attribute, [], [], [], 0, 0)
         return (particle_data, samples)
     
-    # Normalise the vectors
-    vector_1 = vector_1 / np.linalg.norm(vector_1)
-    vector_2 = vector_2 / np.linalg.norm(vector_2)
-    vector_3 = vector_3 / np.linalg.norm(vector_3)
-
     # Check the sample vectors are orthogonal
     dot_product_1 = np.dot(vector_1, vector_2)
     dot_product_2 = np.dot(vector_1, vector_3)
@@ -111,6 +106,11 @@ def sample_3d(particle_data,
     if dot_product_1 != 0 or dot_product_2 != 0 or dot_product_3 != 0:
         raise ValueError("Sample vectors must be orthogonal to each other.")
     
+    # Normalise the vectors
+    vector_1 = vector_1 / np.linalg.norm(vector_1)
+    vector_2 = vector_2 / np.linalg.norm(vector_2)
+    vector_3 = vector_3 / np.linalg.norm(vector_3)
+
     # Resolve the particles and container along the vectors
     resolved_particles_vec_1 = np.dot(particle_data.points, vector_1)
     resolved_particles_vec_2 = np.dot(particle_data.points, vector_2)

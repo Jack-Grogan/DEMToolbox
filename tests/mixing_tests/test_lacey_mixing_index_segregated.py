@@ -36,7 +36,7 @@ def create_particle_grid(positions, radii=None, velocities=None):
     return particle_data
 
 
-class TestVectorFields(unittest.TestCase):
+class TestLaceyMixingIndex(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
@@ -58,7 +58,7 @@ class TestVectorFields(unittest.TestCase):
         # test with non normalised vector
         particle_data, split = sample_1d_volume(particle_data, 
                                                 [0, 0, 3],
-                                                n_samples=2,
+                                                resolution=2,
                                                 append_column="z_split",
                                                 )
 
@@ -83,7 +83,7 @@ class TestVectorFields(unittest.TestCase):
         cls.split = split
         cls.cylinder_data = cylinder_data
 
-    def test_lacey_mixing_index(self):
+    def test_lacey_mixing_index_segregated(self):
         """Test value of the Lacey mixing index."""
 
         expected_value = 0

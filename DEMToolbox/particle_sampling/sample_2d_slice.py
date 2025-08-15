@@ -227,7 +227,7 @@ def sample_2d_slice(particle_data,
                                          sample_data)
 
     # Count the number of sampled and unsampled particles
-    n_unsampled_particles = sum(np.isnan(sample_elements))
+    n_unsampled_particles = sum((sample_elements) == -1)
     n_sampled_particles = len(sample_elements) - n_unsampled_particles
 
     samples = ParticleSamples(append_column, 
