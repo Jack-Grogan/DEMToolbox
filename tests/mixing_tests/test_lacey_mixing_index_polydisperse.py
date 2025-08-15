@@ -49,7 +49,7 @@ class TestVectorFields(unittest.TestCase):
         x, y, z = np.meshgrid(x_range, y_range, z_range)
 
         positions = np.column_stack((x.ravel(), y.ravel(), z.ravel()))
-        radii = [0.0005]*len(positions)
+        radii = np.digitize(positions[:, 2], np.linspace(0, 0.08, 11)) / 4000
 
         particle_data = create_particle_grid(positions, radii=radii)
         cylinder_data = create_cylinder(
@@ -86,12 +86,65 @@ class TestVectorFields(unittest.TestCase):
     def test_lacey_mixing_index(self):
         """Test value of the Lacey mixing index."""
 
-        # 50% of particles in the bulk are of target particle type
-        unmixed_variance = 0.5 * (1 - 0.5)
-        # 2 particles in each of the 125 samples
+        # Number of particles in a row
+        n_particles = 21
+
+        r_1 = 0.00025
+        r_2 = 0.0005
+        row_1_volume = [n_particles * np.pi * r_1**3 * 4/3, 
+                        n_particles * np.pi * r_2**3 * 4/3]
+
+        r_3 = 0.00075
+        r_4 = 0.001
+        row_2_volume = [n_particles * np.pi * r_3**3 * 4/3, 
+                        n_particles * np.pi * r_4**3 * 4/3]
+        
+        r_5 = 0.00125
+        r_6 = 0.0015
+        row_3_volume = [n_particles * np.pi * r_5**3 * 4/3, 
+                        n_particles * np.pi * r_6**3 * 4/3]
+        
+        r_7 = 0.00175
+        r_8 = 0.002
+        row_4_volume = [n_particles * np.pi * r_7**3 * 4/3, 
+                        n_particles * np.pi * r_8**3 * 4/3]
+        
+        r_9 = 0.00225
+        r_10 = 0.0025
+        row_5_volume = [n_particles * np.pi * r_9**3 * 4/3, 
+                        n_particles * np.pi * r_10**3 * 4/3]
+        
+        type_0_volume = (row_1_volume[0]
+                         + row_2_volume[0]
+                         + row_3_volume[0]
+                         + row_4_volume[0]
+                         + row_5_volume[0])
+        
+        type_1_volume = (row_1_volume[1]
+                         + row_2_volume[1]
+                         + row_3_volume[1]
+                         + row_4_volume[1]
+                         + row_5_volume[1])
+        
+        total_volume = type_0_volume + type_1_volume
+
+        # 50% of particle volume in the bulk is of target particle type
+        bulk_conc = type_0_volume / total_volume
+        unmixed_variance = bulk_conc * (1 - bulk_conc)
         mixed_variance = unmixed_variance / 2
-        # Equal volume sampling all samples perfectly mixed
-        variance = 0
+
+        variance = (
+            ((sum(row_1_volume) / total_volume 
+              * (row_1_volume[0] / sum(row_1_volume) - bulk_conc) ** 2))
+            + ((sum(row_2_volume) / total_volume 
+                * (row_2_volume[0] / sum(row_2_volume) - bulk_conc) ** 2))
+            + ((sum(row_3_volume) / total_volume 
+                * (row_3_volume[0] / sum(row_3_volume) - bulk_conc) ** 2))
+            + ((sum(row_4_volume) / total_volume 
+                * (row_4_volume[0] / sum(row_4_volume) - bulk_conc) ** 2))
+            + ((sum(row_5_volume) / total_volume 
+                * (row_5_volume[0] / sum(row_5_volume) - bulk_conc) ** 2))
+        )
 
         expected_value = ((variance - unmixed_variance)
                           / (mixed_variance - unmixed_variance))
