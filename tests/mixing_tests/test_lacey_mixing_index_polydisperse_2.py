@@ -37,47 +37,63 @@ def create_particle_grid(positions, radii=None, velocities=None):
     return particle_data
 
 
+def set_up_lacey_mixing_index_polydisperse_2_test():
+
+    # Create a grid of particles
+    x_range = np.linspace(-0.03, 0.03, 11)[1::2] 
+    y_range = np.linspace(-0.03, 0.03, 11)[1::2] 
+    z_range = np.linspace(0, 0.08, 21)[1::2]
+    x, y, z = np.meshgrid(x_range, y_range, z_range)
+
+    positions = np.column_stack((x.ravel(), y.ravel(), z.ravel()))
+    radii = np.digitize(positions[:, 2], np.linspace(0, 0.08, 11)) / 4000
+
+    # Add a particle to the grid at cell boundary
+    positions = np.vstack([positions, [-0.018001, -0.018001, 0.015999]])
+    radii = np.append(radii, 0.005)
+
+    particle_data = create_particle_grid(positions, radii=radii)
+    cylinder_data = create_cylinder(
+        radius=0.03, height=0.08, resolution=100)
+    
+    ids = np.asarray(particle_data["id"])
+    data = np.column_stack((ids, ids % 2))
+
+    split = ParticleAttribute("id", "mixed", data)
+    particle_data = append_attribute(particle_data, split)
+
+    sample_resolution = [5, 5, 5]
+    particle_data, samples = sample_3d(particle_data,
+                                        cylinder_data,
+                                        vector_1=[1, 0, 0],
+                                        vector_2=[0, 1, 0],
+                                        vector_3=[0, 0, 1],
+                                        resolution=sample_resolution,
+                                        )
+    
+    particle_data, lacey = macro_scale_lacey_mixing(particle_data, 
+                                                    split,
+                                                    samples,
+                                                    )
+    
+    return (particle_data, samples, sample_resolution, 
+            lacey, split, cylinder_data)
+
+
+def test_lacey_mixing_index_polydisperse_2_benchmark(benchmark):
+    benchmark(set_up_lacey_mixing_index_polydisperse_2_test)
+
+
 class TestLaceyMixingIndex(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
 
-         # Create a grid of particles
-        x_range = np.linspace(-0.03, 0.03, 11)[1::2] 
-        y_range = np.linspace(-0.03, 0.03, 11)[1::2] 
-        z_range = np.linspace(0, 0.08, 21)[1::2]
-        x, y, z = np.meshgrid(x_range, y_range, z_range)
+        result = set_up_lacey_mixing_index_polydisperse_2_test()
 
-        positions = np.column_stack((x.ravel(), y.ravel(), z.ravel()))
-        radii = np.digitize(positions[:, 2], np.linspace(0, 0.08, 11)) / 4000
-
-        # Add a particle to the grid at cell boundary
-        positions = np.vstack([positions, [-0.018001, -0.018001, 0.015999]])
-        radii = np.append(radii, 0.005)
-
-        particle_data = create_particle_grid(positions, radii=radii)
-        cylinder_data = create_cylinder(
-            radius=0.03, height=0.08, resolution=100)
-        
-        ids = np.asarray(particle_data["id"])
-        data = np.column_stack((ids, ids % 2))
-
-        split = ParticleAttribute("id", "mixed", data)
-        particle_data = append_attribute(particle_data, split)
-    
-        sample_resolution = [5, 5, 5]
-        particle_data, samples = sample_3d(particle_data,
-                                           cylinder_data,
-                                           vector_1=[1, 0, 0],
-                                           vector_2=[0, 1, 0],
-                                           vector_3=[0, 0, 1],
-                                           resolution=sample_resolution,
-                                           )
-        
-        particle_data, lacey = macro_scale_lacey_mixing(particle_data, 
-                                                        split,
-                                                        samples,
-                                                        )
+        # Unpack results
+        (particle_data, samples, sample_resolution, 
+         lacey, split, cylinder_data) = result
         
         # Store results
         cls.particle_data = particle_data

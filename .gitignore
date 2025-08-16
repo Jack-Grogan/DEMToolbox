@@ -64,3 +64,8 @@ prototyping/
 # Pytest cache files #
 ##########################
 .pytest_cache/
+
+# Benchmark files #
+######################
+# These files are used created during benchmarking
+.benchmarks/

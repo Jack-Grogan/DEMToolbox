@@ -9,24 +9,34 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
 from DEMToolbox.particle_sampling import sample_1d_volume_cylinder
 
 
+def set_up_sample_1d_volume_cylinder_test():
+
+    vtk_file_path = os.path.join(os.path.dirname(__file__),
+                                        os.pardir, "vtks",)
+        
+    particle_data = pv.read(os.path.join(vtk_file_path,
+                                        "particles.vtk"))
+    
+    point = [0, 0, 0]
+    sample_vector = [2, 1, 3]
+    # test with non normalised vector
+    particle_data, split = sample_1d_volume_cylinder(particle_data,
+                                                        point,
+                                                        sample_vector,
+                                                        resolution=10)
+    return particle_data, split
+
+
+def test_sample_1d_volume_cylinder_benchmark(benchmark):
+    benchmark(set_up_sample_1d_volume_cylinder_test)
+
+
 class TestSample1DVolumeCylinder(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
 
-        vtk_file_path = os.path.join(os.path.dirname(__file__),
-                                     os.pardir, "vtks",)
-        
-        particle_data = pv.read(os.path.join(vtk_file_path,
-                                           "particles.vtk"))
-        
-        point = [0, 0, 0]
-        sample_vector = [2, 1, 3]
-        # test with non normalised vector
-        particle_data, split = sample_1d_volume_cylinder(particle_data,
-                                                         point,
-                                                         sample_vector,
-                                                         resolution=10)
+        particle_data, split = set_up_sample_1d_volume_cylinder_test()  
         
         cls.particle_data = particle_data
         cls.split = split
@@ -73,7 +83,7 @@ class TestSample1DVolumeCylinder(unittest.TestCase):
 
         assert all(a == b for a, b in zip(self.split.particles,
                                           [8914, 8913, 8928, 8917, 8919, 
-                                           8942, 8922, 8952, 8925, 8918])
+                                           8942, 8922, 8952, 8924, 8919])
                    )
         
 

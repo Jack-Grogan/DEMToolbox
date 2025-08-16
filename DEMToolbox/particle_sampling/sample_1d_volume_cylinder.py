@@ -110,22 +110,25 @@ def sample_1d_volume_cylinder(particle_data,
 
     sorted_volume = particle_data.point_data["volume"][sorted_indices]
     cumulative_volume = np.cumsum(sorted_volume)
+    total_volume = cumulative_volume[-1]
 
-    total_volume = np.sum(sorted_volume)
-    target_volume = total_volume / resolution
+    bin_edges = np.linspace(0, total_volume, resolution + 1)
+    sample_elements = np.searchsorted(bin_edges, 
+                                      cumulative_volume, side="left") - 1
+    sample_elements = np.clip(sample_elements, 0, resolution - 1)
 
-    samples_column = np.zeros(particle_data.n_points, dtype=int)
+    samples_column = np.full(particle_data.n_points, -1, dtype=int)
+    samples_column[sorted_indices] = sample_elements
+    
+    cells = np.arange(resolution, dtype=int)
 
-    # Assign the last sample to all remaining particles
-    samples_column[:] = resolution - 1
-
-    # loop through the samples and assign the class
-    current_index = 0
-    for i in range(resolution - 1):
-        split_index = np.searchsorted(cumulative_volume, 
-                                        (i + 1) * target_volume)
-        samples_column[sorted_indices[current_index:split_index + 1]] = i
-        current_index = split_index
+    occupied_cells, counts = np.unique(samples_column, return_counts=True)
+    occupied_cells = occupied_cells[occupied_cells != -1]
+    
+    cell_particles = np.zeros(resolution, dtype=int)
+    np.add.at(cell_particles, occupied_cells, counts)
+    n_sampled_particles = np.sum(samples_column != -1)
+    n_unsampled_particles = np.sum(samples_column == -1)
 
     # Add the samples column to the particle data
     particle_data[append_column] = samples_column
@@ -138,11 +141,11 @@ def sample_1d_volume_cylinder(particle_data,
 
     samples = ParticleSamples(append_column,
                               sample_attribute,
-                              list(range(resolution)),
-                              list(range(resolution)),
-                              [np.sum(samples_column == i) for i in range(resolution)],
-                              particle_data.n_points,
-                              0,
+                              cells,
+                              occupied_cells,
+                              cell_particles,
+                              n_sampled_particles,
+                              n_unsampled_particles,
                               )
 
     return particle_data, samples

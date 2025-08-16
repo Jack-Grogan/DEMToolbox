@@ -99,32 +99,24 @@ def sample_1d(particle_data,
                                 max(resolved_container), 
                                 resolution + 1)
     
-    # Create the empty sample elements array
-    sample_elements = np.empty(particle_data.n_points)
-    sample_elements[:] = np.nan
-    
-    cells = []
-    occupied_cells = []
-    cell_particles = []
+    i = np.digitize(resolved_particles, sample_bounds) - 1
 
-    sample_id = int(0)
-    for i in range(len(sample_bounds) - 1):
-        
-        above_lower = resolved_particles >= sample_bounds[i]
-        below_upper = resolved_particles < sample_bounds[i+1]
+    # Mask out particles outside the valid bin range
+    valid_mask = (i >= 0) & (i < len(sample_bounds) - 1)
+    i = i[valid_mask]
 
-        # Boolean array of particles in the sample element
-        sample_element = above_lower & below_upper
+    # Assign unique sample ids to each particle
+    sample_id = i
+    sample_elements = np.full(len(resolved_particles), -1, dtype=int)
+    sample_elements[valid_mask] = sample_id
 
-        # Assign the sample element id to the particles in the sample
-        sample_elements[sample_element] = int(sample_id)
-
-        cells.append(sample_id)
-        cell_particles.append(sum(sample_element))
-        if sum(sample_element) > 0:
-            occupied_cells.append(sample_id)
-
-        sample_id += int(1)
+    # Count particles per cell
+    n_bins = len(sample_bounds) - 1
+    cells = np.arange(n_bins, dtype=int)
+    occupied_cells, counts = np.unique(sample_id, return_counts=True)
+    occupied_cells = occupied_cells[occupied_cells != -1]
+    cell_particles = np.zeros(n_bins, dtype=int)
+    np.add.at(cell_particles, occupied_cells, counts)
 
     # Add the sample column to the particle data
     particle_data[append_column] = sample_elements
@@ -136,7 +128,7 @@ def sample_1d(particle_data,
                                          sample_data)
 
     # Count the number of sampled and unsampled particles
-    n_unsampled_particles = sum(np.isnan(sample_elements))
+    n_unsampled_particles = np.sum(sample_elements == -1)
     n_sampled_particles = len(sample_elements) - n_unsampled_particles
 
     # Create the ParticleSamples object to store data about the samples

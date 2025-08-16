@@ -96,7 +96,7 @@ def sample_2d(particle_data,
     
     # Check the vectors are orthogonal
     dot_product = np.dot(vector_1, vector_2)
-    if dot_product != 0:
+    if not np.isclose(dot_product, 0):
         raise ValueError("Sample vectors must be orthogonal to each other.")
 
     # Normalise the vectors
@@ -117,42 +117,32 @@ def sample_2d(particle_data,
                                     max(resolved_container_vec_2),
                                     resolution[1] + 1)
 
-    # Create the empty sample elements array
-    sample_elements = np.empty(particle_data.n_points)
-    sample_elements[:] = np.nan
+    # Digitise the resolved particles into the sample bounds
+    i = np.digitize(resolved_particles_vec_2, vec_2_sample_bounds) - 1
+    j = np.digitize(resolved_particles_vec_1, vec_1_sample_bounds) - 1
 
-    cells = []
-    occupied_cells = []
-    cell_particles = []
+    # Filter out particles outside the valid ranges
+    mask = (
+        (i >= 0) & (i < len(vec_2_sample_bounds) - 1) &
+        (j >= 0) & (j < len(vec_1_sample_bounds) - 1)
+    )   
 
-    sample_id = int(0)
-    for i in range(len(vec_2_sample_bounds) - 1):
+    i, j = i[mask], j[mask]
 
-        above_lower_vec_2 = (resolved_particles_vec_2
-                              >= vec_2_sample_bounds[i])
-        below_upper_vec_2 = (resolved_particles_vec_2 
-                             < vec_2_sample_bounds[i+1])
+    # Create the sample id for each particle
+    sample_id = np.ravel_multi_index((i, j),
+                                     (len(vec_2_sample_bounds)-1,
+                                      len(vec_1_sample_bounds)-1)).astype(int)
+    
+    cells = np.arange(resolution[0] * resolution[1], dtype=int)
+    occupied_cells, counts = np.unique(sample_id, return_counts=True)
+    occupied_cells = occupied_cells[occupied_cells != -1]
+    cell_particles = np.zeros(resolution[0] * resolution[1], dtype=int)
+    np.add.at(cell_particles, occupied_cells, counts)
 
-        for j in range(len(vec_1_sample_bounds) - 1):
-
-            above_lower_vec_1 = (resolved_particles_vec_1 
-                                 >= vec_1_sample_bounds[j])
-            below_upper_vec_1 = (resolved_particles_vec_1 
-                                 < vec_1_sample_bounds[j+1])
-
-            # Boolean array of particles in the sample element
-            sample_element = ((above_lower_vec_1 & below_upper_vec_1) 
-                            & (above_lower_vec_2 & below_upper_vec_2))
-
-            # Assign the sample element id to the particles in the sample
-            sample_elements[sample_element] = int(sample_id)
-            cells.append(sample_id)
-            cell_particles.append(sum(sample_element))
-            if sum(sample_element) > 0:
-                occupied_cells.append(sample_id)
-
-            sample_id += int(1)
-
+    sample_elements = np.full(particle_data.n_points, -1, dtype=int)
+    sample_elements[mask] = sample_id
+    
     # Add the sample elements to the particle data
     particle_data[append_column] = sample_elements
 
@@ -163,7 +153,7 @@ def sample_2d(particle_data,
                                         sample_data)
 
     # Count the number of sampled and unsampled particles
-    n_unsampled_particles = sum(np.isnan(sample_elements))
+    n_unsampled_particles = np.sum(sample_elements == -1)
     n_sampled_particles = len(sample_elements) - n_unsampled_particles
 
     samples = ParticleSamples(append_column,
