@@ -9,28 +9,39 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
 from DEMToolbox.particle_sampling import sample_1d
 
 
+def set_up_sample_1d_test():
+
+    vtk_file_path = os.path.join(os.path.dirname(__file__),
+                                        os.pardir, "vtks",)
+    
+    particle_data = pv.read(os.path.join(vtk_file_path,
+                                        "particles.vtk"))
+    cylinder_data = pv.read(os.path.join(vtk_file_path,
+                                        "mesh.vtk"))
+    
+    sample_vector = [8, 1, 4]
+    resolution = 21
+
+    # test with non normalised vector
+    particle_data, split = sample_1d(particle_data,
+                                        cylinder_data,
+                                        sample_vector,
+                                        resolution,
+                                        append_column="sample_test")
+    
+    return particle_data, split
+
+
+def test_sample_1d_benchmark(benchmark):
+    benchmark(set_up_sample_1d_test)
+
+
 class TestSample1D(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
 
-        vtk_file_path = os.path.join(os.path.dirname(__file__),
-                                     os.pardir, "vtks",)
-        
-        particle_data = pv.read(os.path.join(vtk_file_path,
-                                           "particles.vtk"))
-        cylinder_data = pv.read(os.path.join(vtk_file_path,
-                                           "mesh.vtk"))
-        
-        sample_vector = [8, 1, 4]
-        resolution = 21
-
-        # test with non normalised vector
-        particle_data, split = sample_1d(particle_data,
-                                         cylinder_data,
-                                         sample_vector,
-                                         resolution,
-                                         append_column="sample_test")
+        particle_data, split = set_up_sample_1d_test()        
 
         cls.particle_data = particle_data
         cls.split = split

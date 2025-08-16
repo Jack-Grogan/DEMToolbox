@@ -35,10 +35,7 @@ def create_particle_grid(positions, radii=None, velocities=None):
     return particle_data
 
 
-class TestVectorFields(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        """Set up the test class."""
+def set_up_simple_velocity_vector_field_test():
 
          # Create a grid of particles
         x_range = np.linspace(-0.03, 0.03, 31)[1::2] 
@@ -72,6 +69,21 @@ class TestVectorFields(unittest.TestCase):
                                                     resolution,
                                                     )
         
+        return vector_field_results, resolution
+
+
+def test_simple_velocity_vector_field_benchmark(benchmark):
+    benchmark(set_up_simple_velocity_vector_field_test)
+
+
+class TestSimpleVectorField(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        """Set up the test class."""
+
+        (vector_field_results, 
+         resolution) = set_up_simple_velocity_vector_field_test()
+        
         # Store results
         cls.resolution = resolution
         cls.particle_data = vector_field_results[0]
@@ -80,19 +92,23 @@ class TestVectorFields(unittest.TestCase):
         cls.occupancy = cls.samples.particles.reshape(resolution[1], 
                                                       resolution[0])
 
+
     def test_vector_field_shape(self):
         assert (np.shape(self.velocity_vectors) 
                 == (self.resolution[1], self.resolution[0], 2))
         
+
     def test_velocity_vectors_values(self):
         expected_value = [0, -0.003]
         for i in range(self.resolution[1]):
             for j in range(self.resolution[0]):
                 assert np.all(self.velocity_vectors[i, j] == expected_value)
         
+
     def test_occupancy_shape(self):
         assert (np.shape(self.occupancy) 
                 == (self.resolution[1], self.resolution[0]))
         
+
     def test_occupancy_values(self):
         assert np.all(self.occupancy == 1)

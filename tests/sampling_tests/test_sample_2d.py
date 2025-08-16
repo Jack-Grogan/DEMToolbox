@@ -9,32 +9,43 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
 from DEMToolbox.particle_sampling import sample_2d
 
 
+def set_up_sample_2d_test():
+
+    vtk_file_path = os.path.join(os.path.dirname(__file__),
+                                    os.pardir, "vtks",)
+    
+    particle_data = pv.read(os.path.join(vtk_file_path,
+                                        "particles.vtk"))
+    cylinder_data = pv.read(os.path.join(vtk_file_path,
+                                        "mesh.vtk"))
+    
+    vector_1 = [1, 2, -1]
+    vector_2 = [4, -1, 2]
+
+    resolution = [3, 3]
+
+    # test with non normalised vector
+    particle_data, split = sample_2d(particle_data,
+                                        cylinder_data,
+                                        vector_1,
+                                        vector_2,
+                                        resolution,
+                                        append_column="sample_test"
+    )
+
+    return particle_data, split
+
+
+def test_sample_2d_benchmark(benchmark):
+    benchmark(set_up_sample_2d_test)
+
+
 class TestSample2D(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
 
-        vtk_file_path = os.path.join(os.path.dirname(__file__),
-                                     os.pardir, "vtks",)
-        
-        particle_data = pv.read(os.path.join(vtk_file_path,
-                                           "particles.vtk"))
-        cylinder_data = pv.read(os.path.join(vtk_file_path,
-                                           "mesh.vtk"))
-        
-        vector_1 = [1, 2, -1]
-        vector_2 = [4, -1, 2]
-   
-        resolution = [3, 3]
-
-        # test with non normalised vector
-        particle_data, split = sample_2d(particle_data,
-                                         cylinder_data,
-                                         vector_1,
-                                         vector_2,
-                                         resolution,
-                                         append_column="sample_test"
-        )
+        particle_data, split = set_up_sample_2d_test()
 
         cls.particle_data = particle_data
         cls.split = split

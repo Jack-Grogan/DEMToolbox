@@ -9,28 +9,39 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
 from DEMToolbox.particle_sampling import sample_3d_cylinder
 
 
+def set_up_sample_3d_cylinder_volume_test():
+
+    vtk_file_path = os.path.join(os.path.dirname(__file__),
+                                    os.pardir, "vtks",)
+    
+    particle_data = pv.read(os.path.join(vtk_file_path,
+                                        "particles.vtk"))
+    cylinder_data = pv.read(os.path.join(vtk_file_path,
+                                        "mesh.vtk"))
+    
+    resolution = [3, 3, 3]
+
+    # test with non normalised vector
+    particle_data, split = sample_3d_cylinder(particle_data,
+                                                cylinder_data,
+                                                resolution,
+                                                sample_constant="volume",
+                                                append_column="sample_test"
+    )
+
+    return particle_data, split
+
+
+def test_sample_3d_cylinder_volume_benchmark(benchmark):
+    benchmark(set_up_sample_3d_cylinder_volume_test)
+
+
 class TestSample3DCylinderVolume(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
 
-        vtk_file_path = os.path.join(os.path.dirname(__file__),
-                                     os.pardir, "vtks",)
-        
-        particle_data = pv.read(os.path.join(vtk_file_path,
-                                           "particles.vtk"))
-        cylinder_data = pv.read(os.path.join(vtk_file_path,
-                                           "mesh.vtk"))
-        
-        resolution = [3, 3, 3]
-
-        # test with non normalised vector
-        particle_data, split = sample_3d_cylinder(particle_data,
-                                                  cylinder_data,
-                                                  resolution,
-                                                  sample_constant="volume",
-                                                  append_column="sample_test"
-        )
+        particle_data, split = set_up_sample_3d_cylinder_volume_test()
 
         cls.particle_data = particle_data
         cls.split = split

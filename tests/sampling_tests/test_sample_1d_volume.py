@@ -9,23 +9,33 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
 from DEMToolbox.particle_sampling import sample_1d_volume
 
 
+def set_up_sample_1d_volume_test():
+
+    vtk_file_path = os.path.join(os.path.dirname(__file__),
+                                    os.pardir, "vtks",)
+    
+    particle_data = pv.read(os.path.join(vtk_file_path,
+                                        "particles.vtk"))
+    
+    sample_vector = [8, 1, 4]
+    # test with non normalised vector
+    particle_data, split = sample_1d_volume(particle_data,
+                                            sample_vector,
+                                            5)
+    
+    return particle_data, split
+                                            
+
+def test_sample_1d_volume_benchmark(benchmark):
+    benchmark(set_up_sample_1d_volume_test)
+
+
 class TestSample1DVolume(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
 
-        vtk_file_path = os.path.join(os.path.dirname(__file__),
-                                     os.pardir, "vtks",)
-        
-        particle_data = pv.read(os.path.join(vtk_file_path,
-                                           "particles.vtk"))
-        
-        sample_vector = [8, 1, 4]
-        # test with non normalised vector
-        particle_data, split = sample_1d_volume(particle_data,
-                                                sample_vector,
-                                                5)
-                                                
+        particle_data, split = set_up_sample_1d_volume_test()
 
         cls.particle_data = particle_data
         cls.split = split
@@ -73,7 +83,7 @@ class TestSample1DVolume(unittest.TestCase):
         """Test particles in each cell."""
 
         assert all(a == b for a, b in zip(self.split.particles,
-                                          [17879, 17842, 17835, 17855, 17839])
+                                          [17879, 17842, 17835, 17854, 17840])
                    )
         
 

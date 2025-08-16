@@ -35,33 +35,45 @@ def create_particle_grid(positions, radii=None, velocities=None):
     return particle_data
 
 
+def set_up_homogeneity_non_zero_test():
+    """Set up the test class."""
+
+    # Create a grid of particles
+    x_range = np.linspace(-0.03, 0.03, 13)[1::2] 
+    y_range = np.linspace(-0.03, 0.03, 13)[1::2] 
+    z_range = np.linspace(0, 0.08, 21)[1::2]
+    x, y, z = np.meshgrid(x_range, y_range, z_range)
+
+    positions = np.column_stack((x.ravel(), y.ravel(), z.ravel()))
+    radii = np.digitize(positions[:, 2], np.linspace(0, 0.08, 11)) / 4000
+
+    particle_data = create_particle_grid(positions, radii=radii)
+    cylinder_data = create_cylinder(
+        radius=0.03, height=0.08, resolution=100)
+
+    particle_data, samples = sample_1d(particle_data,
+                                        cylinder_data,
+                                        [0, 0, 1],
+                                        resolution=10)
+
+    particle_data, hom = homogeneity_index(particle_data,
+                                            "radius",
+                                            samples)
+    
+    return particle_data, samples, hom, cylinder_data
+
+
+def test_homogeneity_index_non_zero_benchmark(benchmark):
+     benchmark(set_up_homogeneity_non_zero_test)
+
+
 class TestHomogeneityIndex(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
 
-         # Create a grid of particles
-        x_range = np.linspace(-0.03, 0.03, 13)[1::2] 
-        y_range = np.linspace(-0.03, 0.03, 13)[1::2] 
-        z_range = np.linspace(0, 0.08, 21)[1::2]
-        x, y, z = np.meshgrid(x_range, y_range, z_range)
-
-        positions = np.column_stack((x.ravel(), y.ravel(), z.ravel()))
-        radii = np.digitize(positions[:, 2], np.linspace(0, 0.08, 11)) / 4000
-
-        particle_data = create_particle_grid(positions, radii=radii)
-        cylinder_data = create_cylinder(
-            radius=0.03, height=0.08, resolution=100)
-        
-        particle_data, samples = sample_1d(particle_data,
-                                           cylinder_data,
-                                           [0, 0, 1],
-                                           resolution=10)
-
-
-        particle_data, hom = homogeneity_index(particle_data,
-                                               "radius",
-                                                samples)
+        result = set_up_homogeneity_non_zero_test()
+        particle_data, samples, hom, cylinder_data = result
 
         # Store results
         cls.particle_data = particle_data
