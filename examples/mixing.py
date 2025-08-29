@@ -49,9 +49,9 @@ splits = []
 for split_dimension, split_column in zip(split_dimensions, split_columns):
     settled_file, split = sample_1d_volume(settled_file, 
                                 split_dimension,
-                                n_samples=split_resolution, 
+                                resolution=split_resolution, 
                                 append_column=split_column)
-    splits.append(split.attribute)
+    splits.append(split.ParticleAttribute)
     
 results = []
 for particle_file in tqdm(files):

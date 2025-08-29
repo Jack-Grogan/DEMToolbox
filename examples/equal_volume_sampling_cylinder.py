@@ -47,11 +47,11 @@ for vector, point, resolution, column in iterator:
         settled_file, 
         point,
         vector,
-        n_samples=resolution, 
+        resolution=resolution, 
         append_column=column
     )
     
-    splits.append(split.attribute)
+    splits.append(split.ParticleAttribute)
     
 for particle_file in tqdm(files):
 
