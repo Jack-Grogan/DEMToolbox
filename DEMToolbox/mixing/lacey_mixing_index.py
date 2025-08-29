@@ -216,6 +216,9 @@ def macro_scale_lacey_mixing(particle_data,
             UserWarning,
         )
         lacey = np.nan
+        variance = np.nan
+        unmixed_variance = np.nan
+        mixed_variance = np.nan
     elif sum(class_0_sample_volume) == 0 or sum(class_1_sample_volume) == 0:
         warnings.warn(
             (f"Only one particle type present in the samples at this timestep."
@@ -223,6 +226,9 @@ def macro_scale_lacey_mixing(particle_data,
             UserWarning,
         )
         lacey = np.nan
+        variance = np.nan
+        unmixed_variance = np.nan
+        mixed_variance = np.nan
     else:
         bulk_concentration = (
             np.sum(class_0_sample_volume)
