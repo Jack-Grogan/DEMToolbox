@@ -24,7 +24,9 @@ def sample_3d_cylinder(particle_data,
     cylinder_data : vtkPolyData
         The cylinder container vtk.
     resolution : list
-        The resolution of the 3D sample space in the form [m, n, o].
+        The resolution of the 3D sample space in the form [m, n, o]. m is the
+        number of angular divisions, n is the number of radial divisions
+        and o is the number of vertical divisions.
     sample_constant : str, optional
         The constant to sample the radial direction, by default 
         "volume". If "volume" the radial direction will be sampled
