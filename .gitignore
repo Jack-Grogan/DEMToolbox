@@ -69,3 +69,4 @@ prototyping/
 ######################
 # These files are used created during benchmarking
 .benchmarks/
+.benchmarking/

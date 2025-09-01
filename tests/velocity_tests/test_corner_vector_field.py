@@ -88,9 +88,8 @@ class TestCornerVectorFields(unittest.TestCase):
         cls.resolution = resolution
         cls.particle_data = vector_field_results[0]
         cls.velocity_vectors = vector_field_results[1]
-        cls.samples = vector_field_results[2]
-        cls.occupancy = cls.samples.particles.reshape(resolution[1], 
-                                                      resolution[0])
+        cls.occupancy = vector_field_results[2]
+        cls.samples = vector_field_results[3]
 
 
     def test_vector_field_shape(self):
