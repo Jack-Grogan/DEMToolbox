@@ -5,13 +5,12 @@ from ..classes.particle_samples import ParticleSamples
 from ..classes.particle_attribute import ParticleAttribute
 
 def sample_2d_slice(particle_data, 
-                    container_data, 
+                    bounds, 
                     point, 
                     vector_1, 
                     vector_2,
                     plane_thickness, 
                     resolution, 
-                    bounds=None,
                     append_column=None, 
                     particle_id_column="id"):
     """Split the particles into samples split along a 2D slice.
@@ -23,8 +22,11 @@ def sample_2d_slice(particle_data,
     ----------
     particle_data : vtkPolyData
         The particle vtk.
-    container_data : vtkPolyData
-        The container vtk.
+    bounds : list, np.ndarray or vtkPolyData
+        If a list or np.ndarray bounds of the sample space in the form 
+        [vec_1_lower_bound, vec_1_upper_bound, vec_2_lower_bound, 
+        vec_2_upper_bound]. If a vtk, the bounds will be determined from 
+        the vtk's bounds.
     point : list
         A point on the plane as [x, y, z].
     vector_1 : list
@@ -130,36 +132,8 @@ def sample_2d_slice(particle_data,
             append_column, sample_attribute, [], [], [], 0, 0)
         return (particle_data, samples)
     
-    if container_data.n_points == 0:
-        warnings.warn("Cannot sample empty container file.", UserWarning)
-        sample_attribute = ParticleAttribute(particle_id_column, 
-                                        append_column,
-                                        np.empty((0, 2)))
-        samples = ParticleSamples(
-            append_column, sample_attribute, [], [], [], 0, 0)
-        return (particle_data, samples)
-
-    # Resolve the particles along the vectors
-    resolved_particles_vec_1 = np.dot(particle_data.points, 
-                                      vector_1)
-    resolved_particles_vec_2 = np.dot(particle_data.points, 
-                                      vector_2)
-
-    if bounds is None:
-        # Resolve container along the vectors
-        resolved_container_vec_1 = np.dot(container_data.points, 
-                                        vector_1)
-        resolved_container_vec_2 = np.dot(container_data.points, 
-                                        vector_2)
-
-        # Define the sample bounds linearly along the resolved container
-        vec_1_sample_bounds = np.linspace(min(resolved_container_vec_1),
-                                          max(resolved_container_vec_1),
-                                          resolution[0] + 1)
-        vec_2_sample_bounds = np.linspace(min(resolved_container_vec_2),
-                                          max(resolved_container_vec_2),
-                                          resolution[1] + 1)
-    else:
+    if isinstance(bounds, list or np.ndarray):
+        
         if len(bounds) != 4:
             raise ValueError("Bounds must be a list of 4 elements.")
         
@@ -174,6 +148,36 @@ def sample_2d_slice(particle_data,
         vec_1_sample_bounds = np.linspace(bounds[0], bounds[1],
                                           resolution[0] + 1)
         vec_2_sample_bounds = np.linspace(bounds[2], bounds[3],
+                                          resolution[1] + 1)
+    
+    else:
+        if bounds.n_points == 0:
+            warnings.warn("Cannot sample empty container file.", UserWarning)
+            sample_attribute = ParticleAttribute(particle_id_column, 
+                                            append_column,
+                                            np.empty((0, 2)))
+            samples = ParticleSamples(
+                append_column, sample_attribute, [], [], [], 0, 0)
+            return (particle_data, samples)
+
+        # Resolve the particles along the vectors
+        resolved_particles_vec_1 = np.dot(particle_data.points, 
+                                        vector_1)
+        resolved_particles_vec_2 = np.dot(particle_data.points, 
+                                        vector_2)
+
+        # Resolve container along the vectors
+        resolved_container_vec_1 = np.dot(bounds.points, 
+                                        vector_1)
+        resolved_container_vec_2 = np.dot(bounds.points, 
+                                        vector_2)
+
+        # Define the sample bounds linearly along the resolved container
+        vec_1_sample_bounds = np.linspace(min(resolved_container_vec_1),
+                                          max(resolved_container_vec_1),
+                                          resolution[0] + 1)
+        vec_2_sample_bounds = np.linspace(min(resolved_container_vec_2),
+                                          max(resolved_container_vec_2),
                                           resolution[1] + 1)
         
     # Define the slice boolean mask

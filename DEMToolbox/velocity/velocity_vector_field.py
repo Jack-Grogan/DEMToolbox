@@ -3,9 +3,8 @@ import warnings
 
 from ..particle_sampling.sample_2d_slice import sample_2d_slice
 
-def velocity_vector_field(particle_data, container_data, point, vector_1, 
+def velocity_vector_field(particle_data, bounds, point, vector_1, 
                           vector_2, plane_thickness, resolution,
-                          bounds=None,
                           sample_column=None, 
                           velocity_column="v",
                           append_column="mean_resolved_velocity",
@@ -16,8 +15,11 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
     ----------
     particle_data : vtkPolyData
         The particle vtk.
-    container_data : vtkPolyData
-        The container vtk.
+    bounds : list, np.ndarray or vtkPolyData
+        If a list or np.ndarray bounds of the sample space in the form 
+        [vec_1_lower_bound, vec_1_upper_bound, vec_2_lower_bound, 
+        vec_2_upper_bound]. If a vtk, the bounds will be determined from 
+        the vtk's bounds.
     point : list
         A point on the plane as [x, y, z].
     vector_1 : list
@@ -53,6 +55,8 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
     velocity_vectors : tuple
         An array of the mean resolved velocity vectors for particles in the
         sample space.
+    occupancy : np.ndarray
+        An array of the number of particles in each sample
     samples : ParticleSamples
         The samples object containing the sample information that was
         used to calculate the velocity vector field. if no particles
@@ -88,23 +92,16 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
         velocity_vectors[:] = np.nan
         return particle_data, velocity_vectors, None
     
-    if container_data.n_points == 0:
-        warnings.warn("Cannot sample empty container file.", UserWarning)
-        velocity_vectors = np.zeros((resolution[1], resolution[0], 2))
-        velocity_vectors[:] = np.nan
-        return particle_data, velocity_vectors, None
-    
     vector_1 = vector_1 / np.linalg.norm(vector_1)
     vector_2 = vector_2 / np.linalg.norm(vector_2)
 
     particle_data, samples = sample_2d_slice(particle_data, 
-                                        container_data, 
+                                        bounds, 
                                         point, 
                                         vector_1, 
                                         vector_2,
                                         plane_thickness, 
                                         resolution,
-                                        bounds=bounds,
                                         append_column=sample_column,
                                         particle_id_column=particle_id_column
                                         )
@@ -148,5 +145,7 @@ def velocity_vector_field(particle_data, container_data, point, vector_1,
                                                 resolution[0], 2)
 
     particle_data[append_column] = cell_velocity
+    occupancy = samples.particles.reshape(resolution[1], 
+                                          resolution[0])
 
-    return particle_data, velocity_vectors, samples
+    return particle_data, velocity_vectors, occupancy, samples
