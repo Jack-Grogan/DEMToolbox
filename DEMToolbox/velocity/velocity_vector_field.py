@@ -90,7 +90,8 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
         warnings.warn("Cannot sample empty particles file.", UserWarning)
         velocity_vectors = np.zeros((resolution[1], resolution[0], 2))
         velocity_vectors[:] = np.nan
-        return particle_data, velocity_vectors, None
+        occupancy = np.zeros((resolution[1], resolution[0]))
+        return particle_data, velocity_vectors, occupancy, None
     
     vector_1 = vector_1 / np.linalg.norm(vector_1)
     vector_2 = vector_2 / np.linalg.norm(vector_2)
