@@ -11,7 +11,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
                 os.pardir)))
 
 from DEMToolbox.velocity import velocity_vector_field 
-import cProfile
 
 def run():
 
@@ -30,7 +29,7 @@ def run():
 
     # Save directories
     file_path = os.path.dirname(__file__)
-    save_dir = os.path.join(file_path, "velocity_analysis_new_new")
+    save_dir = os.path.join(file_path, "velocity_analysis")
     vtk_dir = os.path.join(save_dir, "post")
     save_fig_dir = os.path.join(save_dir, "figures")
     if not os.path.exists(save_fig_dir):
@@ -56,14 +55,14 @@ def run():
         cylinder_data = pv.read(cylinder_file)
 
         
-        particle_data, vectors, _ = velocity_vector_field(particle_data, 
-                                                        cylinder_data, 
-                                                        point, 
-                                                        vector_1, 
-                                                        vector_2, 
-                                                        plane_thickness,
-                                                        resolution, 
-                                                        )
+        particle_data, vectors, _, _ = velocity_vector_field(particle_data, 
+                                                             cylinder_data, 
+                                                             point, 
+                                                             vector_1, 
+                                                             vector_2, 
+                                                             plane_thickness,
+                                                             resolution, 
+                                                             )
         
         vecs = np.empty_like(vectors)
         mags = np.empty(np.shape(vectors)[0:2])
@@ -131,7 +130,7 @@ def run():
         plt.close(fig)
 
 def main():
-    cProfile.run('run()', "run_velocity_analysis_new_new.prof")
+    run()
 
 if __name__ == "__main__":
     main()
