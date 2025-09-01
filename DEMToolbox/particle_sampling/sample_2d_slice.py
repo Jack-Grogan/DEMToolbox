@@ -160,12 +160,6 @@ def sample_2d_slice(particle_data,
                 append_column, sample_attribute, [], [], [], 0, 0)
             return (particle_data, samples)
 
-        # Resolve the particles along the vectors
-        resolved_particles_vec_1 = np.dot(particle_data.points, 
-                                        vector_1)
-        resolved_particles_vec_2 = np.dot(particle_data.points, 
-                                        vector_2)
-
         # Resolve container along the vectors
         resolved_container_vec_1 = np.dot(bounds.points, 
                                         vector_1)
@@ -180,6 +174,12 @@ def sample_2d_slice(particle_data,
                                           max(resolved_container_vec_2),
                                           resolution[1] + 1)
         
+    # Resolve the particles along the vectors
+    resolved_particles_vec_1 = np.dot(particle_data.points, 
+                                    vector_1)
+    resolved_particles_vec_2 = np.dot(particle_data.points, 
+                                    vector_2)
+    
     # Define the slice boolean mask
     bottom_plane = (np.dot(normal, particle_data.points.T) 
                 - np.dot(normal, point)
