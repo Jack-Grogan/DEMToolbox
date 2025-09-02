@@ -21,7 +21,7 @@ None
 
 ### Removed
 2D slice bounds, and as a consequnce vector field bounds, now in cartesian 
-coordintes rather than the specified vector coordinate system. The bounds must therefore be given in the form [$x$<sub>min</sub>, $x$<sub>max</sub>, $y$<sub>min</sub>, $y$<sub>max</sub>, $z$<sub>min</sub>, $z$<sub>max</sub>].
+coordintes rather than the specified vector coordinate system. The bounds must therefore be given in the form [ $x$<sub>min</sub>, $x$<sub>max</sub>, $y$<sub>min</sub>, $y$<sub>max</sub>, $z$<sub>min</sub>, $z$<sub>max</sub> ].
 
 ### Fixed
 Ambiguity in resolution fields.
