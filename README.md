@@ -7,7 +7,7 @@ DEMToolbox provides a range of post processing tools for analysing DEM
 simulations. Performance optimisations have tried to be attained where possible
 through use of [numpy](https://numpy.org/) whos core is written in optimised 
 C code. Often users will want to apply this libraries functionality to many 
-simulation output files. This problem is "Embarrassingly parrallel" and can be sped up using `ProcesssPoolExecutor` from [concurrent.futures](https://docs.python.org/3/library/concurrent.futures.html).
+simulation output files. This problem is "embarrassingly parrallel" and can be sped up using `ProcesssPoolExecutor` from [concurrent.futures](https://docs.python.org/3/library/concurrent.futures.html).
 
 ## Getting Started
 
