@@ -28,3 +28,23 @@ Ambiguity in resolution fields.
 
 ### Security
 None
+
+## [0.0.21] - 2025-09-02
+
+### Added
+None
+
+### Changed
+Internal changes in sample_1d to reflect the change awa from the need for
+container data.
+
+### Deprecated
+None
+
+### Removed
+None
+
+### Fixed
+None
+### Security
+None
