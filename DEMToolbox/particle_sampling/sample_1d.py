@@ -1,11 +1,12 @@
 import numpy as np
 import warnings 
+import pyvista as pv
 
 from ..classes.particle_samples import ParticleSamples
 from ..classes.particle_attribute import ParticleAttribute
 
 def sample_1d(particle_data, 
-              container_data,
+              bounds,
               vector, 
               resolution,
               append_column="1D_samples",
@@ -13,19 +14,20 @@ def sample_1d(particle_data,
     """Split the particles into samples split along 1 dimension.
 
     Split the particles into a 1D samples along a user defined vector to
-    generate a number of sample locations in the container defined by 
-    the resolution.
+    generate a number of sample locations defined by the resolution.
 
     Parameters
     ----------
     particle_data : vtkPolyData
         The particle vtk.
-    container_data : vtkPolyData
-        The container vtk.
+    bounds : list, np.ndarray or vtkPolyData
+        If a list or np.ndarray bounds of the sample space in the form 
+        [x_min, x_max, y_min, y_max, z_min, z_max]. If a vtk, the bounds 
+        will be determined from the vtk's bounds.
     vector : list
         The sample vector to split the particles along as [x, y, z].
     resolution : int
-        The resolution of the 1D sample.
+        The resolution of the 1D sample along the specified vector.
     append_column : str, optional
         The name of the samples column to append to the particle data, 
         by default "1D_samples".
@@ -56,9 +58,15 @@ def sample_1d(particle_data,
     UserWarning
         If the particle data has no points return unedited particle
         data and an empty samples object.
+    ValueError
+        If bounds is not a 6 element list or np.ndarray of integers or 
+        floats or a vtkPolyData.
+    ValueError
+        If bounds list does not contains elements not of the order
+        [x_min, x_max, y_min, y_max, z_min, z_max].
     UserWarning
-        If the container data has no points return unedited particle
-        data and an empty samples object.
+        If bounds is a vtkPolyData and has no points return unedited
+        particle data and an empty samples object.
     """
     if len(vector) != 3:
         raise ValueError("Vector must be a 3 element list.")
@@ -78,26 +86,69 @@ def sample_1d(particle_data,
             append_column, sample_attribute, [], [], [], 0, 0)
         return (particle_data, samples)
     
-    if container_data.n_points == 0:
-        warnings.warn("Cannot sample empty container file.", UserWarning)
-        sample_attribute = ParticleAttribute(particle_id_column, 
-                                        append_column,
-                                        np.empty((0, 2)))
-        samples = ParticleSamples(
-            append_column, sample_attribute, [], [], [], 0, 0)
-        return (particle_data, samples)
-    
     # Normalise the vector
     vector = vector / np.linalg.norm(vector)
 
-    # Resolve the particles and container along the vector
     resolved_particles = np.dot(particle_data.points, vector)
-    resolved_container = np.dot(container_data.points, vector)
 
-    # Define the sample bounds linearly along the resolved container
-    sample_bounds = np.linspace(min(resolved_container),
-                                max(resolved_container), 
-                                resolution + 1)
+    if isinstance(bounds, list or np.ndarray):
+        if len(bounds) != 6:
+            raise ValueError("Bounds must be a list of 6 elements: "
+                             "[x_min, x_max, y_min, y_max, z_min, z_max].")
+        
+        if not all(isinstance(i, (int, float)) for i in bounds):
+            raise ValueError("Bounds must be a list of integers or floats.")
+        
+        # Apply the bounds to the particle data
+        x_min, x_max, y_min, y_max, z_min, z_max = bounds
+
+        if x_min >= x_max or y_min >= y_max or z_min >= z_max:
+            raise ValueError("Bounds are not valid. Ensure that for each "
+                             "dimension min < max.")
+        
+        corners = np.array([
+            [x_min, y_min, z_min],
+            [x_min, y_min, z_max],
+            [x_min, y_max, z_min],
+            [x_min, y_max, z_max],
+            [x_max, y_min, z_min],
+            [x_max, y_min, z_max],
+            [x_max, y_max, z_min],
+            [x_max, y_max, z_max],
+        ])
+        
+        min_bound_vec = np.min(corners @ vector)
+        max_bound_vec = np.max(corners @ vector)
+
+        if min_bound_vec > max_bound_vec:
+            min_bound_vec, max_bound_vec = max_bound_vec, min_bound_vec
+
+        sample_bounds = np.linspace(min_bound_vec,
+                                    max_bound_vec, 
+                                    resolution + 1)
+
+    elif isinstance(bounds, pv.PolyData):
+        if bounds.n_points == 0:
+            warnings.warn("Cannot sample with empty bounds vtk file. "
+                          "Returning unedited particle data.", 
+                          UserWarning)
+            sample_attribute = ParticleAttribute(particle_id_column, 
+                                            append_column,
+                                            np.empty((0, 2)))
+            samples = ParticleSamples(
+                append_column, sample_attribute, [], [], [], 0, 0)
+            return (particle_data, samples)
+        
+        resolved_bounds = np.dot(bounds.points, vector)
+
+        # Define the sample bounds linearly along the resolved container
+        sample_bounds = np.linspace(min(resolved_bounds),
+                                    max(resolved_bounds), 
+                                    resolution + 1)
+        
+    else:
+        raise ValueError("Bounds must be a list or array of 6 elements "
+                         "or a vtkPolyData.")
     
     i = np.digitize(resolved_particles, sample_bounds) - 1
 

@@ -25,7 +25,7 @@ def create_particle_grid(positions, radii=None, velocities=None):
     return particle_data
 
 
-def set_up_velocity_vector_field_velocity_averaging_test():
+def set_up_velocity_vector_field_velocity_averaging_bounds_test():
 
     # Create a grid of particles
     x_range = np.linspace(-0.03, 0.03, 61)[1::2]
@@ -56,7 +56,7 @@ def set_up_velocity_vector_field_velocity_averaging_test():
     vector_2 = [0, 0, 1]
     resolution = [15, 20]
     plane_thickness = 0.012
-    bounds = [-0.03, 0.03, 0, 0.08]
+    bounds = [-0.03, 0.03, -0.03, 0.03, 0, 0.08]
 
     # Call the velocity vector field function
     vector_field_results = velocity_vector_field(particle_data, 
@@ -71,17 +71,17 @@ def set_up_velocity_vector_field_velocity_averaging_test():
     return vector_field_results, resolution
 
 
-def test_velocity_vector_field_velocity_averaging_benchmark(benchmark):
-    benchmark(set_up_velocity_vector_field_velocity_averaging_test)
+def test_velocity_vector_field_velocity_averaging_bounds_benchmark(benchmark):
+    benchmark(set_up_velocity_vector_field_velocity_averaging_bounds_test)
 
 
-class TestVectorFieldVelocityAveraging(unittest.TestCase):
+class TestVectorFieldVelocityAveragingBounds(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
 
         (vector_field_results, 
-         resolution) = set_up_velocity_vector_field_velocity_averaging_test()
+         resolution) = set_up_velocity_vector_field_velocity_averaging_bounds_test()
         
         # Store results
         cls.resolution = resolution
