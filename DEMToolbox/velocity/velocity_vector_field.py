@@ -17,9 +17,8 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
         The particle vtk.
     bounds : list, np.ndarray or vtkPolyData
         If a list or np.ndarray bounds of the sample space in the form 
-        [vec_1_lower_bound, vec_1_upper_bound, vec_2_lower_bound, 
-        vec_2_upper_bound]. If a vtk, the bounds will be determined from 
-        the vtk's bounds.
+        [x_min, x_max, y_min, y_max, z_min, z_max]. If a vtk, the bounds 
+        will be determined from the vtk's bounds.
     point : list
         A point on the plane as [x, y, z].
     vector_1 : list
