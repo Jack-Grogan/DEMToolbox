@@ -141,7 +141,7 @@ def sample_1d(particle_data,
         
         resolved_bounds = np.dot(bounds.points, vector)
 
-        # Define the sample bounds linearly along the resolved container
+        # Define the sample bounds linearly along the resolved vtk data
         sample_bounds = np.linspace(min(resolved_bounds),
                                     max(resolved_bounds), 
                                     resolution + 1)
