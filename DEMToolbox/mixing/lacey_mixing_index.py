@@ -114,9 +114,18 @@ def macro_scale_lacey_mixing(particle_data,
     UserWarning
         If the samples are not found in the particle data return
         unedited particle data and NaN for Lacey.
+    UserWarning
+        If the attribute contains only one particle type with a value
+        of 0 or 1 return unedited particle data and NaN for Lacey.
     ValueError
-        If the particle data contains more than 2 particle types 
-        with values other than 0 and 1.
+        If the attribute contains only one particle type with a value
+        other than 0 or 1 raise a ValueError.
+    ValueError
+        If the attribute contains two particle types with values
+        other than 0 or 1 raise a ValueError.
+    ValueError
+        If the attribute contains more than two particle types raise
+        a ValueError.
     UserWarning
         If there are fewer than 2 non-empty samples in the particle
         data return unedited particle data and NaN for Lacey.
@@ -143,7 +152,24 @@ def macro_scale_lacey_mixing(particle_data,
         return particle_data, np.nan
 
     if len(np.setxor1d(particle_data[attribute.attribute], [1, 0])) != 0:
-        raise Exception("Lacey can only support 2 particle types 0 and 1.")
+        if (len(np.unique(particle_data[attribute.attribute])) == 1 and
+            len(np.setxor1d(particle_data[attribute.attribute]) == 1)):
+            warnings.warn((f"particle data contains only particle type "
+                           f"{particle_data[attribute.attribute][0]}, "
+                           "setting Lacey to NaN."), UserWarning)
+            return particle_data, np.nan
+        elif len(np.unique(particle_data[attribute.attribute])) == 1:
+            raise ValueError((f"particle data contains only one particle "
+                             "type with value other than 0 and 1, cannot "
+                             "calculate Lacey mixing index."))
+        elif len(np.unique(particle_data[attribute.attribute])) == 2:
+            raise ValueError((f"particle data contains two particle "
+                             "types with values other than 0 and 1, cannot "
+                             "calculate Lacey mixing index."))
+        else:
+            raise ValueError((f"particle data contains more than two "
+                             "particle types, cannot calculate Lacey "
+                             "mixing index."))
     
     # Boolean mask for class 0 particles
     class_0_split = (particle_data[attribute.attribute].astype(int)

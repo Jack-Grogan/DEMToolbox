@@ -27,7 +27,7 @@ def set_up_sample_3d_test():
 
     # test with non normalised vector
     particle_data, split = sample_3d(particle_data,
-                                     cylinder_data,
+                                     list(cylinder_data.bounds),
                                      vector_1,
                                      vector_2,
                                      vector_3,
@@ -87,10 +87,9 @@ class TestSample3D(unittest.TestCase):
         """Test occupied cells in split data."""
 
         assert all(a == b for a, b in zip(self.split.occupied_cells, 
-                                          [0, 1, 2, 3, 4, 5, 7, 8,
-                                           9, 10, 11, 12, 13, 14, 15, 
-                                           16, 17, 18, 19, 20, 21, 22, 
-                                           23, 24, 25, 26])
+                                          [0, 1, 3, 4, 5, 7, 8, 9, 10, 
+                                           11, 12, 13, 14, 15, 16, 17,
+                                           18, 19, 21, 22, 23, 25, 26])
                    )
         
 
@@ -98,11 +97,12 @@ class TestSample3D(unittest.TestCase):
         """Test particles in each cell."""
 
         assert all(a == b for a, b in zip(self.split.particles,
-                                          [166, 1124, 16, 396, 4870, 952, 
-                                           0, 503, 169, 1209, 11114, 2668, 
-                                           9469, 22291, 11061, 1768, 7766, 
-                                           1243, 241, 1242, 2, 863, 7079, 
-                                           2130, 8, 706, 194])
+                                          [15, 523, 0, 130, 4395, 
+                                           269, 0, 238, 11, 366, 
+                                           11590, 1369, 7933, 33717,
+                                           9934, 901, 7627, 401, 22, 
+                                           775, 0, 262, 7241, 1228, 
+                                           0, 282, 21])
                    )
         
 
@@ -111,7 +111,7 @@ class TestSample3D(unittest.TestCase):
 
         assert all(a == b for a, b in 
                    zip(self.particle_data["sample_test"][:10],
-                        [22, 19, 22, 22, 19, 23, 19, 10, 23, 23])
+                        [22, 19, 22, 22, 10, 23, 10, 10, 23, 23])
                    )
         
 
@@ -124,7 +124,7 @@ class TestSample3D(unittest.TestCase):
     def test_sample_3d_n_occupied_cells(self):
         """Test the number of occupied cells in split data."""
 
-        assert self.split.n_occupied_cells == 26
+        assert self.split.n_occupied_cells == 23
 
 
     def test_sample_3d_n_sampled_particles(self):
