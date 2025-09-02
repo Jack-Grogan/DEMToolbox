@@ -35,8 +35,7 @@ None
 None
 
 ### Changed
-Internal changes in sample_1d to reflect the change awa from the need for
-container data.
+Internal changes in sample_1d to reflect the change away from the need for container data.
 
 ### Deprecated
 None
