@@ -181,7 +181,7 @@ def macro_scale_lacey_mixing(particle_data,
 
     # Calculate the mean volume of the particles
     particle_volumes = 4/3 * np.pi * particle_data["radius"] ** 3
-    mean_paricle_volume = np.mean(particle_volumes)
+    mean_particle_volume = np.mean(particle_volumes)
 
     # Create a boolean mask for each Lacey sample
     sample_id_booleans = []
@@ -285,7 +285,7 @@ def macro_scale_lacey_mixing(particle_data,
         # Calculate the perfectly mixed variance
         mixed_variance = (unmixed_variance
                            / (np.mean(total_sample_volume) 
-                              / mean_paricle_volume))
+                              / mean_particle_volume))
         
         if mixed_variance == unmixed_variance:
             warnings.warn(
