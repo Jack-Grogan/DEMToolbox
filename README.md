@@ -67,28 +67,29 @@ settled_data, samples = sample_1d_volume(settled_data,
 settled_data.save("updated_settled_particles.vtk")
 ```
 
-The returned `settled_data` is now updated with a column that if 
-not defined is titled `f"{sample_vector[0]}_{sample_vector[1]}_{sample_vector[2]}_volume_sample"`.
+The returned `settled_data` is now updated with a column that, if 
+not defined, is titled `f"{sample_vector[0]}_{sample_vector[1]}_{sample_vector[2]}_volume_sample"`.
 Visualising in ParaView we can see the particles are perfectly segregated
 into equal volumes:
 
 ![z_split_segregated](https://github.com/Jack-Grogan/DEMToolbox/blob/main/docs/images/z_split_segregated.png) 
 
 Alternatively radial divisions of equal volume can be defined with the 
-function `sample_1d_volume_cylinder`:
+function `sample_1d_volume_cylinder`, the remainder of this example will
+however use the `sample_1d_volume` example above.
 
 ```python
 import pyvista as pv
-from DEMToolbox.particle_sampling import sample_1d_volume
+from DEMToolbox.particle_sampling import sample_1d_volume_cylinder
 
 settled_data = pv.read("settled_particles.vtk")
 cylinder_point = [0, 0, 0]
 cylinder_vector = [0, 0, 1]
 
-settled_data, samples = sample_1d_volume_cylinder(settled_data,
-                                                   cylinder_point,
-                                                   cylinder_vector,
-                                                   resolution=2,
+settled_data, samples_cylinder = sample_1d_volume_cylinder(settled_data,
+                                                           cylinder_point,
+                                                           cylinder_vector,
+                                                           resolution=2,
 )
 
 settled_data.save("updated_settled_particles.vtk")
@@ -96,10 +97,10 @@ settled_data.save("updated_settled_particles.vtk")
 
 ![r_split_segregated](https://github.com/Jack-Grogan/DEMToolbox/blob/main/docs/images/r_split_segregated.png) 
 
-Lacey needs to track how these two particles different only in colour
+Lacey needs to track how these two particles, different only in colour,
 disperse. Each particle id's associated colour must therefore be appended to
 each frame in the simulation prior to calculating the lacey index. Liggghts
-will reorder the vtk files rows between timesteps. The list can therefore
+will reorder the vtk file's rows between timesteps. The list can therefore
 not be simply appended in the same order as in the settled state. Instead the
 colour value needs to be added on the appropriate id that is unique for each
 particle. This can be achieved by passing the `ParticleAttribute` attribute of
@@ -142,7 +143,7 @@ axis is parallel to the z axis. `sample_3d_cylinder` creates samples azimuthally
 radially and vertically. The functionality for both of these functions is the 
 same as the 1d sampling functions discussed above. The difference comes in how we
 implement them. For defining samples we need update each particles sample ID at
-every timestep as opposed to appending a previous states sample ID's.
+every timestep as opposed to appending a previous state's sample ID's.
 
 ```python
 import pyvista as pv
@@ -152,7 +153,7 @@ settled_data = pv.read("updated_settled_particles.vtk")
 mixed_data = pv.read("updated_mixed_particles.vtk")
 
 # Define a bounding box in which samples will be generated
-bounds = [0, 1, 0, 1, 0, 1]
+bounds = [-0.03, 0.03, -0.03, 0.03, 0, 0.08]
 
 # define three orthogonal vectors
 vector_1 = [1, 0, 0]
@@ -160,7 +161,7 @@ vector_2 = [0, 1, 0]
 vector_3 = [0, 0, 1]
 
 # Number of splits in vector_1, vector_2 and vector_3 respectively
-resolution = [20, 20, 20]
+resolution = [10, 10, 30]
 
 # Sample settled data
 settled_data, settled_data_samples = sample_3d(settled_data,
