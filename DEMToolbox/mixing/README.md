@@ -7,8 +7,10 @@ proposed the mixing index in 1954 as an extention to the mixing index
 proposed by Kramers [[1]](#1).
 
 $$
-  M = \frac{\sigma_0^2 - \sigma^2}{\sigma_0^2 - \sigma_r^2}\tag{1}
-$$
+\begin{align}
+  M = \frac{\sigma_0^2 - \sigma^2}{\sigma_0^2 - \sigma_r^2}
+\end{align} \tag{1}
+$$ 
 
 ### System Variance
 
@@ -18,8 +20,10 @@ fraction within the sample. DEMToolbox calculates the system variance from
 equation 2
 
 $$
+\begin{align}
   \sigma = \sum_{N_i=0}^{N_s}\frac{V_i}{V}[\phi_{0,i} - \bar{\phi}_0]^2
-  \tag{2}
+\end{align}
+\tag{2}
 $$
 
 When samples encompass all particles in the system the mean target particle
@@ -35,40 +39,55 @@ from equation 2. A perfectly segregated system occurs when the systems samples
 have either a concentration of 0 or 1. We can therefore separate equation 2
 into the summation of samples with a target particle volume fraction of 1,
 and the summation of samples with a target particle volume fraction of 0, 
-equation 3
+equation 3.
 
 $$
-  \sigma_0 = \sum_{N_{0,i}=0}^{N_0}\frac{V_i}{V}[\phi_{0,i} - \bar{\phi}_0]^2 
-  + \sum_{N_{1,i}=0}^{N_1}\frac{V_i}{V}[\phi_{0,i} - \bar{\phi}_0]^2\tag{3}
+\begin{align}
+  \sigma_0 = {\sum_{N_{0,i}=0}^{N_0}\frac{V_i}{V}[\phi_{0,i} - \bar{\phi}_0]^2}
+           + {\sum_{N_{1,i}=0}^{N_1}\frac{V_i}{V}[\phi_{0,i} - \bar{\phi}_0]^2}
+\end{align}  
+\tag{3}
 $$
 
 $$
-  \sigma_0 = \sum_{N_{0,i}=0}^{N_0}\frac{V_i}{V}[1 - \bar{\phi}_0]^2 
-  + \sum_{N_{1,i}=0}^{N_1}\frac{V_i}{V}[0 - \bar{\phi}_0]^2\tag{4}
+\begin{align}
+  \sigma_0 = {\sum_{N_{0,i}=0}^{N_0}\frac{V_i}{V}[1 - \bar{\phi}_0]^2}
+           + {\sum_{N_{1,i}=0}^{N_1}\frac{V_i}{V}[0 - \bar{\phi}_0]^2}
+\end{align}  
+\tag{4}
 $$
 
 $$
-  \sigma_0 = \frac{V_0}{V}(1 - \bar{\phi}_0)^2 
-  + \bar{\phi}_0^2\frac{V - V_0}{V}\tag{5}
+\begin{align}
+  \sigma_0 = \frac{V_0}{V}(1 - \bar{\phi}_0)^2 + \bar{\phi}_0^2\frac{V - V_0}{V}
+\end{align}
+\tag{5}
 $$
 
 Assuming samples encompass all particles within the system $\bar{\phi}_0 = P_0$
 
 $$
-  \sigma_0 = \frac{V_0}{V}(1 - P_0)^2 
-  + P_0^2 \frac{V - V_0}{V}\tag{6}
+\begin{align}
+  \sigma_0 = \frac{V_0}{V}(1 - P_0)^2 + P_0^2 \frac{V - V_0}{V}
+\end{align}
+\tag{6}
 $$
 
 $V_0/V = P_0$
 
 $$
-  \sigma_0 =P_0(1 - P_0)^2 
-  + P_0^2 (1 - P_0)\tag{7}
+\begin{align}
+  \sigma_0 =P_0(1 - P_0)^2 + P_0^2 (1 - P_0)
+\end{align}
+\tag{7}
 $$
 
 
 $$
-  \sigma_0 =P_0(1 - P_0)\tag{8}
+\begin{align}
+  \sigma_0 = P_0(1 - P_0)
+\end{align}
+\tag{8}
 $$
 
 ## Mixed Variance
@@ -76,19 +95,28 @@ $$
 The variance of a perfectly mixed sample can be calculated by modelling the number of target particles as a binomial random variable. This method defines the perfectly mixed state as one in which the probability of sampling a target particle equals its probability in the bulk system. This method provides a more realistic definition of the perfectly mixed state, accounting for the natural variability between samples, unlike assuming a mixed variance of 0, which ignores unavoidable fluctuations even in a well-mixed system. Assuming each sample contains $\bar{n}$ particles, the variance in the number of target particles can be expressed by equation 9.
 
 $$
-\text{Var}[n_0] = \bar{n} P_0(1 - P_0)\tag{9}
+\begin{align}
+  \text{Var}[n_0] = \bar{n} P_0(1 - P_0)
+\end{align}
+\tag{9}
 $$
 
 Instead of the variance in the number of target particles, we focus on the variance in their volume fraction across samples,  $\text{Var}[n_0 \cdot \bar{v}/V_s]$. Assuming minimal variation in mean particle size and total particle volume between samples, the variance in sample volume for a perfectly mixed powder bed can be expressed by equation 10.
         
 $$
-\text{Var}[\varphi_0] =  \left( \frac{\bar{v}}{V_s} \right)^2 \cdot \bar{n} P_0(1 - P_0)\tag{10}
+\begin{align}
+  \text{Var}[\varphi_0] =  \left( \frac{\bar{v}}{V_s} \right)^2 \cdot \bar{n} P_0(1 - P_0)
+\end{align}  
+\tag{10}
 $$
 
 The mean particle volume, $\bar{v}$, divided by the volume of particles within each sample, $V_s$, is equal to the mean number of particles within a sample $n$. The variance in the volume fraction of the target particle type in the perfectly mixed state, $\sigma_r$, can be finally be expressed by equation 11.
 
 $$
-\sigma_r =  \frac{P_0(1 - P_0)}{\bar{n}}\tag{11}
+\begin{align}
+  \sigma_r =  \frac{P_0(1 - P_0)}{\bar{n}}
+\end{align}
+\tag{11}
 $$
 
 Defining the variance of a completely mixed state using a binomial distribution can yield Lacey mixing indices greater than 1; however, such values reflect random sampling fluctuations rather than increased homogeneity.
