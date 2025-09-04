@@ -21,7 +21,7 @@ equation 2
 
 $$
 \begin{align}
-  \sigma = \sum_{N_i=0}^{N_s}\frac{V_i}{V}[\phi_{0,i} - \bar{\phi}_0]^2
+  \sigma^2 = \sum_{N_i=0}^{N_s}\frac{V_i}{V}[\phi_{0,i} - \bar{\phi}_0]^2
 \end{align}
 \tag{2}
 $$
@@ -43,7 +43,7 @@ equation 3.
 
 $$
 \begin{align}
-  \sigma_0 = {\sum_{N_{0,i}=0}^{N_0}\frac{V_i}{V}[\phi_{0,i} - \bar{\phi}_0]^2}
+  \sigma_0^2 = {\sum_{N_{0,i}=0}^{N_0}\frac{V_i}{V}[\phi_{0,i} - \bar{\phi}_0]^2}
            + {\sum_{N_{1,i}=0}^{N_1}\frac{V_i}{V}[\phi_{0,i} - \bar{\phi}_0]^2}
 \end{align}  
 \tag{3}
@@ -51,7 +51,7 @@ $$
 
 $$
 \begin{align}
-  \sigma_0 = {\sum_{N_{0,i}=0}^{N_0}\frac{V_i}{V}[1 - \bar{\phi}_0]^2}
+  \sigma_0^2 = {\sum_{N_{0,i}=0}^{N_0}\frac{V_i}{V}[1 - \bar{\phi}_0]^2}
            + {\sum_{N_{1,i}=0}^{N_1}\frac{V_i}{V}[0 - \bar{\phi}_0]^2}
 \end{align}  
 \tag{4}
@@ -59,7 +59,7 @@ $$
 
 $$
 \begin{align}
-  \sigma_0 = \frac{V_0}{V}(1 - \bar{\phi}_0)^2 + \bar{\phi}_0^2\frac{V - V_0}{V}
+  \sigma_0^2 = \frac{V_0}{V}(1 - \bar{\phi}_0)^2 + \bar{\phi}_0^2\frac{V - V_0}{V}
 \end{align}
 \tag{5}
 $$
@@ -68,7 +68,7 @@ Assuming samples encompass all particles within the system $\bar{\phi}_0 = P_0$
 
 $$
 \begin{align}
-  \sigma_0 = \frac{V_0}{V}(1 - P_0)^2 + P_0^2 \frac{V - V_0}{V}
+  \sigma_0^2 = \frac{V_0}{V}(1 - P_0)^2 + P_0^2 \frac{V - V_0}{V}
 \end{align}
 \tag{6}
 $$
@@ -77,7 +77,7 @@ $V_0/V = P_0$
 
 $$
 \begin{align}
-  \sigma_0 =P_0(1 - P_0)^2 + P_0^2 (1 - P_0)
+  \sigma_0^2 =P_0(1 - P_0)^2 + P_0^2 (1 - P_0)
 \end{align}
 \tag{7}
 $$
@@ -85,7 +85,7 @@ $$
 
 $$
 \begin{align}
-  \sigma_0 = P_0(1 - P_0)
+  \sigma_0^2 = P_0(1 - P_0)
 \end{align}
 \tag{8}
 $$
@@ -114,7 +114,7 @@ The mean particle volume, $\bar{v}$, divided by the volume of particles within e
 
 $$
 \begin{align}
-  \sigma_r =  \frac{P_0(1 - P_0)}{\bar{n}}
+  \sigma_r^2 =  \frac{P_0(1 - P_0)}{\bar{n}}
 \end{align}
 \tag{11}
 $$
@@ -124,9 +124,9 @@ Defining the variance of a completely mixed state using a binomial distribution 
 ## Nomenclature
 
 $M$ = Lacey mixing index \
-$\sigma_0$ = Perfectly segregated variance \
-$\sigma_r$ = Perfectly mixed variance \
-$\sigma$ = System variance \
+$\sigma_0^2$ = Perfectly segregated variance \
+$\sigma_r^2$ = Perfectly mixed variance \
+$\sigma^2$ = System variance \
 $V_i$ = Volume of particles in sample $i$ \
 $V_s$ = Mean sample particle volume \
 $V$ = Total volume of particles in the system \
