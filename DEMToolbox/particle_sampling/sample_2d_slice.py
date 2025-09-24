@@ -135,7 +135,7 @@ def sample_2d_slice(particle_data,
             append_column, sample_attribute, [], [], [], 0, 0)
         return (particle_data, samples)
     
-    if isinstance(bounds, list or np.ndarray):
+    if isinstance(bounds, list) or isinstance(bounds, np.ndarray):
         
         if len(bounds) != 6:
             raise ValueError("Bounds must be a list of 6 elements: "

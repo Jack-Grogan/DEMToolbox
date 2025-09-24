@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.22] - 2025-09-02
+
+### Added
+Added functionality to sample_1d, sample_2d and sample_3d to allow user to
+specify bounds as arrays and lists rather than just lists or vtk files.
+
+### Changed
+None
+
+### Deprecated
+None
+
+### Removed
+None
+
+### Fixed
+None
+
+### Security
+None
+
+
 ## [0.0.21] - 2025-09-02
 
 ### Added
@@ -21,6 +43,7 @@ None
 
 ### Fixed
 None
+
 ### Security
 None
 
