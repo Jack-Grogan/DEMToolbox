@@ -41,23 +41,59 @@ vector in each bin is then calculated on a number basis (i.e. each particle cont
 
 ### Implementation
 
-The `velocity_vector_field` function calculates the 2D binned velocity vector field for a given set of particles. To calculate the resolved velocity field the user provides a plane with a thickness allowing for a vector field to be calculated in a slice through the system. The plane is defined by a point on the plane and two orthogonal vectors defining the plane orientation. The thickness of the plane is defined by a distance normal to the plane. Half of the plabe thickness is added and subtracted from the point on the plane to define the slice in which particles are considered for the velocity field. The number of bins in each direction is also user defined. The function returns the particle data updated with the projected velocity vectors in each bin applied to each particle in the bin. The function also returns the the average velocity vector in each bin of shape (number of $\text{dim}_2$ bins, number of $\text{dim}_1$ bins, 3) where the last dimension is the x, y and z components of the average velocity vector in each bin. The occupancy of each bin is also returned of shape (number of $\text{dim}_2$ bins, number of $\text{dim}_1$ bins). Finally a ParticleSamples object is returned for the internally called `sample_2d_slice` function.
+The `velocity_vector_field` function calculates the 2D binned velocity vector field for a given set of particles. To calculate the resolved velocity field the user provides a plane with a thickness allowing for a vector field to be calculated in a slice through the system. The plane is defined by a point on the plane and two orthogonal vectors defining the plane orientation. The thickness of the plane is defined by a distance normal to the plane. Half of the plane thickness is added and subtracted from the point on the plane to define the slice in which particles are considered for the velocity field. The number of bins in each direction is defined by the user as a resolution parameter. The function internally calls the `sample_2d_slice` function to get the particles in the slice and bin them in 2D space. The particles in each bin then have their velocity projected onto the plane and the average velocity vector in each bin is calculated.
+
+To calculate the velocity vector field the following code can be used. Firstly define
+the plane with a point on the plane and two orthogonal vectors defining the plane orientation. The thickness of the plane is defined by a distance normal to the plane. The number of bins in each direction is defined by the user as a resolution parameter.
+Provide your particle data in the form of a  PyVista PolyData object with velocity vectors stored in a column named 'v' and unique particle ids stored in a column named 'id'. Note if your velocity vectors or ids are stored in under a different column name change the `velocity_column` and `particle_id_column` parameters in the function call below.
 
 ```python
 from demtoolbox.velocity import velocity_vector_field
 import pyvista as pv
 
+# Load particle data
+particle_data = pv.read('particle_data.vtk')
+
 # Define plane
 point_on_plane = [0.0, 0.0, 0.0]
 dim_1 = [1.0, 0.0, 0.0]
 dim_2 = [0.0, 0.0, 1.0]
-plane_thickness = 1 # Much larger than container height width include all particles
-num_bins_dim_1 = 15
-num_bins_dim_2 = 15
 
+bounds = [-0.03, 0.03, -0.03, 0.03, -0.008, 0.088] 
+plane_thickness = 1 # Much larger than container height width include all particles
+
+# Define binning resolution as 15 bins in x and 24 bins in z 
+resolution = [15, 24]
+
+# Calculate velocity vector field
+results = velocity_vector_field(
+    particle_data,
+    bounds=
+    point_on_plane,
+    dim_1,
+    dim_2,
+    plane_thickness,
+    resolution,
+    velocity_column='v',
+    append_column="mean_resolved_velocity",
+    particle_id_column='id'
+)
+
+updated_particle_data = results[0]
+velocity_field = results[1]
+occupancy = results[2]
+samples = results[3]
+```
+
+The function returns the particle data updated with the projected velocity vectors in each bin applied to each particle in the bin. This data is by default stored in a column named 'mean_resolved_velocity' but this can be changed by the user with the `append_column` parameter. The function also returns the the average velocity vector in each bin of shape (number of $\text{dim}_2$ bins, number of $\text{dim}_1$ bins, 3) where the last dimension is the x, y and z components of the average velocity vector in each bin. The occupancy of each bin is also returned of shape (number of $\text{dim}_2$ bins, number of $\text{dim}_1$ bins). Finally a ParticleSamples object is returned for the internally called `sample_2d_slice` function.
+
+The samples generated can be seen in the figure below. Each 2D sample has been labelled with the sample id.
+![2d_samples](https://github.com/Jack-Grogan/DEMToolbox/blob/main/docs/images/2D_sampling.png)
+
+The position of each sample in the returned 2d occupancy and velocity matrices can be seen in the matrix below. Index [0, 0] of the matrices corresponds to minimum bound of vector 1 and minimum bound of vector 2. 
 
 $$
-A = \begin{pmatrix}
+\text{Samples} = \begin{pmatrix}
   0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 \\
   15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 & 26 & 27 & 28 & 29 \\ 30 & 31 & 32 & 33 & 34 & 35 & 36 & 37 & 38 & 39 & 40 & 41 & 42 & 43 & 44 \\
   45 & 46 & 47 & 48 & 49 & 50 & 51 & 52 & 53 & 54 & 55 & 56 & 57 & 58 & 59 \\
