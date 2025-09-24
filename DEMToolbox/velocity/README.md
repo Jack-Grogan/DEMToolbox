@@ -48,7 +48,7 @@ the plane with a point on the plane and two orthogonal vectors defining the plan
 Provide your particle data in the form of a  PyVista PolyData object with velocity vectors stored in a column named 'v' and unique particle ids stored in a column named 'id'. Note if your velocity vectors or ids are stored in under a different column name change the `velocity_column` and `particle_id_column` parameters in the function call below.
 
 ```python
-from demtoolbox.velocity import velocity_vector_field
+from DEMToolbox.velocity import velocity_vector_field
 import pyvista as pv
 
 # Load particle data
@@ -120,3 +120,19 @@ $$
   345 & 346 & 347 & 348 & 349 & 350 & 351 & 352 & 353 & 354 & 355 & 356 & 357 & 358 & 359 \\
 \end{pmatrix}
 $$
+
+## Mean Velocity Vector Fields
+
+The `velocity_vector_field` function covered above calculates the binned mean velocity vector field for a given simulation frame. To calculate the mean velocity vector field over a time period the `mean_velocity_vector_field` function can be used. This function uses a list of vector field arrays and occupancy arrays generated from the `velocity_vector_field` function to calculate the mean velocity vector field over a time period. The time and depths averaged mean velocity vector field is calculated by summing the velocity vectors in each bin weighted by the occupancy of each bin and dividing by the total occupancy of each bin over the time period. Average velocity is calculated with `numpy.nanmean` so that bins with no occupancy are ignored in the bins average velocity. Average occupancy should be calculated including zero values so that bins with no occupancy are correctly represented in the average occupancy field.
+
+```python
+from DEMToolbox.velocity import mean_velocity_vector_field
+import numpy as np
+
+# Load list of velocity fields and occupancy arrays
+velocity_fields = [np.load('velocity_field_0.npy'), np.load('velocity_field_1.npy'), ...]
+occupancies = [np.load('occupancy_0.npy'), np.load('occupancy_1.npy'), ...]
+
+# Calculate mean velocity vector field
+mean_velocity_field = mean_velocity_vector_field(velocity_fields, occupancies)
+```
