@@ -115,7 +115,7 @@ def sample_3d(particle_data,
     resolved_particles_vec_2 = np.dot(particle_data.points, vector_2)
     resolved_particles_vec_3 = np.dot(particle_data.points, vector_3)
 
-    if isinstance(bounds, list or np.ndarray):
+    if isinstance(bounds, list) or isinstance(bounds, np.ndarray):
         if len(bounds) != 6:
             raise ValueError("Bounds must be a list of 6 elements: "
                              "[x_min, x_max, y_min, y_max, z_min, z_max].")

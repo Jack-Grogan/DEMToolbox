@@ -29,11 +29,6 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
         The thickness of the plane.
     resolution : list
         The resolution of the 2D sample space in the form [m, n].
-    bounds : list, optional
-        The bounds of the sample space in the form [vec_1_lower_bound,
-        vec_1_upper_bound, vec_2_lower_bound, vec_2_upper_bound].
-        If None, the bounds will be determined from the container data,
-        by default None.
     sample_column : str, optional
         The name of the samples column to append to the particle data,
         by default None. If None, the column name will be

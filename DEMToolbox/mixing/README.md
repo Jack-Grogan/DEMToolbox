@@ -18,7 +18,7 @@ proposed by Kramers [[1]](#1).
 In line with the work of Kristensen [[2]](#2) and Fan et al. [[3]](#3) the 
 liklihood of sampling a given particle is proportional to the particles volume
 fraction within the sample. DEMToolbox calculates the system variance from
-equation 2
+equation 2.
 
 ```math
 \begin{align}
@@ -65,7 +65,7 @@ equation 3.
 \tag{5}
 ```
 
-Assuming samples encompass all particles within the system $\bar{\phi}_0 = P_0$
+Assuming samples encompass all particles within the system $\bar{\phi}_0 = P_0$.
 
 ```math
 \begin{align}
