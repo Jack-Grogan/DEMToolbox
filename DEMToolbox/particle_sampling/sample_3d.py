@@ -200,6 +200,13 @@ def sample_3d(particle_data,
         raise ValueError("Bounds must be a list of 6 elements or a "
                          "vtkPolyData.")
 
+    vector_1_centers = (vec_1_sample_bounds[:-1] 
+                         + np.diff(vec_1_sample_bounds) / 2)
+    vector_2_centers = (vec_2_sample_bounds[:-1] 
+                         + np.diff(vec_2_sample_bounds) / 2)
+    vector_3_centers = (vec_3_sample_bounds[:-1] 
+                         + np.diff(vec_3_sample_bounds) / 2)
+    
     i = np.digitize(resolved_particles_vec_3, vec_3_sample_bounds) - 1
     j = np.digitize(resolved_particles_vec_2, vec_2_sample_bounds) - 1
     k = np.digitize(resolved_particles_vec_1, vec_1_sample_bounds) - 1
@@ -247,6 +254,12 @@ def sample_3d(particle_data,
                               cell_particles, 
                               n_sampled_particles, 
                               n_unsampled_particles,
+                              vector_1_centers=vector_1_centers,
+                              vector_1_bounds=vec_1_sample_bounds,
+                              vector_2_centers=vector_2_centers,
+                              vector_2_bounds=vec_2_sample_bounds,
+                              vector_3_centers=vector_3_centers,
+                              vector_3_bounds=vec_3_sample_bounds,
                               )
 
     return (particle_data, samples)

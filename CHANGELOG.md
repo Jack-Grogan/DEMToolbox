@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.23] - 2025-10-06
+
+### Added
+Added data regarding bounds and centers to ParticleSamples object returned from
+sampling functions. This aids post procssing as the user can now easily access the
+bounds and centers of each sample in each dimension. Added tests for this new
+functionality.
+
+### Changed
+Non
+
+### Deprecated
+None
+
+### Removed
+None
+
+### Fixed
+None
+
+### Security
+None
+
 ## [0.0.22] - 2025-09-02
 
 ### Added

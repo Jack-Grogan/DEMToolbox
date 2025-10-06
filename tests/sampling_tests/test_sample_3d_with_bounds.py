@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
 from DEMToolbox.particle_sampling import sample_3d
 
 
-def set_up_sample_3d_test():
+def set_up_sample_3d_bounds_test():
 
     vtk_file_path = os.path.join(os.path.dirname(__file__),
                                     os.pardir, "vtks",)
@@ -38,28 +38,28 @@ def set_up_sample_3d_test():
     return particle_data, split
 
 
-def test_sample_3d_benchmark(benchmark):
-    benchmark(set_up_sample_3d_test)
+def test_sample_3d_bounds_benchmark(benchmark):
+    benchmark(set_up_sample_3d_bounds_test)
 
 
-class TestSample3D(unittest.TestCase):
+class TestSample3DBounds(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
 
-        particle_data, split = set_up_sample_3d_test()
+        particle_data, split = set_up_sample_3d_bounds_test()
         
         cls.particle_data = particle_data
         cls.split = split
         
 
-    def test_sample_3d_name(self):
+    def test_sample_3d_bounds_name(self):
         """Test column name in particle data."""
 
         assert self.split.name == "sample_test"
 
 
-    def test_sample_3d_ParticleAttribute(self):
+    def test_sample_3d_bounds_ParticleAttribute(self):
         """Test ParticleAttribute in split data."""
 
         assert self.split.ParticleAttribute.field == "id"
@@ -69,7 +69,7 @@ class TestSample3D(unittest.TestCase):
         assert self.split.ParticleAttribute.data.shape[1] == 2
 
 
-    def test_sample_3d_cells(self):
+    def test_sample_3d_bounds_cells(self):
         """Test cells in split data."""
 
         assert self.split.cells.shape[0] == 27
@@ -83,7 +83,7 @@ class TestSample3D(unittest.TestCase):
                   )
         
 
-    def test_sample_3d_occupied_cells(self):
+    def test_sample_3d_bounds_occupied_cells(self):
         """Test occupied cells in split data."""
 
         assert all(a == b for a, b in zip(self.split.occupied_cells, 
@@ -93,7 +93,7 @@ class TestSample3D(unittest.TestCase):
                    )
         
 
-    def test_sample_3d_particles(self):
+    def test_sample_3d_bounds_particles(self):
         """Test particles in each cell."""
 
         assert all(a == b for a, b in zip(self.split.particles,
@@ -106,7 +106,7 @@ class TestSample3D(unittest.TestCase):
                    )
         
 
-    def test_sample_3d_sample_ids(self):
+    def test_sample_3d_bounds_sample_ids(self):
         """Test sample ids in particle data."""
 
         assert all(a == b for a, b in 
@@ -115,25 +115,91 @@ class TestSample3D(unittest.TestCase):
                    )
         
 
-    def test_sample_3d_n_cells(self):
+    def test_sample_3d_bounds_n_cells(self):
         """Test the number of cells in split data."""
 
         assert self.split.n_cells == 27
 
 
-    def test_sample_3d_n_occupied_cells(self):
+    def test_sample_3d_bounds_n_occupied_cells(self):
         """Test the number of occupied cells in split data."""
 
         assert self.split.n_occupied_cells == 23
 
 
-    def test_sample_3d_n_sampled_particles(self):
+    def test_sample_3d_bounds_n_sampled_particles(self):
         """Test the number of sampled particles in split data."""
 
         assert self.split.n_sampled_particles == 89250
 
 
-    def test_sample_3d_n_unsampled_particles(self):
+    def test_sample_3d_bounds_n_unsampled_particles(self):
         """Test the number of unsampled particles in split data."""
 
         assert self.split.n_unsampled_particles == 0
+
+
+    def test_sample_3d_bounds_vector_1_centers(self):
+        """Test vector 1 cell centers in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_1_centers,
+                      [-0.05012336, -0.01474185, 0.02063967])
+                   )
+        
+        assert len(self.split.vector_1_centers) == 3
+
+
+    def test_sample_3d_bounds_vector_1_bounds(self):
+        """Test vector 1 bounds in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_1_bounds,
+                     [-0.06781412, -0.03243261, 0.00294891, 0.03833043])
+                   )
+        
+        assert len(self.split.vector_1_bounds) == 4
+
+    
+    def test_sample_3d_bounds_vector_2_centers(self):
+        """Test vector 2 cell centers in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_2_centers,
+                     [-0.01770038, 0.0157597, 0.04921977])
+                   )
+        
+        assert len(self.split.vector_2_centers) == 3
+
+
+    def test_sample_3d_bounds_vector_2_bounds(self):
+        """Test vector 2 bounds in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_2_bounds,
+                     [-0.03443041, -0.00097034, 0.03248973, 0.06594981])
+                   )
+        
+        assert len(self.split.vector_2_bounds) == 4
+
+
+    def test_sample_3d_bounds_vector_3_centers(self):
+        """Test vector 3 cell centers in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_3_centers,
+                     [-0.06636898, -0.02895241, 0.00846416])
+                   )
+        
+        assert len(self.split.vector_3_centers) == 3
+
+
+    def test_sample_3d_bounds_vector_3_bounds(self):
+        """Test vector 3 bounds in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_3_bounds,
+                     [-0.08507727, -0.0476607, -0.01024413, 0.02717244])
+                   )
+        
+        assert len(self.split.vector_3_bounds) == 4

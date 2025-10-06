@@ -137,3 +137,60 @@ class TestSample2DSlice(unittest.TestCase):
         """Test the number of unsampled particles in split data."""
 
         assert self.split.n_unsampled_particles == 66207
+
+
+    def test_sample_2d_slice_vector_1_centers(self):
+        """Test vector 1 cell centers in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_1_centers,
+                     [-0.01052546, 0.01437274, 0.03927094, 0.06416913])
+                   )
+        
+
+    def test_sample_2d_slice_vector_1_bounds(self):
+        """Test vector 1 bounds in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_1_bounds,
+                     [-0.02297455, 0.00192364, 0.02682184, 
+                      0.05172003, 0.07661823])
+                   )
+        
+        
+    def test_sample_2d_slice_vector_2_centers(self):
+        """Test vector 2 cell centers in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_2_centers,
+                     [-0.02020332, -0.00273074, 0.01474185, 
+                      0.03221443, 0.04968702])
+                   )
+        
+
+    def test_sample_2d_slice_vector_2_bounds(self):
+        """Test vector 2 bounds in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_2_bounds,
+                     [-0.02893961, -0.01146703, 0.00600555, 0.02347814,
+                       0.04095072, 0.05842331])
+                   )
+        
+
+    def test_sample_2d_slice_vector_3_centers(self):
+        """Test vector 3 cell centers in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_3_centers,
+                     [-0.02122675])
+                   )
+
+
+    def test_sample_2d_slice_vector_3_bounds(self):
+        """Test vector 3 bounds in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_3_bounds,
+                     [-0.02622675, -0.01622675])
+                   )

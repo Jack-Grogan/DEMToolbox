@@ -110,6 +110,10 @@ def sample_1d_volume(particle_data,
                                       cumulative_volume, side="left") - 1
     sample_elements = np.clip(sample_elements, 0, resolution - 1)
 
+    _, first_idx = np.unique(sample_elements, return_index=True)
+    sample_bounds = resolved_points[sorted_indices][np.array([*first_idx, -1])]
+    sample_centers = (sample_bounds[:-1] + np.diff(sample_bounds) / 2)
+
     samples_column = np.full(particle_data.n_points, -1, dtype=int)
     samples_column[sorted_indices] = sample_elements
     
@@ -138,7 +142,9 @@ def sample_1d_volume(particle_data,
                               occupied_cells,
                               cell_particles,
                               n_sampled_particles,
-                              n_unsampled_particles,        
+                              n_unsampled_particles, 
+                              vector_1_centers=sample_centers,
+                              vector_1_bounds=sample_bounds,       
                               )
 
     return particle_data, samples
