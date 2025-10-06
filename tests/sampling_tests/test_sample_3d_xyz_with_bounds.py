@@ -139,3 +139,70 @@ class TestSample3DXYZBounds(unittest.TestCase):
         """Test the number of unsampled particles in split data."""
 
         assert self.split.n_unsampled_particles == 0
+
+
+    def test_sample_2d_xyz_bounds_vector_1_centers(self):
+        """Test vector 1 cell centers in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_1_centers,
+                       [-0.02, 0.00, 0.02])
+                    )
+        
+        assert len(self.split.vector_1_centers) == 3
+
+
+    def test_sample_2d_xyz_bounds_vector_1_bounds(self):
+        """Test vector 1 bounds in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_1_bounds,
+                     [-0.03, -0.01, 0.01, 0.03])
+                   )
+        
+        assert len(self.split.vector_1_bounds) == 4
+
+
+    def test_sample_2d_xyz_bounds_vector_2_centers(self):
+        """Test vector 2 cell centers in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_2_centers,
+                       [-0.02, 0.00, 0.02])
+                    )
+        
+        assert len(self.split.vector_2_centers) == 3
+
+
+    def test_sample_2d_xyz_bounds_vector_2_bounds(self):
+        """Test vector 2 bounds in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_2_bounds,
+                        [-0.03, -0.01, 0.01, 0.03])
+                   )
+        
+        assert len(self.split.vector_2_bounds) == 4
+
+
+    def test_sample_2d_xyz_bounds_vector_3_centers(self):
+        """Test vector 3 cell centers in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_3_centers,
+                       [0.00944334, 0.03611, 0.06277667])
+                    )
+        
+        assert len(self.split.vector_3_centers) == 3
+
+
+    def test_sample_2d_xyz_bounds_vector_3_bounds(self):
+        """Test vector 3 bounds in split data."""
+
+        print(self.split.vector_3_bounds)
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_3_bounds,
+                     [-0.00388999, 0.02277667, 0.04944334, 0.07611])
+                   )
+        
+        assert len(self.split.vector_3_bounds) == 4

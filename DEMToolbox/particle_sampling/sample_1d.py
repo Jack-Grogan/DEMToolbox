@@ -150,6 +150,8 @@ def sample_1d(particle_data,
         raise ValueError("Bounds must be a list or array of 6 elements "
                          "or a vtkPolyData.")
     
+    sample_centers = (sample_bounds[:-1] + np.diff(sample_bounds) / 2)
+
     i = np.digitize(resolved_particles, sample_bounds) - 1
 
     # Mask out particles outside the valid bin range
@@ -189,7 +191,9 @@ def sample_1d(particle_data,
                               occupied_cells, 
                               cell_particles, 
                               n_sampled_particles, 
-                              n_unsampled_particles, 
+                              n_unsampled_particles,
+                              vector_1_centers=sample_centers,
+                              vector_1_bounds=sample_bounds,
                               )
 
     return (particle_data, samples)

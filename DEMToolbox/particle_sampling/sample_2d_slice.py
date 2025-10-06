@@ -209,6 +209,14 @@ def sample_2d_slice(particle_data,
         raise ValueError("Bounds must be a list of 6 elements or a "
                          "vtkPolyData.")
         
+    vector_1_centers = (vec_1_sample_bounds[:-1] 
+                        + np.diff(vec_1_sample_bounds) / 2)
+    vector_2_centers = (vec_2_sample_bounds[:-1] 
+                        + np.diff(vec_2_sample_bounds) / 2)
+    vector_3_centers = np.array([point @ normal])
+    vector_3_bounds = np.array([(point @ normal) - plane_thickness / 2,
+                               (point @ normal) + plane_thickness / 2])
+
     # Resolve the particles along the vectors
     resolved_particles_vec_1 = np.dot(particle_data.points, 
                                     vector_1)
@@ -276,7 +284,13 @@ def sample_2d_slice(particle_data,
                               occupied_cells, 
                               cell_particles, 
                               n_sampled_particles, 
-                              n_unsampled_particles, 
+                              n_unsampled_particles,
+                              vector_1_centers=vector_1_centers,
+                              vector_1_bounds=vec_1_sample_bounds,
+                              vector_2_centers=vector_2_centers,
+                              vector_2_bounds=vec_2_sample_bounds,
+                              vector_3_centers=vector_3_centers,
+                              vector_3_bounds=vector_3_bounds,
                               )
     
     return (particle_data, samples)

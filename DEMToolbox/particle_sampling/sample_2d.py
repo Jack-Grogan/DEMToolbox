@@ -173,7 +173,16 @@ def sample_2d(particle_data,
         vec_2_sample_bounds = np.linspace(min(resolved_bounds_vec_2),
                                         max(resolved_bounds_vec_2),
                                         resolution[1] + 1)
+    else:
+        raise ValueError("Bounds must be a list of 6 elements or a "
+                         "vtkPolyData.")
 
+    # Calculate the cell centers in each vector direction
+    vector_1_centers = (vec_1_sample_bounds[:-1] 
+                        + np.diff(vec_1_sample_bounds) / 2)
+    vector_2_centers = (vec_2_sample_bounds[:-1] 
+                        + np.diff(vec_2_sample_bounds) / 2)
+    
     # Digitise the resolved particles into the sample bounds
     i = np.digitize(resolved_particles_vec_2, vec_2_sample_bounds) - 1
     j = np.digitize(resolved_particles_vec_1, vec_1_sample_bounds) - 1
@@ -220,6 +229,10 @@ def sample_2d(particle_data,
                               cell_particles, 
                               n_sampled_particles, 
                               n_unsampled_particles,
+                              vector_1_centers=vector_1_centers,
+                              vector_1_bounds=vec_1_sample_bounds,
+                              vector_2_centers=vector_2_centers,
+                              vector_2_bounds=vec_2_sample_bounds,
                               )
 
     return (particle_data, samples)

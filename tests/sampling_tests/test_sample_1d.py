@@ -126,3 +126,60 @@ class TestSample1D(unittest.TestCase):
         """Test the number of unsampled particles in split data."""
 
         assert self.split.n_unsampled_particles == 0
+
+
+    def test_sample_1d_vector_1_centers(self):
+        """Test vector 1 cell centers in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_1_centers,
+                     [-0.02645526, -0.02220484, -0.01795443, 
+                      -0.01370401, -0.0094536, -0.00520318,
+                      -0.00095277, 0.00329765, 0.00754806, 
+                      0.01179848, 0.01604889, 0.02029931,
+                      0.02454972, 0.02880014, 0.03305055, 
+                      0.03730097, 0.04155138, 0.0458018,
+                      0.05005221, 0.05430263, 0.05855304])
+                   )
+        
+        assert len(self.split.vector_1_centers) == 21
+        
+
+    def test_sample_1d_vector_1_bounds(self):
+        """Test vector 1 bounds in split data."""
+
+        assert all(round(a, 8) == b for a, b 
+                   in zip(self.split.vector_1_bounds,
+                     [-0.02858047, -0.02433005, -0.02007964,
+                      -0.01582922, -0.01157881, -0.00732839,
+                      -0.00307798, 0.00117244, 0.00542285, 
+                      0.00967327, 0.01392368, 0.0181741,
+                      0.02242451, 0.02667493, 0.03092534, 
+                      0.03517576, 0.03942617, 0.04367659,
+                      0.047927, 0.05217742, 0.05642783, 0.06067825])
+                   )
+        
+        assert len(self.split.vector_1_bounds) == 22
+
+    def test_sample_1d_vector_2_centers(self):
+        """Test vector 2 cell centers in split data."""
+
+        assert self.split.vector_2_centers is None
+
+
+    def test_sample_1d_vector_2_bounds(self):
+        """Test vector 2 bounds in split data."""
+
+        assert self.split.vector_2_bounds is None
+
+
+    def test_sample_1d_vector_3_centers(self):
+        """Test vector 3 cell centers in split data."""
+
+        assert self.split.vector_3_centers is None
+
+
+    def test_sample_1d_vector_3_bounds(self):
+        """Test vector 3 bounds in split data."""
+
+        assert self.split.vector_3_bounds is None
