@@ -279,7 +279,7 @@ mixing index can be calculated using the function `macro_scale_lacey_mixing`:
 ```python
 from DEMToolbox.mixing import macro_scale_lacey_mixing
 
-settled_data, settled_lacey = macro_scale_lacey_mixing(mixed_data, 
+settled_data, settled_lacey = macro_scale_lacey_mixing(settled_data, 
                                                        samples.ParticleAttribute,
                                                        settled_data_samples,
                                                        )
