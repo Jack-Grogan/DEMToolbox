@@ -6,10 +6,10 @@ build-backend = "hatchling.build"
 name = "DEMToolbox"
 version = "0.0.23"
 authors = [
-  { name="Jack R Grogan", email="***REMOVED***" },
+  { name="Jack R Grogan"},
 ]
 maintainers = [
-  { name="Jack R Grogan", email="***REMOVED***" },
+  { name="Jack R Grogan"},
 ]
 description = "A set of tools for post processing DEM Simulation data."
 keywords = ["DEM", "Post Processing", "Simulation"]
