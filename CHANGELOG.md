@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.24] - 2026-02-22
+
+### Added
+None
+
+### Changed
+DEMToolbox.mixing.lacey_mixing has been renamed to DEMToolbox.mixing.lacey_mixing_curve_fit to better reflect the functionality of the module. The function lacey_mixing_curve_fit has been updated to return the covariance of the fitted parameters instead of the r2 score, as this is more informative for assessing the quality of the fit. The docstring for lacey_mixing_curve_fit has been updated to reflect these changes.
+
+### Deprecated
+DEMToolbox.mixing.lacey_mixing is now deprecated. Users should switch to using DEMToolbox.mixing.lacey_mixing_curve_fit instead. r2 score is no longer returned by lacey_mixing_curve_fit, so users should not rely on this metric for assessing fit quality. This change was implemented due to the different ways in which r2 score can be calculated with one of the methods allowing for negative r2 scores and the other not, which could lead to confusion.
+
+### Removed
+DEMToolbox.mixing.lacey_mixing has been removed. Users should switch to using DEMToolbox.mixing.lacey_mixing_curve_fit instead. The r2 score is no longer returned by lacey_mixing_curve_fit.
+
+### Fixed
+None
+
+### Security
+None
+
 ## [0.0.23] - 2025-10-06
 
 ### Added
@@ -14,7 +34,7 @@ bounds and centers of each sample in each dimension. Added tests for this new
 functionality.
 
 ### Changed
-Non
+None
 
 ### Deprecated
 None

@@ -138,8 +138,8 @@ def lacey_mixing_curve_fit(time, m, t0=0, tend=None):
     -------
     popt : array-like
         The optimal values for the parameters k and tau.
-    r2 : float
-        The coefficient of determination for the fit.
+    pcov : 2D array
+        The estimated covariance of popt as returned by curve_fit.
     time_mixing : array-like
         The time data for the mixing period used in the fit.
     m_mixing : array-like
@@ -189,7 +189,7 @@ def lacey_mixing_curve_fit(time, m, t0=0, tend=None):
     t0 = time_mixing[0]
 
     partial_lacey_mixing_curve = partial(lacey_mixing_curve, m0=m0)
-    popt, _ = curve_fit(partial_lacey_mixing_curve, 
+    popt, pcov = curve_fit(partial_lacey_mixing_curve, 
                         time_mixing, 
                         m_mixing,
                         p0=(0, t0), 
@@ -198,6 +198,5 @@ def lacey_mixing_curve_fit(time, m, t0=0, tend=None):
                         )
     
     m_fit = partial_lacey_mixing_curve(time_mixing, *popt)
-    r2 = r2_score(m_mixing, m_fit)
 
-    return popt, r2, time_mixing, m_mixing, m_fit
+    return popt, pcov, time_mixing, m_mixing, m_fit
