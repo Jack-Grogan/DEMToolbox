@@ -68,7 +68,7 @@ resolution = [15, 24]
 # Calculate velocity vector field
 results = velocity_vector_field(
     particle_data,
-    bounds=
+    bounds,
     point_on_plane,
     dim_1,
     dim_2,
