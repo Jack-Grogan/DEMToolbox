@@ -10,7 +10,8 @@ def sample_3d(particle_data,
               vector_1,  
               vector_2, 
               vector_3, 
-              resolution, 
+              resolution=False,
+              cube_length=None, 
               append_column="3D_samples",
               particle_id_column="id"):
     """Split the particles into samples split along 3 dimensions.
@@ -32,8 +33,16 @@ def sample_3d(particle_data,
         The second sample vector to split the particles along.
     vector_3 : list
         The third sample vector to split the particles along.
-    resolution : list
-        The resolution of the 3D sample space in the form [m, n, o].
+    resolution : list, optional
+        The number of samples in each vector direction in the form
+        [n_samples_vector_1, n_samples_vector_2, n_samples_vector_3], 
+        by default False. If resolution is specified, cube_length must be None. 
+        If resolution is False, cube_length must be specified.
+    cube_length : float, optional
+        The length of the cube to sample the particles in, by default None. If
+        resolution is specified, cube_length must be None. If resolution is 
+        False, cube_length must be specified. Cube length is defined in the 
+        units of the bounds provided.
     append_column : str, optional
         The name of the samples column to append to the particle data, 
         by default "3D_samples".
@@ -58,9 +67,21 @@ def sample_3d(particle_data,
     ValueError
         If vectors are not 3 element lists.
     ValueError
-        If resolution is not a 3 element list of integers.
+        If resolution is False and cube_length is None.
     ValueError
-        If resolution is less than or equal to 0.
+        If resolution is False and cube_length is not an integer or 
+        float.
+    ValueError
+        If resolution is False and cube_length is less than or equal 
+        to 0.
+    ValueError
+        If resolution is not False and cube_length is not None.
+    ValueError
+        If resolution is not False and resolution is not a 3 element 
+        list of integers.
+    ValueError
+        If resolution is not False and any element of resolution is less 
+        than or equal to 0.
     ValueError
         If vectors are not orthogonal.
     UserWarning
@@ -78,17 +99,33 @@ def sample_3d(particle_data,
     """
     if len(vector_1) != 3 or len(vector_2) != 3 or len(vector_3) != 3:
         raise ValueError("Vectors must be 3 element lists.")
+
+    if resolution is False:
+        if cube_length is None:
+            raise ValueError(
+                "If resolution is False, cube_length must be specified."
+            )
+        if not isinstance(cube_length, (int, float)):
+            raise ValueError("Cube length must be an integer or float.")
+        if cube_length <= 0:
+            raise ValueError("Cube length must be greater than 0.")
+    else:
+        if cube_length is not None:
+            raise ValueError(
+                "If resolution is specified, cube_length must be None."
+            )
     
-    if len(resolution) != 3:
-        raise ValueError("Resolution must be a 3 element list.")
-    
-    if not all(isinstance(i, int) for i in resolution):
-        raise ValueError("Resolution must be a list of integers.")
-    
-    if any(i <= 0 for i in resolution):
-        raise ValueError("Resolution must be greater than 0 in all "
-                         "dimensions.")
-    
+        if len(resolution) != 3:
+            raise ValueError("Resolution must be a 3 element list.")
+        
+        if not all(isinstance(i, int) for i in resolution):
+            raise ValueError("Resolution must be a list of integers.")
+        
+        if any(i <= 0 for i in resolution):
+            raise ValueError(
+                "Resolution must be greater than 0 in all dimensions."
+            )
+        
     if particle_data.n_points == 0:
         warnings.warn("Cannot sample empty particles file.", UserWarning)
         sample_attribute = ParticleAttribute(particle_id_column, 
@@ -159,15 +196,41 @@ def sample_3d(particle_data,
         if min_bound_vec_3 > max_bound_vec_3:
             min_bound_vec_3, max_bound_vec_3 = max_bound_vec_3, min_bound_vec_3          
 
-        vec_1_sample_bounds = np.linspace(min_bound_vec_1,
-                                          max_bound_vec_1,
-                                          resolution[0] + 1)
-        vec_2_sample_bounds = np.linspace(min_bound_vec_2,
-                                          max_bound_vec_2,
-                                          resolution[1] + 1)
-        vec_3_sample_bounds = np.linspace(min_bound_vec_3,
-                                          max_bound_vec_3,
-                                          resolution[2] + 1)
+        if resolution is False:
+
+            # Define the sample bounds based on the cube length
+            vec_1_sample_bounds = np.arange(min_bound_vec_1,
+                                            max_bound_vec_1 + cube_length,
+                                            cube_length)
+            vec_2_sample_bounds = np.arange(min_bound_vec_2,
+                                            max_bound_vec_2 + cube_length,
+                                            cube_length)
+            vec_3_sample_bounds = np.arange(min_bound_vec_3,
+                                            max_bound_vec_3 + cube_length,
+                                            cube_length)
+
+            # If the last sample bound exceeds the max bound shift the 
+            # sample bounds to give equal overshoot on both sides of the bounds
+            if vec_1_sample_bounds[-1] > max_bound_vec_1:
+                overshoot = vec_1_sample_bounds[-1] - max_bound_vec_1
+                vec_1_sample_bounds -= overshoot / 2
+            if vec_2_sample_bounds[-1] > max_bound_vec_2:
+                overshoot = vec_2_sample_bounds[-1] - max_bound_vec_2
+                vec_2_sample_bounds -= overshoot / 2
+            if vec_3_sample_bounds[-1] > max_bound_vec_3:
+                overshoot = vec_3_sample_bounds[-1] - max_bound_vec_3
+                vec_3_sample_bounds -= overshoot / 2
+
+        else:
+            vec_1_sample_bounds = np.linspace(min_bound_vec_1,
+                                            max_bound_vec_1,
+                                            resolution[0] + 1)
+            vec_2_sample_bounds = np.linspace(min_bound_vec_2,
+                                            max_bound_vec_2,
+                                            resolution[1] + 1)
+            vec_3_sample_bounds = np.linspace(min_bound_vec_3,
+                                            max_bound_vec_3,
+                                            resolution[2] + 1)
 
     elif isinstance(bounds, pv.PolyData):
 
@@ -186,16 +249,44 @@ def sample_3d(particle_data,
         resolved_bounds_vec_2 = np.dot(bounds.points, vector_2)
         resolved_bounds_vec_3 = np.dot(bounds.points, vector_3)
 
-        # Define the sample bounds linearly along the resolved vtk data
-        vec_1_sample_bounds = np.linspace(min(resolved_bounds_vec_1),
-                                        max(resolved_bounds_vec_1),
-                                        resolution[0] + 1)
-        vec_2_sample_bounds = np.linspace(min(resolved_bounds_vec_2),
-                                        max(resolved_bounds_vec_2),
-                                        resolution[1] + 1)
-        vec_3_sample_bounds = np.linspace(min(resolved_bounds_vec_3),
-                                        max(resolved_bounds_vec_3),
-                                        resolution[2] + 1)
+        if resolution is False:
+            
+            # Define the sample bounds based on the cube length
+            vec_1_sample_bounds = np.arange(min(resolved_bounds_vec_1),
+                                            max(resolved_bounds_vec_1) + cube_length,
+                                            cube_length)
+            vec_2_sample_bounds = np.arange(min(resolved_bounds_vec_2),
+                                            max(resolved_bounds_vec_2) + cube_length,
+                                            cube_length)
+            vec_3_sample_bounds = np.arange(min(resolved_bounds_vec_3),
+                                            max(resolved_bounds_vec_3) + cube_length,
+                                            cube_length)
+
+            # If the last sample bound exceeds the max bound shift the 
+            # sample bounds to give equal overshoot on both sides of the bounds
+            if vec_1_sample_bounds[-1] > max(resolved_bounds_vec_1):
+                overshoot = vec_1_sample_bounds[-1] - max(resolved_bounds_vec_1)
+                vec_1_sample_bounds -= overshoot / 2
+            if vec_2_sample_bounds[-1] > max(resolved_bounds_vec_2):
+                overshoot = vec_2_sample_bounds[-1] - max(resolved_bounds_vec_2)
+                vec_2_sample_bounds -= overshoot / 2
+            if vec_3_sample_bounds[-1] > max(resolved_bounds_vec_3):
+                overshoot = vec_3_sample_bounds[-1] - max(resolved_bounds_vec_3)
+                vec_3_sample_bounds -= overshoot / 2
+
+        else:
+
+            # Define the sample bounds linearly along the resolved vtk data
+            vec_1_sample_bounds = np.linspace(min(resolved_bounds_vec_1),
+                                            max(resolved_bounds_vec_1),
+                                            resolution[0] + 1)
+            vec_2_sample_bounds = np.linspace(min(resolved_bounds_vec_2),
+                                            max(resolved_bounds_vec_2),
+                                            resolution[1] + 1)
+            vec_3_sample_bounds = np.linspace(min(resolved_bounds_vec_3),
+                                            max(resolved_bounds_vec_3),
+                                            resolution[2] + 1)
+            
     else:
         raise ValueError("Bounds must be a list of 6 elements or a "
                          "vtkPolyData.")
@@ -211,20 +302,27 @@ def sample_3d(particle_data,
     j = np.digitize(resolved_particles_vec_2, vec_2_sample_bounds) - 1
     k = np.digitize(resolved_particles_vec_1, vec_1_sample_bounds) - 1
 
+    n_samples_vec_1 = len(vec_1_sample_bounds) - 1
+    n_samples_vec_2 = len(vec_2_sample_bounds) - 1
+    n_samples_vec_3 = len(vec_3_sample_bounds) - 1
+
     # Filter out particles outside the valid ranges
     mask = (
-        (i >= 0) & (i < len(vec_3_sample_bounds) - 1) &
-        (j >= 0) & (j < len(vec_2_sample_bounds) - 1) &
-        (k >= 0) & (k < len(vec_1_sample_bounds) - 1)
+        (i >= 0) & (i < n_samples_vec_3) &
+        (j >= 0) & (j < n_samples_vec_2) &
+        (k >= 0) & (k < n_samples_vec_1)
     )
+
     i, j, k = i[mask], j[mask], k[mask] 
 
     sample_id = np.ravel_multi_index((i, j, k),
-                                    (len(vec_3_sample_bounds)-1,
-                                    len(vec_2_sample_bounds)-1,
-                                    len(vec_1_sample_bounds)-1)).astype(int)
-          
-    cells = np.arange(resolution[0] * resolution[1] * resolution[2], dtype=int)
+                                    (n_samples_vec_3,
+                                    n_samples_vec_2,
+                                    n_samples_vec_1)).astype(int)
+
+    cells = np.arange(n_samples_vec_3 * n_samples_vec_2 * n_samples_vec_1, 
+                      dtype=int)
+    
     occupied_cells, counts = np.unique(sample_id, return_counts=True)
     occupied_cells = occupied_cells[occupied_cells != -1]
     cell_particles = np.zeros_like(cells, dtype=int)

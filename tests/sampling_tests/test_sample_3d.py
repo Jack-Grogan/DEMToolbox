@@ -199,7 +199,6 @@ class TestSample3D(unittest.TestCase):
     def test_sample_3d_vector_3_bounds(self):
         """Test vector 3 bounds in split data."""
 
-        print(self.split.vector_3_bounds)
         assert all(round(a, 8) == b for a, b 
                    in zip(self.split.vector_3_bounds,
                         [-0.07892954, -0.04561146, -0.01229337, 

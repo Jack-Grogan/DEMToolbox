@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.25] - 2026-06-22
+
+### Added
+Functionality in sample_3d to specify a cube length rather than a resolution for the sampling grid. This allows for more control over the size of the cells in the sampling grid, which can be useful for certain applications. Added tests for this new functionality.
+
+### Changed
+With this functionality, the resolution parameter in sample_3d is now optional and defaults
+to `False`. If the user specifies a cube length, the resolution must be set to `False`. If the user does not specify a cube length, the resolution must be defined as a list of three integers. The docstring for sample_3d has been updated to reflect these changes.
+
+### Deprecated
+None
+
+### Removed
+None
+
+### Fixed
+None
+
+
 ## [0.0.24] - 2026-02-22
 
 ### Added
