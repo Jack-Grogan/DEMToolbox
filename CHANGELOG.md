@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.28] - 2026-06-30
+
+### Added
+Method save to ParticleSamples class to save the sampled cells as a StructuredGrid in 3D space. If filename is provided, the StructuredGrid will be saved as a .vtk file with the specified name. If filename is not provided, the StructuredGrid will be saved as a .vtk file with the name of the samples column. This is a more efficient way to save the sampled cells than using the to_vtm method, as it does not require rendering the cubes in 3D space. Added tests for this new functionality.
+
+### Changed
+None
+
+### Deprecated
+None
+
+### Removed
+None
+
+### Fixed
+None
+
 ## [0.0.27] - 2026-06-30
 
 ### Added

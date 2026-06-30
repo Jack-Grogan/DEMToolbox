@@ -41,6 +41,11 @@ class ParticleSamples():
 
     Methods
     -------
+    save(filename=None):
+        Save the sampled cells as a StructuredGrid in 3D space. If filename 
+        is provided, the StructuredGrid will be saved as a .vtk file with the 
+        specified name. If filename is not provided, the StructuredGrid will be 
+        saved as a .vtk file with the name of the samples column.
     to_vtm(filename=None):
         Render the sampled cells as cubes in 3D space. If filename 
         is provided, the rendered cubes will be saved as a .vtm file 
@@ -87,6 +92,37 @@ class ParticleSamples():
         self.vector_3 = vector_3
         self.vector_3_centers = vector_3_centers
         self.vector_3_bounds = vector_3_bounds
+
+
+    def save(self, filename=None):
+        """Save the sampled cells as a StructuredGrid in 3D space. If filename 
+        is provided, the StructuredGrid will be saved as a .vtk file with the 
+        specified name. If filename is not provided, the StructuredGrid will be 
+        saved as a .vtk file with the name of the samples column.
+        """
+        z, y, x = np.meshgrid(self.vector_3_bounds,
+                              self.vector_2_bounds,
+                              self.vector_1_bounds,
+                              indexing='ij'
+        )
+
+        rotation_matrix = np.eye(4)
+        rotation_matrix[:3, :3] = np.array([self.vector_1, 
+                                             self.vector_2, 
+                                             self.vector_3]).T
+
+        meshgrid = pv.StructuredGrid(x, y, z)
+        meshgrid.transform(rotation_matrix, inplace=True)
+
+        # Save the meshgrid to a .vtm file if filename is provided, 
+        # otherwise save with the name of the samples column
+        if filename is not None:
+            meshgrid.save(filename)
+        else:
+            meshgrid.save(f"{self.name}.vtk")
+            
+        return
+    
 
     def to_vtm(self, filename=None):
 

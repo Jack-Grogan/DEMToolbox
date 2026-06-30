@@ -53,8 +53,8 @@ class TestSample3DBounds(unittest.TestCase):
         cls.split = split
 
         
-    def test_sample_3d_render(self):
-        """Test rendering of the sampled particles."""
+    def test_sample_3d_to_vtm(self):
+        """Test the to_vtm method of the Sample3D class."""
 
         output_dir = os.path.join(os.path.dirname(__file__), "generated_test_files")
         os.makedirs(output_dir, exist_ok=True)
@@ -62,5 +62,11 @@ class TestSample3DBounds(unittest.TestCase):
         self.split.to_vtm(filename=os.path.join(output_dir, "samples.vtm"))
         self.particle_data.save(os.path.join(output_dir, "particles.vtp"))
 
+    def test_sample_3d_save(self):
+        """Test the save method of the Sample3D class."""
 
+        output_dir = os.path.join(os.path.dirname(__file__), "generated_test_files")
+        os.makedirs(output_dir, exist_ok=True)
+
+        self.split.save(filename=os.path.join(output_dir, "meshgrid.vtk"))
      
