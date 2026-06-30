@@ -97,8 +97,12 @@ class ParticleSamples():
         )
 
         cube_centers = np.stack([x, y, z], axis=-1).reshape(-1, 3)
-        data = []
 
+        rotation_matrix = np.eye(4)
+        rotation_matrix[:3, :3] = np.array([self.vector_1, 
+                                             self.vector_2, 
+                                             self.vector_3]).T
+        data = []
         for i, (x, y, z) in enumerate(cube_centers):
             cube = pv.Cube(
                 center=(x, y, z),
@@ -107,18 +111,13 @@ class ParticleSamples():
                 z_length=self.vector_3_bounds[1] - self.vector_3_bounds[0],
             )
 
+            # Rotate the blocks to align with the original vectors
+            cube.transform(rotation_matrix, inplace=True)
             cube["id"] = np.full(cube.n_cells, i)
+
             data.append(cube)
 
         blocks = pv.MultiBlock(data)
-
-        # Rotate the blocks to align with the original vectors
-        rotation_matrix = np.eye(4)
-        rotation_matrix[:3, :3] = np.array([self.vector_1, 
-                                             self.vector_2, 
-                                             self.vector_3]).T
-        blocks.transform(rotation_matrix, inplace=True)
-
 
         # Save the blocks to a .vtm file if filename is provided, 
         # otherwise save with the name of the samples column
