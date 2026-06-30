@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.27] - 2026-06-30
+
+### Added
+None
+
+### Changed
+None
+
+### Deprecated
+None
+
+### Removed
+None
+
+### Fixed
+Transformations of the cubes in the to_vtm method of the ParticleSamples class have been updated to 
+ensure that the cubes are correctly aligned with the original vectors. This was done by applying 
+the rotation matrix to each individual cube before adding it to the MultiBlock object, rather than 
+applying the transformation to the entire MultiBlock object after all cubes have been added. 
+This change ensures that each cube is correctly oriented in 3D space.
+
 ## [0.0.26] - 2026-06-30
 
 ### Added
