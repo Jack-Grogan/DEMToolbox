@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.26] - 2026-06-30
+
+### Added
+Method to_vtm to ParticleSamples class to render the sampled cells as cubes in 3D space. If output_file is provided, the rendered cubes will be saved as a .vtm file with the specified name. If output_file is not provided, the rendered cubes will be saved as a .vtm file with the name of the samples column. vtp files are saved for each individual cube in the sample space, in a folder named after the samples column.
+
+### Changed
+ParticleSamples now also has the option to store the normal vector of the sampled cells in addition to the bounds and centers. This allows for more information about the orientation of the sampled cells to be stored and accessed. Sample_3d has been updated to include the normal vector in the ParticleSamples object returned from the sampling function. The docstring for sample_3d has been updated to reflect these changes.
+
+### Deprecated
+None
+
+### Removed
+None
+
+### Fixed
+None
+
+
 ## [0.0.25] - 2026-06-22
 
 ### Added
