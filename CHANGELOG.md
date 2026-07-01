@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.29] - 2026-07-01
+
+### Added
+None
+
+### Changed
+Centering of the meshgrid in sample_3d has been updated to be optional rather than the default behavior. The center_meshgrid parameter in sample_3d now defaults to False, meaning that the meshgrid will not be centered on the bounds provided unless the user explicitly sets center_meshgrid to True. This change was made to provide more flexibility in how the meshgrid is generated, as centering may not always be desired. This functiomality is only needed when the user is sampling with a cube length rather than a resolution, as the meshgrid will always be centered when sampling with a resolution.
+
+### Deprecated
+None
+
+### Removed
+None
+
+### Fixed
+None
+
 ## [0.0.28] - 2026-06-30
 
 ### Added

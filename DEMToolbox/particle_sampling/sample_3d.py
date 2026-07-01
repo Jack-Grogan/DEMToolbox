@@ -10,8 +10,9 @@ def sample_3d(particle_data,
               vector_1,  
               vector_2, 
               vector_3, 
-              resolution=False,
-              cube_length=None, 
+              resolution=None,
+              cube_length=None,
+              center_meshgrid=False,
               append_column="3D_samples",
               particle_id_column="id"):
     """Split the particles into samples split along 3 dimensions.
@@ -36,13 +37,17 @@ def sample_3d(particle_data,
     resolution : list, optional
         The number of samples in each vector direction in the form
         [n_samples_vector_1, n_samples_vector_2, n_samples_vector_3], 
-        by default False. If resolution is specified, cube_length must be None. 
-        If resolution is False, cube_length must be specified.
+        by default None. If resolution is specified, cube_length must be None. 
+        If resolution is None, cube_length must be specified.
     cube_length : float, optional
         The length of the cube to sample the particles in, by default None. If
         resolution is specified, cube_length must be None. If resolution is 
-        False, cube_length must be specified. Cube length is defined in the 
+        None, cube_length must be specified. Cube length is defined in the 
         units of the bounds provided.
+    center_meshgrid : bool, optional
+        If True, the meshgrid will be centered on the bounds provided, by 
+        default False. If False, the meshgrid will start at the minimum corner 
+        of the bounds provided.
     append_column : str, optional
         The name of the samples column to append to the particle data, 
         by default "3D_samples".
@@ -67,20 +72,22 @@ def sample_3d(particle_data,
     ValueError
         If vectors are not 3 element lists.
     ValueError
-        If resolution is False and cube_length is None.
+        If resolution is None and cube_length is None.
     ValueError
-        If resolution is False and cube_length is not an integer or 
+        If resolution is None and cube_length is not an integer or 
         float.
     ValueError
-        If resolution is False and cube_length is less than or equal 
+        If resolution is None and cube_length is less than or equal 
         to 0.
     ValueError
-        If resolution is not False and cube_length is not None.
+        If resolution is not None and cube_length is not None.
+    UserWarning
+        If center_meshgrid is True and resolution is None.
     ValueError
-        If resolution is not False and resolution is not a 3 element 
+        If resolution is not None and resolution is not a 3 element 
         list of integers.
     ValueError
-        If resolution is not False and any element of resolution is less 
+        If resolution is not None and any element of resolution is less 
         than or equal to 0.
     ValueError
         If vectors are not orthogonal.
@@ -100,19 +107,28 @@ def sample_3d(particle_data,
     if len(vector_1) != 3 or len(vector_2) != 3 or len(vector_3) != 3:
         raise ValueError("Vectors must be 3 element lists.")
 
-    if resolution is False:
+    if resolution is None:
         if cube_length is None:
             raise ValueError(
-                "If resolution is False, cube_length must be specified."
+                "If resolution is None, cube_length must be specified."
             )
+        
         if not isinstance(cube_length, (int, float)):
             raise ValueError("Cube length must be an integer or float.")
+        
         if cube_length <= 0:
             raise ValueError("Cube length must be greater than 0.")
+        
     else:
         if cube_length is not None:
             raise ValueError(
                 "If resolution is specified, cube_length must be None."
+            )
+
+        if center_meshgrid:
+            warnings.warn(
+                "Centering the meshgrid is completed by definition when "
+                "resolution is specified.", UserWarning
             )
     
         if len(resolution) != 3:
@@ -196,7 +212,7 @@ def sample_3d(particle_data,
         if min_bound_vec_3 > max_bound_vec_3:
             min_bound_vec_3, max_bound_vec_3 = max_bound_vec_3, min_bound_vec_3          
 
-        if resolution is False:
+        if resolution is None:
 
             # Define the sample bounds based on the cube length
             vec_1_sample_bounds = np.arange(min_bound_vec_1,
@@ -209,17 +225,16 @@ def sample_3d(particle_data,
                                             max_bound_vec_3 + cube_length,
                                             cube_length)
 
-            # If the last sample bound exceeds the max bound shift the 
-            # sample bounds to give equal overshoot on both sides of the bounds
-            if vec_1_sample_bounds[-1] > max_bound_vec_1:
-                overshoot = vec_1_sample_bounds[-1] - max_bound_vec_1
-                vec_1_sample_bounds -= overshoot / 2
-            if vec_2_sample_bounds[-1] > max_bound_vec_2:
-                overshoot = vec_2_sample_bounds[-1] - max_bound_vec_2
-                vec_2_sample_bounds -= overshoot / 2
-            if vec_3_sample_bounds[-1] > max_bound_vec_3:
-                overshoot = vec_3_sample_bounds[-1] - max_bound_vec_3
-                vec_3_sample_bounds -= overshoot / 2
+            if center_meshgrid:
+                # Calculate the overshoot for each vector
+                overshoot_vec_1 = vec_1_sample_bounds[-1] - max_bound_vec_1
+                overshoot_vec_2 = vec_2_sample_bounds[-1] - max_bound_vec_2
+                overshoot_vec_3 = vec_3_sample_bounds[-1] - max_bound_vec_3
+
+                # Shift the sample bounds to center the meshgrid
+                vec_1_sample_bounds -= overshoot_vec_1 / 2
+                vec_2_sample_bounds -= overshoot_vec_2 / 2
+                vec_3_sample_bounds -= overshoot_vec_3 / 2
 
         else:
             vec_1_sample_bounds = np.linspace(min_bound_vec_1,
@@ -249,7 +264,7 @@ def sample_3d(particle_data,
         resolved_bounds_vec_2 = np.dot(bounds.points, vector_2)
         resolved_bounds_vec_3 = np.dot(bounds.points, vector_3)
 
-        if resolution is False:
+        if resolution is None:
             
             # Define the sample bounds based on the cube length
             vec_1_sample_bounds = np.arange(min(resolved_bounds_vec_1),
@@ -262,17 +277,16 @@ def sample_3d(particle_data,
                                             max(resolved_bounds_vec_3) + cube_length,
                                             cube_length)
 
-            # If the last sample bound exceeds the max bound shift the 
-            # sample bounds to give equal overshoot on both sides of the bounds
-            if vec_1_sample_bounds[-1] > max(resolved_bounds_vec_1):
-                overshoot = vec_1_sample_bounds[-1] - max(resolved_bounds_vec_1)
-                vec_1_sample_bounds -= overshoot / 2
-            if vec_2_sample_bounds[-1] > max(resolved_bounds_vec_2):
-                overshoot = vec_2_sample_bounds[-1] - max(resolved_bounds_vec_2)
-                vec_2_sample_bounds -= overshoot / 2
-            if vec_3_sample_bounds[-1] > max(resolved_bounds_vec_3):
-                overshoot = vec_3_sample_bounds[-1] - max(resolved_bounds_vec_3)
-                vec_3_sample_bounds -= overshoot / 2
+            if center_meshgrid:
+                # Calculate the overshoot for each vector
+                overshoot_vec_1 = vec_1_sample_bounds[-1] - max(resolved_bounds_vec_1)
+                overshoot_vec_2 = vec_2_sample_bounds[-1] - max(resolved_bounds_vec_2)
+                overshoot_vec_3 = vec_3_sample_bounds[-1] - max(resolved_bounds_vec_3)
+
+                # Shift the sample bounds to center the meshgrid
+                vec_1_sample_bounds -= overshoot_vec_1 / 2
+                vec_2_sample_bounds -= overshoot_vec_2 / 2
+                vec_3_sample_bounds -= overshoot_vec_3 / 2
 
         else:
 
