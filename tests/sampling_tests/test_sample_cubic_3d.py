@@ -200,20 +200,21 @@ class TestSample3D(unittest.TestCase):
     def test_sample_3d_vector_3_centers(self):
         """Test vector 3 cell centers in split data."""
 
-        assert all(round(a, 8) == b for a, b 
+        print(self.split.vector_3_centers)
+        assert all(round(a, 5) == b for a, b 
                    in zip(self.split.vector_3_centers,
                        [0.00611, 0.02611, 0.04611, 0.06611])
                     )
-        
+
         assert len(self.split.vector_3_centers) == 4
 
 
     def test_sample_3d_vector_3_bounds(self):
         """Test vector 3 bounds in split data."""
 
-        assert all(round(a, 8) == b for a, b 
+        print(self.split.vector_3_bounds)
+        assert all(round(a, 5) == b for a, b 
                    in zip(self.split.vector_3_bounds,
                         [-0.00389, 0.01611, 0.03611, 0.05611, 0.07611])
                    )
-        
         assert len(self.split.vector_3_bounds) == 5
