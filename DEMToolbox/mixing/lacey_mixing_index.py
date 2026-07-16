@@ -118,14 +118,8 @@ def macro_scale_lacey_mixing(particle_data,
         If the attribute contains only one particle type with a value
         of 0 or 1 return unedited particle data and NaN for Lacey.
     ValueError
-        If the attribute contains only one particle type with a value
-        other than 0 or 1 raise a ValueError.
-    ValueError
-        If the attribute contains two particle types with values
-        other than 0 or 1 raise a ValueError.
-    ValueError
-        If the attribute contains more than two particle types raise
-        a ValueError.
+        If the attribute contains particle types with values other 
+        than 0 and 1 raise a ValueError.
     UserWarning
         If there are fewer than 2 non-empty samples in the particle
         data return unedited particle data and NaN for Lacey.
@@ -151,25 +145,18 @@ def macro_scale_lacey_mixing(particle_data,
                       "returning NaN."), UserWarning)
         return particle_data, np.nan
 
-    if len(np.setxor1d(particle_data[attribute.attribute], [1, 0])) != 0:
-        if (len(np.unique(particle_data[attribute.attribute])) == 1 and
-            len(np.setxor1d(particle_data[attribute.attribute]) == 1)):
-            warnings.warn((f"particle data contains only particle type "
+    ones_and_zeros = np.setdiff1d(particle_data[attribute.attribute], [1, 0])
+
+    if len(ones_and_zeros) == 0:
+        if len(np.unique(particle_data[attribute.attribute])) == 1:
+            warnings.warn(("particle data contains only particle type "
                            f"{particle_data[attribute.attribute][0]}, "
                            "setting Lacey to NaN."), UserWarning)
             return particle_data, np.nan
-        elif len(np.unique(particle_data[attribute.attribute])) == 1:
-            raise ValueError(("particle data contains only one particle "
-                             "type with value other than 0 and 1, cannot "
-                             "calculate Lacey mixing index."))
-        elif len(np.unique(particle_data[attribute.attribute])) == 2:
-            raise ValueError(("particle data contains two particle "
-                             "types with values other than 0 and 1, cannot "
-                             "calculate Lacey mixing index."))
-        else:
-            raise ValueError(("particle data contains more than two "
-                             "particle types, cannot calculate Lacey "
-                             "mixing index."))
+    else:
+        raise ValueError(("particle data contains particle types with values "
+                          "other than 0 and 1, cannot calculate Lacey mixing "
+                          f"index. Found particle types: {ones_and_zeros}"))
     
     # Boolean mask for class 0 particles
     class_0_split = (particle_data[attribute.attribute].astype(int)
@@ -245,16 +232,6 @@ def macro_scale_lacey_mixing(particle_data,
         variance = np.nan
         unmixed_variance = np.nan
         mixed_variance = np.nan
-    elif sum(class_0_sample_volume) == 0 or sum(class_1_sample_volume) == 0:
-        warnings.warn(
-            ("Only one particle type present in the samples at this timestep."
-            " Setting Lacey to NaN."),
-            UserWarning,
-        )
-        lacey = np.nan
-        variance = np.nan
-        unmixed_variance = np.nan
-        mixed_variance = np.nan
     else:
         bulk_concentration = (
             np.sum(class_0_sample_volume)
@@ -290,7 +267,10 @@ def macro_scale_lacey_mixing(particle_data,
         if mixed_variance == unmixed_variance:
             warnings.warn(
                 ("Mixed variance is equal to unmixed variance, "
-                 "setting Lacey to NaN."),
+                 "setting Lacey to NaN on account of division by zero. "
+                 "This is likely due to the sample resolution being too "
+                 "fine leading to each sample containing only one particle."
+                 " Consider coarsening the sample resolution."), 
                 UserWarning,
             )
             lacey = np.nan

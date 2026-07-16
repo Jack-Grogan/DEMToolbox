@@ -61,15 +61,20 @@ def set_up_lacey_mixing_index_part_mixed_test():
 
     sample_resolution = [1,1,3]
     sample_constant = "volume"
-    particle_data, samples = sample_3d_cylinder(particle_data,
-                                                cylinder_data,
-                                                sample_resolution,
-                                                sample_constant)
+
+    particle_data, samples = sample_3d_cylinder(
+        particle_data,
+        cylinder_data,
+        sample_resolution,
+        sample_constant,
+    )
     
-    particle_data, lacey = macro_scale_lacey_mixing(particle_data, 
-                                                    split.ParticleAttribute,
-                                                    samples,
-                                                    )
+    particle_data, lacey = macro_scale_lacey_mixing(
+        particle_data, 
+        split.ParticleAttribute,
+        samples,
+        append_column="test_append",
+    )
     
     return (particle_data, samples, sample_resolution, 
             lacey, split, cylinder_data)
@@ -119,3 +124,14 @@ class TestLaceyMixingIndex(unittest.TestCase):
                           / (mixed_variance - unmixed_variance))
 
         assert np.isclose(self.lacey, expected_value, atol=1e-10)
+
+        expected_keys = [
+            'radius', 
+            'id', 
+            'volume',
+            'z_split', 
+            '3D_cylinder_samples', 
+            'test_append'
+        ]
+
+        assert self.particle_data.point_data.keys() == expected_keys

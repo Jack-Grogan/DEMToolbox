@@ -78,17 +78,19 @@ class TestHomogeneityIndexRaises(unittest.TestCase):
         cls.samples = samples
         cls.cylinder_data = cylinder_data
 
-
         return
     
 
     def test_homogeneity_index_no_particles(self):
+        """Test error handling for empty particle data."""
 
         particle_data = pv.PolyData([])
 
         with self.assertWarns(UserWarning) as context:
             result_particle_data, result_hi = homogeneity_index(
-                particle_data, "radius", self.samples
+                particle_data, 
+                "radius", 
+                self.samples,
             )
 
         self.assertEqual(
@@ -99,7 +101,7 @@ class TestHomogeneityIndexRaises(unittest.TestCase):
         self.assertTrue(np.isnan(result_hi))
         self.assertIs(result_particle_data, particle_data)
 
-    def test_homogeneity_index_missing_column(self):
+    def test_homogeneity_index_missing_attribute_column(self):
 
         with self.assertWarns(UserWarning) as context:
             result_particle_data, result_hi = homogeneity_index(
@@ -114,7 +116,7 @@ class TestHomogeneityIndexRaises(unittest.TestCase):
         self.assertTrue(np.isnan(result_hi))
         self.assertIs(result_particle_data, self.particle_data)
 
-    def test_homogeneity_index_no_samples(self):
+    def test_homogeneity_index_missing_samples_column(self):
 
         unmodified_particle_data = self.particle_data.copy()
         _, samples = sample_1d(self.particle_data,
@@ -127,7 +129,9 @@ class TestHomogeneityIndexRaises(unittest.TestCase):
         print(unmodified_particle_data.point_data.keys())
         with self.assertWarns(UserWarning) as context:
             result_particle_data, result_hi = homogeneity_index(
-                unmodified_particle_data, "radius", samples
+                unmodified_particle_data, 
+                "radius", 
+                samples,
             )
 
         self.assertEqual(
@@ -144,7 +148,7 @@ class TestHomogeneityIndexRaises(unittest.TestCase):
         unmodified_particle_data["non_numeric"] = ["a"] * unmodified_particle_data.n_points
 
         with self.assertRaises(ValueError) as context:
-            result_particle_data, result_hi = homogeneity_index(
+            homogeneity_index(
                 unmodified_particle_data, "non_numeric", self.samples
             )
 
@@ -208,9 +212,10 @@ class TestHomogeneityIndexRaises(unittest.TestCase):
 
         output = captured_output.getvalue()
 
-        self.assertIn("Homogeneity index:  0.0007180703308172537\nBulk mean:  "
-                      "0.001375\nSample means:  [0.00025 0.0005  0.00075 0.001 "
-                      "  0.00125 0.0015  0.00175 0.002   0.00225\n 0.0025 "
-                      "]\nNumber of samples:  10\n", 
-                      output
+        self.assertEqual(
+            "Homogeneity index:  0.0007180703308172537\nBulk mean:  "
+            "0.001375\nSample means:  [0.00025 0.0005  0.00075 0.001 "
+            "  0.00125 0.0015  0.00175 0.002   0.00225\n 0.0025 "
+            "]\nNumber of samples:  10\n", 
+            output
         )
