@@ -161,5 +161,4 @@ class ParticleSamples():
             blocks.save(filename)
         else:
             blocks.save(f"{self.name}.vtm")
-
         return
