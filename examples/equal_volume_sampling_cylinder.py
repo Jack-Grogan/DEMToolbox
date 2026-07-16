@@ -4,7 +4,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
                 os.pardir)))
 
 from DEMToolbox.particle_sampling import sample_1d_volume_cylinder
-from DEMToolbox.classes.particle_attribute import ParticleAttribute
 from DEMToolbox.utilities import append_attribute
 
 from natsort import natsorted
@@ -12,7 +11,6 @@ import glob
 import re
 import pyvista as pv
 from tqdm import tqdm
-import numpy as np
 
 # Sample parameters
 split_vectors = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]  # Split along x, y, z axes

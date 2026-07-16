@@ -1,6 +1,5 @@
 import numpy as np
 import warnings
-import pandas as pd
 
 from ..classes.particle_samples import ParticleSamples
 

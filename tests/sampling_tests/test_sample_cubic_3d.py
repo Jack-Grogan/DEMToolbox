@@ -21,8 +21,6 @@ def set_up_sample_cubic_3d_test():
     vector_2 = [0, 1, 0]
     vector_3 = [0, 0, 1]
 
-    resolution = [3, 3, 3]
-
     # test with non normalised vector
     particle_data, split = sample_3d(particle_data,
                                      cylinder_data,

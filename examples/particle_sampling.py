@@ -14,7 +14,6 @@ import glob
 import re
 import pyvista as pv
 from tqdm import tqdm
-import pandas as pd
 
 # Mesh 1D
 vector_1d = [0, 0, 1]

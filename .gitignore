@@ -66,6 +66,7 @@ prototyping/
 ##########################
 .pytest_cache/
 .coverage
+.ruff_cache/
 
 # Benchmark files #
 ######################

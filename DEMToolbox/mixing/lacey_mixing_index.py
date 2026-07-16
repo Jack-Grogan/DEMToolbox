@@ -159,15 +159,15 @@ def macro_scale_lacey_mixing(particle_data,
                            "setting Lacey to NaN."), UserWarning)
             return particle_data, np.nan
         elif len(np.unique(particle_data[attribute.attribute])) == 1:
-            raise ValueError((f"particle data contains only one particle "
+            raise ValueError(("particle data contains only one particle "
                              "type with value other than 0 and 1, cannot "
                              "calculate Lacey mixing index."))
         elif len(np.unique(particle_data[attribute.attribute])) == 2:
-            raise ValueError((f"particle data contains two particle "
+            raise ValueError(("particle data contains two particle "
                              "types with values other than 0 and 1, cannot "
                              "calculate Lacey mixing index."))
         else:
-            raise ValueError((f"particle data contains more than two "
+            raise ValueError(("particle data contains more than two "
                              "particle types, cannot calculate Lacey "
                              "mixing index."))
     
@@ -236,7 +236,7 @@ def macro_scale_lacey_mixing(particle_data,
     
     if samples.n_occupied_cells < 2:
         warnings.warn(
-            (f"Fewer than 2 non-empty samples in particle data. "
+            ("Fewer than 2 non-empty samples in particle data. "
             "Setting Lacey to NaN, consider refining the sample "
             "resolution."),
             UserWarning,
@@ -247,7 +247,7 @@ def macro_scale_lacey_mixing(particle_data,
         mixed_variance = np.nan
     elif sum(class_0_sample_volume) == 0 or sum(class_1_sample_volume) == 0:
         warnings.warn(
-            (f"Only one particle type present in the samples at this timestep."
+            ("Only one particle type present in the samples at this timestep."
             " Setting Lacey to NaN."),
             UserWarning,
         )
