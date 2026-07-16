@@ -1,5 +1,4 @@
 import pyvista as pv
-import numpy as np
 import os
 import sys
 import unittest
@@ -7,17 +6,6 @@ import unittest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
 from DEMToolbox.particle_sampling import sample_3d
-
-import pyvista as pv
-import numpy as np
-import os
-import sys
-import unittest
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
-                os.pardir, os.pardir)))
-from DEMToolbox.particle_sampling import sample_3d
-
 
 def set_up_sample_cubic_3d_test():
 
@@ -32,8 +20,6 @@ def set_up_sample_cubic_3d_test():
     vector_1 = [1, 0, 0]
     vector_2 = [0, 1, 0]
     vector_3 = [0, 0, 1]
-
-    resolution = [3, 3, 3]
 
     # test with non normalised vector
     particle_data, split = sample_3d(particle_data,

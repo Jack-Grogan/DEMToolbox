@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.optimize import curve_fit
-from sklearn.metrics import r2_score
 from functools import partial
 
 def lacey_mixing_curve(time, k, tau, m0):

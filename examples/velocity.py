@@ -102,7 +102,7 @@ def run():
         ax.set_ylabel("Dimension 2 (m)")
         ax.set_ylim(-0.01, 0.09)
         ax.set_xlim(-0.035, 0.035)
-        ax.set_title(f"Velocity Vector Field")
+        ax.set_title("Velocity Vector Field")
         ax.set_aspect('equal')
 
         if not np.isnan(mags).all(): 
@@ -112,7 +112,7 @@ def run():
             U = vecs[:,:,0]
             V = vecs[:,:,1]
 
-            q = ax.quiver(X, Y, U, V, units='width', pivot='mid', angles='xy')
+            ax.quiver(X, Y, U, V, units='width', pivot='mid', angles='xy')
 
             xmin = -0.03
             xmax = 0.03

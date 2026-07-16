@@ -65,6 +65,8 @@ prototyping/
 # Pytest cache files #
 ##########################
 .pytest_cache/
+.coverage
+.ruff_cache/
 
 # Benchmark files #
 ######################
