@@ -39,9 +39,9 @@ examples = [
     "tqdm >= 4.67.0",
 ]
 test = [
-    "pytest >= 7.4.0",
-    "pytest-cov >= 4.1.0",
-    "unitest >= 1.0.0",
+    "pytest >= 7.0.0",
+    "pytest-cov >= 4.0.0",
+    "pytest-benchmark >= 4.0.0",
 ]
 
 [project.urls]
