@@ -58,8 +58,14 @@ class TestSample3DBounds(unittest.TestCase):
         output_dir = os.path.join(os.path.dirname(__file__), "generated_test_files")
         os.makedirs(output_dir, exist_ok=True)
 
-        self.split.to_vtm(filename=os.path.join(output_dir, "samples.vtm"))
+        vtm_file = os.path.join(output_dir, "samples.vtm")
+
+        self.split.to_vtm(filename=vtm_file)
         self.particle_data.save(os.path.join(output_dir, "particles.vtp"))
+
+        assert os.path.exists(vtm_file)
+        assert os.path.getsize(vtm_file) > 0
+
 
     def test_sample_3d_save(self):
         """Test the save method of the Sample3D class."""
@@ -67,5 +73,29 @@ class TestSample3DBounds(unittest.TestCase):
         output_dir = os.path.join(os.path.dirname(__file__), "generated_test_files")
         os.makedirs(output_dir, exist_ok=True)
 
-        self.split.save(filename=os.path.join(output_dir, "meshgrid.vtk"))
+        vtk_file = os.path.join(output_dir, "meshgrid.vtk")
+
+        self.split.save(filename=vtk_file)
+
+        assert os.path.exists(vtk_file)
+        assert os.path.getsize(vtk_file) > 0
+
+    # Commented out as generating files in the root directory is not ideal for testing purposes.
+
+    # def test_sample_3d_to_vtm_autoname(self):
+    #     """Test the to_vtm method of the Sample3D class."""
+
+    #     self.split.to_vtm()
+
+    #     assert os.path.exists("sample_test.vtm")
+    #     assert os.path.getsize("sample_test.vtm") > 0
+
+
+    # def test_sample_3d_save_autoname(self):
+    #     """Test the save method of the Sample3D class."""
+
+    #     self.split.save()
+
+    #     assert os.path.exists("sample_test.vtk")
+    #     assert os.path.getsize("sample_test.vtk") > 0
      

@@ -23,7 +23,7 @@ def lacey_mixing_curve(time, k, tau, m0):
 
     .. math::
 
-        M(t) = max(1 - (1 - M_0) e^{-k(t - \\tau)})
+        M(t) = max(1 - (1 - M_0) e^{-k(t - \\tau)}, M_0)
 
     This mixing model is used to fit the mixing data as with no delayed
     onset of exponential mixing Ratnayake et al.'s model reduces to the
@@ -69,7 +69,6 @@ def lacey_mixing_curve(time, k, tau, m0):
         If m0 is not an integer or float.
     """
     if not isinstance(time, np.ndarray):
-        time = np.array(time)
         raise ValueError("time must be an array-like object")
     
     if not isinstance(k, (int, float)):
@@ -104,7 +103,7 @@ def lacey_mixing_curve_fit(time, m, t0=0, tend=None):
 
     .. math::
 
-        M(t) = max(1 - (1 - M_0) e^{-k(t - \\tau)})
+        M(t) = max(1 - (1 - M_0) e^{-k(t - \\tau)}, M_0)
 
     This mixing model is used to fit the mixing data as with no delayed
     onset of exponential mixing Ratnayake et al.'s model reduces to the

@@ -80,13 +80,15 @@ def sample_2d(particle_data,
         raise ValueError("Resolution must be a 2 element list.")
     
     if not all(isinstance(i, int) for i in resolution):
-        raise ValueError("Resolution must be an integer.")
+        raise ValueError("Resolution must be a 2 element list of integers.")
 
     if any(i <= 0 for i in resolution):
-        raise ValueError("Resolution must be greater than 0.")
+        raise ValueError("Resolution must be a 2 element list of "
+                         "integers greater than 0.")
     
     if particle_data.n_points == 0:
-        warnings.warn("Cannot sample empty particles file.", UserWarning)
+        warnings.warn("Cannot sample with empty particle data. "
+                      "Returning unedited particle data.", UserWarning)
         sample_attribute = ParticleAttribute(particle_id_column, 
                                         append_column,
                                         np.empty((0, 2)))
@@ -111,7 +113,9 @@ def sample_2d(particle_data,
             raise ValueError("Bounds must be a list of 6 elements: "
                              "[x_min, x_max, y_min, y_max, z_min, z_max].")
         
-        if not all(isinstance(i, (int, float)) for i in bounds):
+        if not all(isinstance(i, 
+                              (int, float, np.integer, np.floating)
+                              ) for i in bounds):
             raise ValueError("Bounds must be a list of integers or floats.")
         
         # Apply the bounds to the particle data
@@ -136,12 +140,6 @@ def sample_2d(particle_data,
 
         min_bound_vec_2 = np.min(corners @ vector_2)
         max_bound_vec_2 = np.max(corners @ vector_2)
-
-        if min_bound_vec_1 > max_bound_vec_1:
-            min_bound_vec_1, max_bound_vec_1 = max_bound_vec_1, min_bound_vec_1
-
-        if min_bound_vec_2 > max_bound_vec_2:
-            min_bound_vec_2, max_bound_vec_2 = max_bound_vec_2, min_bound_vec_2
 
         vec_1_sample_bounds = np.linspace(min_bound_vec_1,
                                         max_bound_vec_1,
@@ -174,8 +172,8 @@ def sample_2d(particle_data,
                                         max(resolved_bounds_vec_2),
                                         resolution[1] + 1)
     else:
-        raise ValueError("Bounds must be a list of 6 elements or a "
-                         "vtkPolyData.")
+        raise ValueError("Bounds must be a list or array of 6 elements "
+                         "or a vtkPolyData.")
 
     # Calculate the cell centers in each vector direction
     vector_1_centers = (vec_1_sample_bounds[:-1] 

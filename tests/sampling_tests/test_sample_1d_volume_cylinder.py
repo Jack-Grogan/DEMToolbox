@@ -12,13 +12,14 @@ from DEMToolbox.particle_sampling import sample_1d_volume_cylinder
 def set_up_sample_1d_volume_cylinder_test():
 
     vtk_file_path = os.path.join(os.path.dirname(__file__),
-                                        os.pardir, "vtks",)
+                                        os.pardir, "vtks")
         
     particle_data = pv.read(os.path.join(vtk_file_path,
                                         "particles.vtk"))
     
     point = [0, 0, 0]
     sample_vector = [2, 1, 3]
+
     # test with non normalised vector
     particle_data, split = sample_1d_volume_cylinder(particle_data,
                                                         point,

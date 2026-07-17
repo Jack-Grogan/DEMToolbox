@@ -85,7 +85,8 @@ def sample_3d_cylinder(particle_data,
                          "dimensions.")
     
     if particle_data.n_points == 0:
-        warnings.warn("Cannot sample empty particles file.", UserWarning)
+        warnings.warn("Cannot sample with empty particle data. "
+                      "Returning unedited particle data.", UserWarning)
         sample_attribute = ParticleAttribute(particle_id_column, 
                                         append_column,
                                         np.empty((0, 2)))
@@ -94,7 +95,8 @@ def sample_3d_cylinder(particle_data,
         return (particle_data, samples)
     
     if cylinder_data.n_points == 0:
-        warnings.warn("Cannot sample empty container file.", UserWarning)
+        warnings.warn("Cannot sample empty container file."
+                      "Returning unedited particle data.", UserWarning)
         sample_attribute = ParticleAttribute(particle_id_column, 
                                         append_column,
                                         np.empty((0, 2)))

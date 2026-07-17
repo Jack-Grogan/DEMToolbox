@@ -119,8 +119,7 @@ class ParticleSamples():
         if filename is not None:
             meshgrid.save(filename)
         else:
-            meshgrid.save(f"{self.name}.vtk")
-            
+            meshgrid.save(f"{self.name}.vtk") # pragma: no cover
         return
     
 
@@ -160,6 +159,5 @@ class ParticleSamples():
         if filename is not None:
             blocks.save(filename)
         else:
-            blocks.save(f"{self.name}.vtm")
-
+            blocks.save(f"{self.name}.vtm") # pragma: no cover
         return
