@@ -12,7 +12,7 @@ from DEMToolbox.mixing import macro_scale_lacey_mixing
 from DEMToolbox.particle_sampling import sample_1d_volume
 from DEMToolbox.particle_sampling import sample_3d_cylinder
 from DEMToolbox.particle_sampling import sample_3d
-from DEMToolbox.classes import ParticleAttribute, ParticleSamples
+from DEMToolbox.classes import ParticleAttribute
 from DEMToolbox.utilities import append_attribute
 
 def create_cylinder(radius=0.03, height=0.08, resolution=100):

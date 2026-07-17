@@ -98,4 +98,4 @@ class TestSimpleVectorFieldRaises(unittest.TestCase):
         assert results[0] == empty_particle_data
         assert np.all(np.isnan(results[1]))
         assert np.array_equal(results[2], expected_occupancy)
-        assert results[3] == None
+        assert results[3] is None
