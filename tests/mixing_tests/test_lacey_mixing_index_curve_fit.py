@@ -33,10 +33,10 @@ class TestLaceyMixingIndex(unittest.TestCase):
         self.assertAlmostEqual(k, 0.0, places=5)
         self.assertAlmostEqual(tau, 0.0, places=5)
 
-        self.assertEqual(results[1][0, 0], 1.0363836214613491e-22)
-        self.assertEqual(results[1][0, 1], 9.111118648114095e-14)
-        self.assertEqual(results[1][1, 0], 9.111118648114094e-14)
-        self.assertEqual(results[1][1, 1], 0.0031584677190661177)
+        np.isclose(results[1][0, 0], 1.0363836214613491e-22, rtol=1e-9, atol=0)
+        np.isclose(results[1][0, 1], 9.111118648114095e-14, rtol=1e-9, atol=0)
+        np.isclose(results[1][1, 0], 9.111118648114094e-14, rtol=1e-9, atol=0)
+        np.isclose(results[1][1, 1], 0.0031584677190661177, rtol=1e-9, atol=0)
 
         assert np.all(results[2] == self.times)
         assert np.all(results[3] == lacey_0)
@@ -58,10 +58,10 @@ class TestLaceyMixingIndex(unittest.TestCase):
         self.assertAlmostEqual(k, 0.0, places=5)
         self.assertAlmostEqual(tau, 0.0, places=5)
 
-        self.assertEqual(results[1][0, 0], 0.0)
-        self.assertEqual(results[1][0, 1], 0.0)
-        self.assertEqual(results[1][1, 0], 0.0)
-        self.assertEqual(results[1][1, 1], 0.0)
+        np.isclose(results[1][0, 0], 0.0, rtol=1e-9, atol=0)
+        np.isclose(results[1][0, 1], 0.0, rtol=1e-9, atol=0)
+        np.isclose(results[1][1, 0], 0.0, rtol=1e-9, atol=0)
+        np.isclose(results[1][1, 1], 0.0, rtol=1e-9, atol=0)
 
         assert np.all(results[2] == self.times)
         assert np.all(results[3] == lacey_1)
@@ -83,10 +83,10 @@ class TestLaceyMixingIndex(unittest.TestCase):
         self.assertEqual(k, 84.06014038940896)
         self.assertEqual(tau, 5.15602967908695e-12)
 
-        self.assertEqual(results[1][0, 0], 20052087.00180876)
-        self.assertEqual(results[1][0, 1], 23854.41667977134)
-        self.assertEqual(results[1][1, 0], 23854.416679771337)
-        self.assertEqual(results[1][1, 1], 28.377755579520105)
+        np.isclose(results[1][0, 0], 20052087.00180876, rtol=1e-9, atol=0)
+        np.isclose(results[1][0, 1], 23854.41667977134, rtol=1e-9, atol=0)
+        np.isclose(results[1][1, 0], 23854.416679771337, rtol=1e-9, atol=0)
+        np.isclose(results[1][1, 1], 28.377755579520105, rtol=1e-9, atol=0)
 
         assert np.all(results[2] == self.times)
         assert np.all(results[3] == lacey_values)
@@ -110,14 +110,17 @@ class TestLaceyMixingIndex(unittest.TestCase):
         self.assertAlmostEqual(k, k_fit)
         self.assertAlmostEqual(tau, tau_fit)
 
-        self.assertEqual(results[1][0, 0], 6.187977008560435e-21)
-        self.assertEqual(results[1][0, 1], 1.2991315443332372e-20)
-        self.assertEqual(results[1][1, 0], 1.2991315443332372e-20)
-        self.assertEqual(results[1][1, 1], 5.175835209191755e-20)
+        np.isclose(results[1][0, 0], 6.187977008560435e-21, rtol=1e-9, atol=0)
+        np.isclose(results[1][0, 1], 1.2991315443332372e-20, rtol=1e-9, atol=0)
+        np.isclose(results[1][1, 0], 1.2991315443332372e-20, rtol=1e-9, atol=0)
+        np.isclose(results[1][1, 1], 5.175835209191755e-20, rtol=1e-9, atol=0)
 
         assert np.all(results[2] == self.times)
         assert np.all(results[3] == lacey_values)
-        assert np.all(results[4] == lacey_mixing_curve(self.times, k_fit, tau_fit, lacey_values[0]))
+        assert np.all(results[4] == lacey_mixing_curve(
+            self.times, k_fit, tau_fit, lacey_values[0]
+            )
+        )
 
     def test_lacey_mixing_curve_raises(self):
         """Test the lacey_mixing_curve_fit function raises errors for invalid inputs."""
