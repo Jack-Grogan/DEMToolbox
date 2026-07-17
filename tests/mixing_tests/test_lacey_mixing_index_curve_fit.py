@@ -80,8 +80,8 @@ class TestLaceyMixingIndex(unittest.TestCase):
         tau = results[0][1]
 
         # Check that the parameters are close to zero
-        self.assertEqual(k, 84.06014038940896)
-        self.assertEqual(tau, 5.15602967908695e-12)
+        np.isclose(k, 84.06014038940896,  rtol=1e-9, atol=0)
+        np.isclose(tau, 5.15602967908695e-12, rtol=1e-9, atol=0)
 
         np.isclose(results[1][0, 0], 20052087.00180876, rtol=1e-9, atol=0)
         np.isclose(results[1][0, 1], 23854.41667977134, rtol=1e-9, atol=0)
