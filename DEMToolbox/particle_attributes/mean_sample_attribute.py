@@ -43,31 +43,39 @@ def mean_sample_attribute(particle_data,
         unedited particle data and an empty mean attribute object.
     """
     if particle_data.n_points == 0:
-        warnings.warn("no particles in particle_data vtk", UserWarning)
+        warnings.warn("No particles in particle_data vtk. " 
+                      "Returning unedited particle_data and "
+                      "empty mean_attribute.",
+                      UserWarning)
+        
         mean_attribute = ParticleAttribute(attribute.field,
                                            append_column,
                                            [[None, None]])
+        
         return particle_data, mean_attribute
     
     if attribute.attribute not in particle_data.point_data.keys():
-        warnings.warn("attribute not in particle_data vtk", UserWarning)
+        warnings.warn("Attribute column not in particle_data vtk. "
+                      "Returning unedited particle_data and "
+                      "empty mean_attribute.",
+                      UserWarning)
+        
         mean_attribute = ParticleAttribute(attribute.field,
                                            append_column,
                                            [[None, None]])
+        
         return particle_data, mean_attribute
-    
-    if attribute.field not in particle_data.point_data.keys():
-        warnings.warn("attribute field not in particle_data vtk", UserWarning)
-        mean_attribute = ParticleAttribute(attribute.field,
-                                           append_column,
-                                           [[None, None]])
-        return particle_data, mean_attribute
-    
+
     if samples.name not in particle_data.point_data.keys():
-        warnings.warn("samples not in particle_data vtk", UserWarning)
+        warnings.warn("Samples column not in particle_data vtk. "
+                      "Returning unedited particle_data and "
+                      "empty mean_attribute.",
+                      UserWarning)
+        
         mean_attribute = ParticleAttribute(attribute.field,
                                            append_column,
                                            [[None, None]])
+        
         return particle_data, mean_attribute
     
     if append_column is None:

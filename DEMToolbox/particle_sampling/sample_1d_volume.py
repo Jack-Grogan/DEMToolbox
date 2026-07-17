@@ -66,13 +66,13 @@ def sample_1d_volume(particle_data,
         an empty ParticleSamples object is returned.
     """
     if len(sample_vector) != 3:
-        raise ValueError("sample_vector must be a 3 element list.")
+        raise ValueError("Sample_vector must be a 3 element list.")
     
     if resolution < 2:
-        raise ValueError("resolution must be greater than or equal to 2.")
+        raise ValueError("Resolution must be greater than or equal to 2.")
     
     if not np.issubdtype(type(resolution), np.integer):
-        raise ValueError("resolution must be an integer.")
+        raise ValueError("Resolution must be an integer.")
     
     sample_vector = np.asarray(sample_vector)
     sample_vector = sample_vector/np.linalg.norm(sample_vector)
@@ -81,7 +81,7 @@ def sample_1d_volume(particle_data,
                             f"{sample_vector[2]}_volume_sample")
         
     if particle_data.n_points == 0:
-        warnings.warn("Cannot split empty particles file", UserWarning)
+        warnings.warn("Cannot sample empty particles file.", UserWarning)
         sample_attribute = ParticleAttribute(particle_id_column, 
                                              append_column,
                                              np.empty((0, 2)))
@@ -90,7 +90,7 @@ def sample_1d_volume(particle_data,
         return particle_data, samples
     
     if resolution > particle_data.n_points:
-        raise ValueError("resolution must be less than or equal to the "
+        raise ValueError("Resolution must be less than or equal to the "
                          "number of particles in the particle data.")
     
     # Calculate equal volume samples along the specified vector

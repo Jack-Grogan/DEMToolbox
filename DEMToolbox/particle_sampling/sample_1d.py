@@ -96,7 +96,9 @@ def sample_1d(particle_data,
             raise ValueError("Bounds must be a list of 6 elements: "
                              "[x_min, x_max, y_min, y_max, z_min, z_max].")
         
-        if not all(isinstance(i, (int, float)) for i in bounds):
+        if not all(isinstance(i, 
+                              (int, float, np.integer, np.floating)
+                            ) for i in bounds):
             raise ValueError("Bounds must be a list of integers or floats.")
         
         # Apply the bounds to the particle data
@@ -119,9 +121,6 @@ def sample_1d(particle_data,
         
         min_bound_vec = np.min(corners @ vector)
         max_bound_vec = np.max(corners @ vector)
-
-        if min_bound_vec > max_bound_vec:
-            min_bound_vec, max_bound_vec = max_bound_vec, min_bound_vec
 
         sample_bounds = np.linspace(min_bound_vec,
                                     max_bound_vec, 

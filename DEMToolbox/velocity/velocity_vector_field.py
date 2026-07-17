@@ -81,7 +81,8 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
         and NaN array for the velocity vectors.
     """
     if particle_data.n_points == 0:
-        warnings.warn("Cannot sample empty particles file.", UserWarning)
+        warnings.warn("Cannot sample empty container file."
+                      "Returning unedited particle data.", UserWarning)
         velocity_vectors = np.zeros((resolution[1], resolution[0], 2))
         velocity_vectors[:] = np.nan
         occupancy = np.zeros((resolution[1], resolution[0]))

@@ -80,7 +80,8 @@ def sample_1d_volume_cylinder(particle_data,
                          f"{sample_vector[2]}_volume_sample")
         
     if particle_data.n_points == 0:
-        warnings.warn("Cannot split empty particles file", UserWarning)
+        warnings.warn("Cannot sample with empty particle data. "
+                      "Returning unedited particle data.", UserWarning)
         sample_attribute = ParticleAttribute(particle_id_column, 
                                              append_column,
                                              np.empty((0, 2)))
