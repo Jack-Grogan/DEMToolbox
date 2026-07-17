@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.29] - 2026-07-01
 
 ### Added
+Tests made more extensive
+
+### Changed
+Some error messages have been updated to be more informative and helpful for users. 
+Some dead code loops in the sampling functions have been removed to improve efficiency and reduce unnecessary computations.
+
+### Deprecated
+None
+
+### Removed
+min max bounds switching checks that were impossible to trigger have been removed from the sampling functions. These checks were intended to ensure that the minimum and maximum bounds provided by the user were in the correct order, but they were not necessary as the sampling functions already handle this internally.
+
+### Fixed
+None
+
+## [0.0.29] - 2026-07-01
+
+### Added
 None
 
 ### Changed
