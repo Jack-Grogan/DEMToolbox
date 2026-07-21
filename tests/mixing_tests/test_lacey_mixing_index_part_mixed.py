@@ -75,7 +75,7 @@ def set_up_lacey_mixing_index_part_mixed_test():
         samples,
         append_column="test_append",
     )
-    
+
     return (particle_data, samples, sample_resolution, 
             lacey, split, cylinder_data)
 

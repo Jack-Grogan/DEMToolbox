@@ -157,70 +157,77 @@ def macro_scale_lacey_mixing(particle_data,
         raise ValueError(("particle data contains particle types with values "
                           "other than 0 and 1, cannot calculate Lacey mixing "
                           f"index. Found particle types: {ones_and_zeros}"))
-    
-    # Boolean mask for class 0 particles
-    class_0_split = (particle_data[attribute.attribute].astype(int)
-                    ^ np.ones(
-                        len(particle_data[attribute.attribute])).astype(int))
 
-    # Boolean mask for class 1 particles
-    class_1_split = particle_data[attribute.attribute].astype(int)
-
-    # Calculate the mean volume of the particles
+    # Calculate the volume of each particle and the mean particle volume
     particle_volumes = 4/3 * np.pi * particle_data["radius"] ** 3
     mean_particle_volume = np.mean(particle_volumes)
 
-    # Create a boolean mask for each Lacey sample
-    sample_id_booleans = []
-    for ids in samples.occupied_cells:
-        sample_boolean_mask = particle_data[samples.name] == ids
-        sample_id_booleans.append(sample_boolean_mask)
+    # Array of sample ids for each particle, -1 for unsampled particles
+    sample_ids = particle_data[samples.name].astype(int)
 
-    class_0_sample_volume = np.zeros(samples.n_occupied_cells)
-    class_1_sample_volume = np.zeros(samples.n_occupied_cells)
-    total_sample_volume = np.zeros(samples.n_occupied_cells)
+    # Create boolean masks for the two particle types
+    class_1_mask = particle_data[attribute.attribute].astype(bool)
+    class_0_mask = ~class_1_mask
 
-    particles_concentration = np.empty(particle_data.n_points)
-    particles_concentration[:] = np.nan
+    # valid is a boolean array indicating which particles have valid sample ids
+    # sample_ids == -1 indicates unsampled particles, so valid is True for 
+    # sampled particles
+    valid = sample_ids != -1
 
-    for i, sample_element in enumerate(sample_id_booleans):
+    sample_ids_valid = sample_ids[valid]
+    particle_volumes_valid = particle_volumes[valid]
+    class_0_mask_valid = class_0_mask[valid]
 
-        # Boolean mask for particles of class 0 in the sample
-        particles_class_0 = class_0_split & sample_element
+    # Calculate the volume of each particle type in each sample using 
+    # np.bincount
+    class_0_volume_per_cell = np.bincount(
+        sample_ids_valid[class_0_mask_valid],
+        weights=particle_volumes_valid[class_0_mask_valid],
+        minlength=samples.n_cells,
+    )
+    class_1_volume_per_cell = np.bincount(
+        sample_ids_valid[~class_0_mask_valid],
+        weights=particle_volumes_valid[~class_0_mask_valid],
+        minlength=samples.n_cells,
+    )
 
-        # Boolean mask for particles of class 1 in the sample
-        particles_class_1 = class_1_split & sample_element
+    # Discard empty samples from the volume arrays
+    class_0_sample_volume = class_0_volume_per_cell[samples.occupied_cells]
+    class_1_sample_volume = class_1_volume_per_cell[samples.occupied_cells]
+    total_sample_volume = class_0_sample_volume + class_1_sample_volume
 
-        # Calculate the volume of particles of class 0 sample 
-        class_0_radii = particle_data["radius"][particles_class_0.astype(bool)]
-        class_0_volume = 4/3 * np.pi * class_0_radii ** 3
-        
-        # Calculate the volume of particles of class 1 sample
-        class_1_radii = particle_data["radius"][particles_class_1.astype(bool)]
-        class_1_volume = 4/3 * np.pi * class_1_radii ** 3
+    # Calculate the concentration of the target particle type in each sample
+    # that is occupied by at least one particle of either type. Unoccupied
+    # samples will be ignored in the calculation of the Lacey mixing index.
+    # The concentration is calculated as the volume fraction of the target
+    # particle type in each sample.
+    concentrations = class_0_sample_volume / total_sample_volume
 
-        # Total volume of particles in the sample 
-        class_0_sample_volume[i] = sum(class_0_volume)
-        class_1_sample_volume[i] = sum(class_1_volume)
-        total_sample_volume[i] = sum(class_0_volume) + sum(class_1_volume)
+    # Create an Nan array for the concentration of the target particle type 
+    # in each sample including unoccupied samples. This will be used to assign 
+    # the concentration of the target particle type to each particle based on 
+    # its sample id.
+    concentration_per_cell = np.full(samples.n_cells, np.nan)
 
-        # Assign the concentration value of the sample element to all
-        # particles that reside in the sample element. Used for 
-        # concentration visualisation
-        particles_concentration[sample_element] = (
-            sum(class_0_volume)
-                / (
-                    sum(class_0_volume)
-                    + sum(class_1_volume)
-                )
-            )
+    # Assign the concentration of the target particle type to each occupied sample
+    concentration_per_cell[samples.occupied_cells] = concentrations
+
+    # Create an array of particle concentrations based on their sample ids
+    particles_concentration = np.full(particle_data.n_points, np.nan)
+
+    # Assign the concentration of the target particle type to each particle 
+    # based on its sample id. Concentration is only assigned to particles 
+    # that are within the sample space (i.e., have a valid sample id (not -1),
+    # -1 is used to indicate that a particle is not in any sample). Particles
+    # that are not in any sample will have a concentration of NaN.
+    particles_concentration[valid] = concentration_per_cell[sample_ids[valid]]
 
     # Append particle concentration and samples to the particle_data
     if append_column is not None:
         particle_data[append_column] = particles_concentration
     else:
         particle_data[f"{attribute.attribute}_conc"] = particles_concentration
-    
+
     if samples.n_occupied_cells < 2:
         warnings.warn(
             ("Fewer than 2 non-empty samples in particle data. "
@@ -232,20 +239,13 @@ def macro_scale_lacey_mixing(particle_data,
         variance = np.nan
         unmixed_variance = np.nan
         mixed_variance = np.nan
+
     else:
         bulk_concentration = (
             np.sum(class_0_sample_volume)
             / (
                 np.sum(class_0_sample_volume)
                 + np.sum(class_1_sample_volume)
-            )
-        )
-
-        concentrations = (
-            class_0_sample_volume
-            / (
-                class_0_sample_volume
-                + class_1_sample_volume
             )
         )
 
