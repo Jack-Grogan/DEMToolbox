@@ -8,11 +8,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
                 os.pardir, os.pardir)))
 from DEMToolbox.mixing import macro_scale_lacey_mixing 
 from DEMToolbox.particle_sampling import sample_1d_volume
-from DEMToolbox.particle_sampling import sample_3d_cylinder
+from DEMToolbox.particle_sampling import sample_3d
 
 def create_cylinder(radius=0.03, height=0.08, resolution=100):
     """Create a container_data mesh."""
-    return pv.Cylinder(center=(0 ,0, height / 2),
+    return pv.Cylinder(center=(0 ,0, 0.08 / 2),
                        direction=(0, 0, 1),
                        radius=radius, 
                        height=height, 
@@ -48,25 +48,25 @@ def set_up_lacey_mixing_index_part_mixed_test():
 
     particle_data = create_particle_grid(positions, radii=radii)
     cylinder_data = create_cylinder(
-        radius=0.03, height=0.08, resolution=100)
+        radius=0.03, height=0.048, resolution=100)
     
     
-    # test with non normalised vector
     particle_data, split = sample_1d_volume(particle_data, 
-                                            [1, 1, 3],
+                                            [0, 0, 1],
                                             resolution=2,
                                             append_column="z_split",
                                             )
 
 
     sample_resolution = [1,1,3]
-    sample_constant = "volume"
 
-    particle_data, samples = sample_3d_cylinder(
+    particle_data, samples = sample_3d(
         particle_data,
         cylinder_data,
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
         sample_resolution,
-        sample_constant,
     )
     
     particle_data, lacey = macro_scale_lacey_mixing(
@@ -75,7 +75,7 @@ def set_up_lacey_mixing_index_part_mixed_test():
         samples,
         append_column="test_append",
     )
-
+    
     return (particle_data, samples, sample_resolution, 
             lacey, split, cylinder_data)
 
@@ -109,9 +109,9 @@ class TestLaceyMixingIndex(unittest.TestCase):
         bulk_concentration = 0.5
         unmixed_variance = bulk_concentration * (1 - bulk_concentration)
 
-        # 6x6x30 points corners outside the cylinder that are not sampled
-        # 960 points in total, 320 of each type across the 3 samples
-        mixed_variance = unmixed_variance / (960/3)
+        # 6x6x18 points 216 of each type across the 3 occupied samples, 
+        # 648 points in total
+        mixed_variance = unmixed_variance / (648/3)
 
         # 1 sample all target particles, 1 sample all non-target particles
         # 1 sample with 50% target particles. particles in each sample
@@ -123,6 +123,8 @@ class TestLaceyMixingIndex(unittest.TestCase):
         expected_value = ((variance - unmixed_variance)
                           / (mixed_variance - unmixed_variance))
 
+        print(f"Expected Lacey mixing index: {expected_value}")
+        print(f"Calculated Lacey mixing index: {self.lacey}")
         assert np.isclose(self.lacey, expected_value, atol=1e-10)
 
         expected_keys = [
@@ -130,7 +132,7 @@ class TestLaceyMixingIndex(unittest.TestCase):
             'id', 
             'volume',
             'z_split', 
-            '3D_cylinder_samples', 
+            '3D_samples', 
             'test_append'
         ]
 
