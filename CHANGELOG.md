@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.31] - 2026-07-21
+
+### Added
+None
+
+### Changed
+Performance improvements to Lacey mixing index calculation. The calculation of the Lacey mixing 
+index has been optimized to reduce the number of computations required, resulting in faster 
+execution times for large datasets. 
+
+### Deprecated
+None
+
+### Removed
+None
+
+### Fixed
+None
+
+
 ## [0.0.29] - 2026-07-01
 
 ### Added
