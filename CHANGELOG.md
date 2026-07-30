@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.32] - 2026-07-30
+
+### Added
+Ability to specify the weighting column for the calculation of velocity vector fields. The user can now specify a column in the particle data to be used as weights for the calculation of the velocity vector field. This allows for more accurate representation of the velocity field, especially in cases where certain particles have more influence on the flow than others i.e. when particles have different sizes or masses. Added tests for this new functionality.
+
+### Changed
+None
+
+### Deprecated
+None
+
+### Removed
+None
+
+### Fixed
+None
+
+
+### Changed
+
 ## [0.0.31] - 2026-07-21
 
 ### Added
