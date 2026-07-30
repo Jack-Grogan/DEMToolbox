@@ -90,7 +90,7 @@ class TestSample3DCylinderRaises(unittest.TestCase):
         # Invalid rotation (only 2 dimensions)
         invalid_rotation = "1"
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_3d_cylinder(self.particle_data,
                                self.cylinder_data,
                                resolution=[3, 3, 3],

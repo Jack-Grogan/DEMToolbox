@@ -176,7 +176,7 @@ def lacey_mixing_curve_fit(time, m, t0=0, tend=None):
     if tend is None:
         tend = time[-1]
     elif not isinstance(tend, (int, float)):
-        raise ValueError("tend must be an integer or float")
+        raise TypeError("tend must be an integer or float")
     
     if len(time) != len(m):
         raise ValueError("time and m must be the same length")

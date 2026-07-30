@@ -62,7 +62,7 @@ class TestSample1D(unittest.TestCase):
         sample_vector = [8, 1, 4]
         resolution = "invalid"
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_1d(
                 self.particle_data,
                 self.cylinder_data,
@@ -184,7 +184,7 @@ class TestSample1D(unittest.TestCase):
         # test with invalid bounds type
         bounds = [0, 1, 2, 3, 4, "invalid"] 
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_1d(
                 self.particle_data,
                 bounds,
@@ -288,7 +288,7 @@ class TestSample1D(unittest.TestCase):
         # test with invalid bounds type
         bounds = "invalid" 
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_1d(
                 self.particle_data,
                 bounds,

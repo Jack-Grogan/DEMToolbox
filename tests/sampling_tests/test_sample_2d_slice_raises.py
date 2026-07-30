@@ -159,7 +159,7 @@ class TestSample2DSliceRaises(unittest.TestCase):
         # Test with a non-numeric plane thickness
         plane_thickness = "invalid"
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_2d_slice(
                 self.particle_data,
                 self.cylinder_data,
@@ -284,7 +284,7 @@ class TestSample2DSliceRaises(unittest.TestCase):
         # Test with a bounds that has a non-numeric value
         bounds = [0, 1, 0, 1, 0, "invalid"]
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_2d_slice(
                 self.particle_data,
                 bounds,
@@ -353,7 +353,7 @@ class TestSample2DSliceRaises(unittest.TestCase):
         # Test with a bounds that is not a list or numpy array
         bounds = "invalid"
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_2d_slice(
                 self.particle_data,
                 bounds,

@@ -195,7 +195,7 @@ class TestSample2DRaises(unittest.TestCase):
         # Bounds with non-numeric values
         bounds = [1, 2, 3, 4, 5, "six"]
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_2d(
                 self.particle_data,
                 bounds,
@@ -259,7 +259,7 @@ class TestSample2DRaises(unittest.TestCase):
         # Bounds neither a list nor a vtkPolyData
         invalid_bounds = "invalid_bounds"
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_2d(
                 self.particle_data,
                 invalid_bounds,

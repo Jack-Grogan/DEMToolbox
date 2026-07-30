@@ -129,7 +129,7 @@ class TestLaceyMixingIndex(unittest.TestCase):
         tau = 1.0
         m0 = 0.2
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             lacey_mixing_curve(list(self.times), k, tau, m0)
 
         self.assertEqual(
@@ -137,7 +137,7 @@ class TestLaceyMixingIndex(unittest.TestCase):
             "time must be an array-like object"
         )
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             lacey_mixing_curve(self.times, "invalid input type", tau, m0)
 
         self.assertEqual(
@@ -145,7 +145,7 @@ class TestLaceyMixingIndex(unittest.TestCase):
             "k must be an integer or float"
         )
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             lacey_mixing_curve(self.times, k, "invalid input type", m0)
 
         self.assertEqual(
@@ -153,7 +153,7 @@ class TestLaceyMixingIndex(unittest.TestCase):
             "tau must be an integer or float"
         )
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             lacey_mixing_curve(self.times, k, tau, "invalid input type")    
 
         self.assertEqual(
@@ -164,7 +164,7 @@ class TestLaceyMixingIndex(unittest.TestCase):
     def test_lacey_mixing_curve_fit_raises(self):
         """Test the lacey_mixing_curve_fit function raises errors for invalid inputs."""
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             lacey_mixing_curve_fit(list(self.times), np.ones_like(self.times))
 
         self.assertEqual(
@@ -172,7 +172,7 @@ class TestLaceyMixingIndex(unittest.TestCase):
             "time must be an array-like object"
         )
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             lacey_mixing_curve_fit(self.times, list(np.ones_like(self.times)))
 
         self.assertEqual(
@@ -180,7 +180,7 @@ class TestLaceyMixingIndex(unittest.TestCase):
             "m must be an array-like object"
         )
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             lacey_mixing_curve_fit(self.times, np.ones_like(self.times), t0="invalid input type")
 
         self.assertEqual(
@@ -188,7 +188,7 @@ class TestLaceyMixingIndex(unittest.TestCase):
             "t0 must be an integer or float"
         )
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             lacey_mixing_curve_fit(self.times, np.ones_like(self.times), tend="invalid input type")
 
         self.assertEqual(

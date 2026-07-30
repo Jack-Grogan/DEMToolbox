@@ -305,7 +305,7 @@ class TestSample3DRaises(unittest.TestCase):
         # Test with bounds that are not a 6 element list of integers or floats
         bounds = [0, 1, 2, 3, 4, "invalid"]
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_3d(
                 self.particle_data,
                 bounds,
@@ -370,7 +370,7 @@ class TestSample3DRaises(unittest.TestCase):
 
         bounds = "invalid"
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_3d(
                 self.particle_data,
                 bounds,

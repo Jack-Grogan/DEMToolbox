@@ -183,7 +183,7 @@ def sample_3d(particle_data,
         if not all(isinstance(i, 
                               (int, float, np.integer, np.floating)
                               ) for i in bounds):
-            raise ValueError("Bounds must be a list of integers or floats.")
+            raise TypeError("Bounds must be a list of integers or floats.")
         
         # Apply the bounds to the particle data
         x_min, x_max, y_min, y_max, z_min, z_max = bounds
