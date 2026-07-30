@@ -1,9 +1,11 @@
-import numpy as np
 import warnings
+
+import numpy as np
 import pyvista as pv
 
-from ..classes.particle_samples import ParticleSamples
 from ..classes.particle_attribute import ParticleAttribute
+from ..classes.particle_samples import ParticleSamples
+
 
 def sample_2d_slice(particle_data, 
                     bounds, 
@@ -69,7 +71,7 @@ def sample_2d_slice(particle_data,
         If resolution is not a 2 element list of integers.
     ValueError
         If resolution is less than or equal to 0.
-    ValueError
+    TypeError
         If plane_thickness is not an integer or float.
     ValueError
         If plane_thickness is less than or equal to 0.
@@ -78,7 +80,7 @@ def sample_2d_slice(particle_data,
     UserWarning
         If the particle data has no points return unedited particle
         data and an empty samples object.
-    ValueError
+    TypeError
         If bounds is not a 6 element list or np.ndarray of integers or 
         floats or a vtkPolyData.
     ValueError
@@ -105,7 +107,7 @@ def sample_2d_slice(particle_data,
                          "integers greater than 0.")
 
     if not isinstance(plane_thickness, (int, float)):
-        raise ValueError("plane_thickness must be an integer or float.")
+        raise TypeError("plane_thickness must be an integer or float.")
     
     if plane_thickness <= 0:
         raise ValueError("plane_thickness must be greater than 0.")
@@ -140,7 +142,7 @@ def sample_2d_slice(particle_data,
             append_column, sample_attribute, [], [], [], 0, 0)
         return (particle_data, samples)
     
-    if isinstance(bounds, list) or isinstance(bounds, np.ndarray):
+    if isinstance(bounds, (list, np.ndarray)):
         
         if len(bounds) != 6:
             raise ValueError("Bounds must be a list of 6 elements: "
@@ -206,7 +208,7 @@ def sample_2d_slice(particle_data,
                                           max(resolved_bounds_vec_2),
                                           resolution[1] + 1)
     else:
-        raise ValueError("Bounds must be a list of 6 elements or a "
+        raise TypeError("Bounds must be a list of 6 elements or a "
                          "vtkPolyData.")
         
     vector_1_centers = (vec_1_sample_bounds[:-1] 

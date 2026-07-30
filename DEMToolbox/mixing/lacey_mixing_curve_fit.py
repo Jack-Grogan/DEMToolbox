@@ -1,6 +1,8 @@
+from functools import partial
+
 import numpy as np
 from scipy.optimize import curve_fit
-from functools import partial
+
 
 def lacey_mixing_curve(time, k, tau, m0):
     """Curve for the Lacey mixing model.
@@ -59,26 +61,26 @@ def lacey_mixing_curve(time, k, tau, m0):
 
     Raises
     ------
-    ValueError
+    TypeError
         If time is not an array-like object.
-    ValueError
+    TypeError
         If k is not an integer or float.
-    ValueError
+    TypeError
         If tau is not an integer or float.
-    ValueError
+    TypeError
         If m0 is not an integer or float.
     """
     if not isinstance(time, np.ndarray):
-        raise ValueError("time must be an array-like object")
+        raise TypeError("time must be an array-like object")
     
     if not isinstance(k, (int, float)):
-        raise ValueError("k must be an integer or float")
+        raise TypeError("k must be an integer or float")
     
     if not isinstance(tau, (int, float)):
-        raise ValueError("tau must be an integer or float")
+        raise TypeError("tau must be an integer or float")
     
     if not isinstance(m0, (int, float)):
-        raise ValueError("m0 must be an integer or float")
+        raise TypeError("m0 must be an integer or float")
     
     return [max((1 - (1 - m0) * np.exp(-k*(t - tau))), m0) for t in time]
 
@@ -149,27 +151,27 @@ def lacey_mixing_curve_fit(time, m, t0=0, tend=None):
 
     Raises
     ------
-    ValueError
+    TypeError
         If time is not an array-like object.
-    ValueError
+    TypeError
         If m is not an array-like object.
-    ValueError
+    TypeError
         If t0 is not an integer or float.
-    ValueError
+    TypeError
         If tend is not an integer or float.
     ValueError
         If time and m are not the same length.
     """
     if not isinstance(time, np.ndarray):
         time = np.array(time)
-        raise ValueError("time must be an array-like object")
+        raise TypeError("time must be an array-like object")
     
     if not isinstance(m, np.ndarray):
         m = np.array(m)
-        raise ValueError("m must be an array-like object")
+        raise TypeError("m must be an array-like object")
     
     if not isinstance(t0, (int, float)):
-        raise ValueError("t0 must be an integer or float")
+        raise TypeError("t0 must be an integer or float")
     
     if tend is None:
         tend = time[-1]

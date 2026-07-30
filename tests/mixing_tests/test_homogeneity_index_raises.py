@@ -1,15 +1,17 @@
-import pyvista as pv
-import numpy as np
+import io
 import os
 import sys
 import unittest
-import io
 from unittest.mock import patch
+
+import numpy as np
+import pyvista as pv
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
-from DEMToolbox.mixing import homogeneity_index 
+from DEMToolbox.mixing import homogeneity_index
 from DEMToolbox.particle_sampling import sample_1d
+
 
 def create_cylinder(radius=0.03, height=0.08, resolution=100):
     """Create a container_data mesh."""
@@ -78,7 +80,6 @@ class TestHomogeneityIndexRaises(unittest.TestCase):
         cls.samples = samples
         cls.cylinder_data = cylinder_data
 
-        return
     
 
     def test_homogeneity_index_no_particles(self):
@@ -171,7 +172,7 @@ class TestHomogeneityIndexRaises(unittest.TestCase):
         unmodified_particle_data["non_numeric_samples"] = ["a"] * unmodified_particle_data.n_points
 
         with self.assertRaises(ValueError) as context:
-            result_particle_data, result_hi = homogeneity_index(
+            homogeneity_index(
                 unmodified_particle_data, "radius", samples
             )
 

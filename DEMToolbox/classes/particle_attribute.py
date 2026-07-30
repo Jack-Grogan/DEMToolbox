@@ -1,5 +1,7 @@
 import numpy as np
-class ParticleAttribute():
+
+
+class ParticleAttribute:
     """Class to store particle attribute data
     
     Attributes

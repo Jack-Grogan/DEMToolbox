@@ -1,13 +1,14 @@
-import pyvista as pv
-import numpy as np
 import os
 import sys
 import unittest
 
+import numpy as np
+import pyvista as pv
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
-from DEMToolbox.utilities import append_attribute
 from DEMToolbox.classes import ParticleAttribute
+from DEMToolbox.utilities import append_attribute
 
 
 def set_up_append_attribute_test():
@@ -85,5 +86,5 @@ class TestAppendAttribute(unittest.TestCase):
                          "appended",
         )
 
-        assert "test_attribute" not in updated_particle_data.point_data.keys()
+        assert "test_attribute" not in updated_particle_data.point_data
         

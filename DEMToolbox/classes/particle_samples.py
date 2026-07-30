@@ -1,6 +1,8 @@
 import numpy as np
 import pyvista as pv
+
 from .particle_attribute import ParticleAttribute
+
 
 class ParticleSamples:
     """Class to store particle sample information.
@@ -120,7 +122,6 @@ class ParticleSamples:
             meshgrid.save(filename)
         else:
             meshgrid.save(f"{self.name}.vtk") # pragma: no cover
-        return
     
 
     def to_vtm(self, filename=None):
@@ -160,4 +161,3 @@ class ParticleSamples:
             blocks.save(filename)
         else:
             blocks.save(f"{self.name}.vtm") # pragma: no cover
-        return

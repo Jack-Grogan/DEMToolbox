@@ -1,12 +1,13 @@
-import numpy as np
 import os
 import sys
 import unittest
 
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
-from DEMToolbox.mixing import lacey_mixing_curve_fit 
-from DEMToolbox.mixing import lacey_mixing_curve
+from DEMToolbox.mixing import lacey_mixing_curve, lacey_mixing_curve_fit
+
 
 class TestLaceyMixingIndex(unittest.TestCase):
     @classmethod

@@ -1,7 +1,8 @@
-import pyvista as pv
 import os
 import sys
 import unittest
+
+import pyvista as pv
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
@@ -57,7 +58,7 @@ class TestSample1DVolumeCylinderRaises(unittest.TestCase):
         empty_particle_data = pv.PolyData()
 
         with self.assertWarns(UserWarning) as context:
-            returned_particle_data, split = sample_1d_volume_cylinder(
+            sample_1d_volume_cylinder(
                 empty_particle_data,
                 point,
                 sample_vector,

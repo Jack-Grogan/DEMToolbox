@@ -1,9 +1,11 @@
-import numpy as np
 import warnings
+
+import numpy as np
 import pyvista as pv
 
-from ..classes.particle_samples import ParticleSamples
 from ..classes.particle_attribute import ParticleAttribute
+from ..classes.particle_samples import ParticleSamples
+
 
 def sample_3d(particle_data, 
               bounds, 
@@ -94,7 +96,7 @@ def sample_3d(particle_data,
     UserWarning
         If the particle data has no points return unedited particle
         data and an empty samples object.
-    ValueError
+    TypeError
         If bounds is not a 6 element list or np.ndarray of integers or 
         floats or a vtkPolyData.
     ValueError
@@ -173,7 +175,7 @@ def sample_3d(particle_data,
     resolved_particles_vec_2 = np.dot(particle_data.points, vector_2)
     resolved_particles_vec_3 = np.dot(particle_data.points, vector_3)
 
-    if isinstance(bounds, list) or isinstance(bounds, np.ndarray):
+    if isinstance(bounds, (list, np.ndarray)):
         if len(bounds) != 6:
             raise ValueError("Bounds must be a list of 6 elements: "
                              "[x_min, x_max, y_min, y_max, z_min, z_max].")
@@ -300,7 +302,7 @@ def sample_3d(particle_data,
                                             resolution[2] + 1)
             
     else:
-        raise ValueError("Bounds must be a list of 6 elements or a "
+        raise TypeError("Bounds must be a list of 6 elements or a "
                          "vtkPolyData.")
 
     vector_1_centers = (vec_1_sample_bounds[:-1] 

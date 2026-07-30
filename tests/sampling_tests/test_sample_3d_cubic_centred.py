@@ -1,11 +1,13 @@
-import pyvista as pv
 import os
 import sys
 import unittest
 
+import pyvista as pv
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
 from DEMToolbox.particle_sampling import sample_3d
+
 
 def set_up_sample_3d_cubic_with_bounds_test():
 

@@ -1,14 +1,15 @@
-import pyvista as pv
-import numpy as np
 import os
 import sys
 import unittest
 
+import numpy as np
+import pyvista as pv
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
-from DEMToolbox.mixing import macro_scale_lacey_mixing 
-from DEMToolbox.particle_sampling import sample_1d_volume
-from DEMToolbox.particle_sampling import sample_3d_cylinder
+from DEMToolbox.mixing import macro_scale_lacey_mixing
+from DEMToolbox.particle_sampling import sample_1d_volume, sample_3d_cylinder
+
 
 def create_cylinder(radius=0.03, height=0.08, resolution=100):
     """Create a container_data mesh."""

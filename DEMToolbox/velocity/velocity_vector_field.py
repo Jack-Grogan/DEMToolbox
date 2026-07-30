@@ -1,7 +1,9 @@
-import numpy as np
 import warnings
 
+import numpy as np
+
 from ..particle_sampling.sample_2d_slice import sample_2d_slice
+
 
 def velocity_vector_field(particle_data, bounds, point, vector_1, 
                           vector_2, plane_thickness, resolution,
@@ -144,7 +146,7 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
         occupancy = samples.particles.reshape(resolution[1], resolution[0])
     else:
 
-        if weighting_column not in particle_data.point_data.keys():
+        if weighting_column not in particle_data.point_data:
             raise ValueError(f"Weighting column '{weighting_column}' not found "
                              "in particle data point data.")
 

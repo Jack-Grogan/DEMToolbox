@@ -1,7 +1,9 @@
-import numpy as np
 import warnings
 
+import numpy as np
+
 from ..classes.particle_attribute import ParticleAttribute
+
 
 def append_attribute(particle_data, attribute:ParticleAttribute):
     """ Append the particle attribute to the particle data.
@@ -29,7 +31,7 @@ def append_attribute(particle_data, attribute:ParticleAttribute):
     """
     field = attribute.field
 
-    if (field in particle_data.point_data.keys() 
+    if (field in particle_data.point_data
         and particle_data.n_points != 0):
 
         new_column = np.zeros(len(particle_data[field]))

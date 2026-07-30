@@ -1,16 +1,18 @@
-import pyvista as pv
 import glob
+import os
+import re
+import sys
+
+import pandas as pd
+import pyvista as pv
 from natsort import natsorted
 from tqdm import tqdm
-import re
-import os
-import pandas as pd
-import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir)))
 
-from DEMToolbox.particle_sampling import sample_1d
 from DEMToolbox.mixing import homogeneity_index
+from DEMToolbox.particle_sampling import sample_1d
 
 # Mesh 1D
 vector_1d = [0, 0, 1]

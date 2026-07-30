@@ -1,19 +1,19 @@
-import pyvista as pv
-import numpy as np
+import io
 import os
 import sys
 import unittest
-import io
 from unittest.mock import patch
+
+import numpy as np
+import pyvista as pv
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
-from DEMToolbox.mixing import macro_scale_lacey_mixing 
-from DEMToolbox.particle_sampling import sample_1d_volume
-from DEMToolbox.particle_sampling import sample_3d_cylinder
-from DEMToolbox.particle_sampling import sample_3d
 from DEMToolbox.classes import ParticleAttribute
+from DEMToolbox.mixing import macro_scale_lacey_mixing
+from DEMToolbox.particle_sampling import sample_1d_volume, sample_3d, sample_3d_cylinder
 from DEMToolbox.utilities import append_attribute
+
 
 def create_cylinder(radius=0.03, height=0.08, resolution=100):
     """Create a container_data mesh."""
@@ -329,7 +329,7 @@ class TestLaceyMixingIndex(unittest.TestCase):
         )
 
         with self.assertWarns(UserWarning) as context:
-            returned_particle_data, lacey = macro_scale_lacey_mixing(
+            macro_scale_lacey_mixing(
                 particle_data, 
                 self.split.ParticleAttribute, 
                 samples,
