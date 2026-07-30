@@ -2,7 +2,7 @@ import numpy as np
 import pyvista as pv
 from .particle_attribute import ParticleAttribute
 
-class ParticleSamples():
+class ParticleSamples:
     """Class to store particle sample information.
 
     Attributes

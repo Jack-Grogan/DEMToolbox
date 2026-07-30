@@ -1,10 +1,11 @@
-import numpy as np
 import os
 import sys
 
+import numpy as np
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
-from DEMToolbox.velocity import mean_velocity_vector_field 
+from DEMToolbox.velocity import mean_velocity_vector_field
 
 
 def test_mean_velocity_vector_field_invalid_velocity_vectors():
