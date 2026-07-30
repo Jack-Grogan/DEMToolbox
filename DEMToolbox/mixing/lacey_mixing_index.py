@@ -1,8 +1,10 @@
-import numpy as np
 import warnings
 
-from ..classes.particle_samples import ParticleSamples
+import numpy as np
+
 from ..classes.particle_attribute import ParticleAttribute
+from ..classes.particle_samples import ParticleSamples
+
 
 def macro_scale_lacey_mixing(particle_data, 
                              attribute:ParticleAttribute, 
@@ -135,12 +137,12 @@ def macro_scale_lacey_mixing(particle_data,
                        "index for empty particle file."), UserWarning)
         return particle_data, np.nan
     
-    if attribute.attribute not in particle_data.point_data.keys():
+    if attribute.attribute not in particle_data.point_data:
         warnings.warn((f"{attribute.attribute} not found in particle file, "
                       "returning NaN."), UserWarning)
         return particle_data, np.nan
     
-    if samples.name not in particle_data.point_data.keys():
+    if samples.name not in particle_data.point_data:
         warnings.warn((f"{samples.name} not found in particle file, "
                       "returning NaN."), UserWarning)
         return particle_data, np.nan
@@ -154,9 +156,9 @@ def macro_scale_lacey_mixing(particle_data,
                            "setting Lacey to NaN."), UserWarning)
             return particle_data, np.nan
     else:
-        raise ValueError(("particle data contains particle types with values "
+        raise ValueError("particle data contains particle types with values "
                           "other than 0 and 1, cannot calculate Lacey mixing "
-                          f"index. Found particle types: {ones_and_zeros}"))
+                          f"index. Found particle types: {ones_and_zeros}")
 
     # Calculate the volume of each particle and the mean particle volume
     particle_volumes = 4/3 * np.pi * particle_data["radius"] ** 3

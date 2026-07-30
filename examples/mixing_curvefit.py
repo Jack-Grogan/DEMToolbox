@@ -1,7 +1,9 @@
-import pandas as pd
-import matplotlib.pyplot as plt
 import os
 import sys
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir)))
 
@@ -32,15 +34,15 @@ def plot_fit(x, y, fit_x, fit_y, popt, r2, dimension, save_path):
     
     plt.annotate("Particle Loading", (1, ylim[1]/2), rotation=90, 
                  ha='center', va='center', fontsize=14, 
-                 bbox=dict(facecolor='white',edgecolor='white', alpha=0.5))
+                 bbox={'facecolor': 'white', 'edgecolor': 'white', 'alpha': 0.5})
     
     plt.annotate("Particle Settling", (13, ylim[1]/2), rotation=90, 
                  ha='center', va='center', fontsize=14, 
-                 bbox=dict(facecolor='white', edgecolor='white', alpha=0.5))
+                 bbox={'facecolor': 'white', 'edgecolor': 'white', 'alpha': 0.5})
 
     plt.annotate((r"M$_{end}$ = " + f"{y[-1]:.5f}"), xy=(x[-1], y[-1]), 
                  xytext = (15, y[-1]), fontsize=12, va='center', 
-                 arrowprops=dict(facecolor='black', arrowstyle='->'))
+                 arrowprops={'facecolor': 'black', 'arrowstyle': '->'})
     
     fit_str = (f"M$_0$ = {fit_y[0]:.5g}    k = {popt[0]:.5g}    "
                f"$\\tau$ = {popt[1]:.5g}    R$^2$ = {r2:.5g}")
@@ -63,7 +65,6 @@ def plot_fit(x, y, fit_x, fit_y, popt, r2, dimension, save_path):
     plt.savefig(save_path)
     plt.close(fig)
 
-    return
 
 lacey_df_path = os.path.join(os.path.dirname(__file__),
                              "mixing_analysis", 

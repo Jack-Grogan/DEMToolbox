@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def mean_velocity_vector_field(velocity_vectors, occupancies):
     """
     Calculate the mean velocity vector field from the velocity vectors.

@@ -1,15 +1,17 @@
-import pyvista as pv
-import numpy as np
 import os
 import sys
 import unittest
 
+import numpy as np
+import pyvista as pv
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
-from DEMToolbox.mixing import macro_scale_lacey_mixing 
 from DEMToolbox.classes import ParticleAttribute
-from DEMToolbox.utilities import append_attribute
+from DEMToolbox.mixing import macro_scale_lacey_mixing
 from DEMToolbox.particle_sampling import sample_3d
+from DEMToolbox.utilities import append_attribute
+
 
 def create_cylinder(radius=0.03, height=0.08, resolution=100):
     """Create a container_data mesh."""
@@ -151,14 +153,14 @@ class TestLaceyMixingIndex(unittest.TestCase):
         variance = (
             ((sum(row_1_volume) / total_volume 
               * (row_1_volume[0] / sum(row_1_volume) - bulk_conc) ** 2))
-            + ((sum(row_2_volume) / total_volume 
-                * (row_2_volume[0] / sum(row_2_volume) - bulk_conc) ** 2))
-            + ((sum(row_3_volume) / total_volume 
-                * (row_3_volume[0] / sum(row_3_volume) - bulk_conc) ** 2))
-            + ((sum(row_4_volume) / total_volume 
-                * (row_4_volume[0] / sum(row_4_volume) - bulk_conc) ** 2))
-            + ((sum(row_5_volume) / total_volume 
-                * (row_5_volume[0] / sum(row_5_volume) - bulk_conc) ** 2))
+            + (sum(row_2_volume) / total_volume 
+                * (row_2_volume[0] / sum(row_2_volume) - bulk_conc) ** 2)
+            + (sum(row_3_volume) / total_volume 
+                * (row_3_volume[0] / sum(row_3_volume) - bulk_conc) ** 2)
+            + (sum(row_4_volume) / total_volume 
+                * (row_4_volume[0] / sum(row_4_volume) - bulk_conc) ** 2)
+            + (sum(row_5_volume) / total_volume 
+                * (row_5_volume[0] / sum(row_5_volume) - bulk_conc) ** 2)
         )
 
         expected_value = ((variance - unmixed_variance)

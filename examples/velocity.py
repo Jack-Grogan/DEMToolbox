@@ -1,16 +1,19 @@
-import pyvista as pv
 import glob
-from natsort import natsorted
+import os
+import re
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
+import pyvista as pv
+from natsort import natsorted
 from tqdm import tqdm
-import re
-import os
-import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir)))
 
-from DEMToolbox.velocity import velocity_vector_field 
+from DEMToolbox.velocity import velocity_vector_field
+
 
 def run():
 

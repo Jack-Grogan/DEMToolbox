@@ -1,8 +1,10 @@
-import numpy as np
 import warnings
 
-from ..classes.particle_samples import ParticleSamples
+import numpy as np
+
 from ..classes.particle_attribute import ParticleAttribute
+from ..classes.particle_samples import ParticleSamples
+
 
 def sample_3d_cylinder(particle_data, 
                        cylinder_data, 
@@ -60,7 +62,7 @@ def sample_3d_cylinder(particle_data,
         If resolution is not a 3 element list of integers.
     ValueError
         If resolution is not a list of 3 integers.
-    ValueError
+    TypeError
         If rotation is not an integer or float.
     ValueError
         If resolution is less than or equal to 0 in any dimension.
@@ -74,11 +76,11 @@ def sample_3d_cylinder(particle_data,
     if len(resolution) != 3:
         raise ValueError("Resolution must be a list of 3 integers.")
     
-    if not all([isinstance(i, int) for i in resolution]):
+    if not all(isinstance(i, int) for i in resolution):
         raise ValueError("Resolution must be a list of 3 integers.")
     
     if not isinstance(rotation, (int, float)):
-        raise ValueError("Rotation must be an integer or float.")
+        raise TypeError("Rotation must be an integer or float.")
     
     if resolution[0] <= 0 or resolution[1] <= 0 or resolution[2] <= 0:
         raise ValueError("Resolution must be greater than 0 in all "

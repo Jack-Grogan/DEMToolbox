@@ -20,7 +20,7 @@ def create_cylinder(radius=0.03, height=0.08, resolution=100):
                        )
 
 
-def create_particle_grid(positions, radii=None, velocities=None):
+def create_particle_grid(positions, radii=None, velocities=None, masses=None):
     """Create sample particle data."""
 
     particle_data = pv.PolyData(positions)
@@ -30,26 +30,40 @@ def create_particle_grid(positions, radii=None, velocities=None):
 
     if velocities is not None:
         particle_data['v'] = velocities
+
+    if masses is not None:
+        particle_data['mass'] = masses
     
     particle_data["id"] = np.arange(len(positions))
 
     return particle_data
 
 
-def set_up_corner_velocity_vector_field_test():
+def set_up_velocity_vector_field_velocity_averaging_test():
 
     # Create a grid of particles
-    x_range = np.linspace(-0.03, -0.022, 5)[1::2] 
+    x_range = np.linspace(-0.03, 0.03, 61)[1::2]
+    x_vel = [0.003 if i % 2 else -0.003 for i in range(len(x_range))]
+
     y_range = np.linspace(-0.03, 0.03, 3)[1::2] 
-    z_range = np.linspace(0.04, 0.08, 21)[1::2]
+    y_vel = [0 for _ in range(len(y_range))]
+
+    z_range = np.linspace(0, 0.08, 81)[1::2]
+    z_vel = [0 for _ in range(len(z_range))]
+
     x, y, z = np.meshgrid(x_range, y_range, z_range)
+    x_vel, y_vel, z_vel = np.meshgrid(x_vel, y_vel, z_vel)
 
     positions = np.column_stack((x.ravel(), y.ravel(), z.ravel()))
-    radii = [0.0005]*len(positions)
-    velocity = [[0, 0.003, -0.003] for _ in range(len(positions))]
+    velocity = np.column_stack((x_vel.ravel(),
+                                    y_vel.ravel(),
+                                    z_vel.ravel()))
+    
+    radii = [0.0005 if i//40 % 2 == 0 else 0.001 for i in range(len(positions))]
+    mass = [0.0001 if i//40 % 2 == 0 else 0.0002 for i in range(len(positions))]
 
     particle_data = create_particle_grid(
-        positions, radii=radii, velocities=velocity)
+        positions, radii=radii, velocities=velocity, masses=mass)
     container_data = create_cylinder(
         radius=0.03, height=0.08, resolution=100)
 
@@ -68,22 +82,23 @@ def set_up_corner_velocity_vector_field_test():
                                                 vector_2, 
                                                 plane_thickness,
                                                 resolution,
+                                                weighting_column="mass"
                                                 )
     
     return vector_field_results, resolution
-        
-
-def test_velocity_vector_field_corner_benchmark(benchmark):
-    benchmark(set_up_corner_velocity_vector_field_test)
 
 
-class TestCornerVectorFields(unittest.TestCase):
+def test_velocity_vector_field_velocity_averaging_benchmark(benchmark):
+    benchmark(set_up_velocity_vector_field_velocity_averaging_test)
+
+
+class TestVectorFieldVelocityAveraging(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test class."""
 
         (vector_field_results, 
-         resolution) = set_up_corner_velocity_vector_field_test()
+         resolution) = set_up_velocity_vector_field_velocity_averaging_test()
         
         # Store results
         cls.resolution = resolution
@@ -94,26 +109,21 @@ class TestCornerVectorFields(unittest.TestCase):
 
 
     def test_vector_field_shape(self):
-        """Test the shape of the velocity vectors."""
-        assert np.shape(self.velocity_vectors) == (
-            self.resolution[1], self.resolution[0], 2)
-
+        assert (np.shape(self.velocity_vectors) 
+                == (self.resolution[1], self.resolution[0], 2))
+        
 
     def test_velocity_vectors_values(self):
-        """Test the values of the velocity vectors."""
-        expected_velocity = np.zeros((self.resolution[1], 
-                                      self.resolution[0], 2))
-        expected_velocity[10:, :2, :] = [[0., -0.003], [0., -0.003]]
-        
-        assert np.all(self.velocity_vectors == expected_velocity)     
-        
+        expected_value = [0.001, 0]
+        for i in range(self.resolution[1]):
+            for j in range(self.resolution[0]):
+                assert np.all(self.velocity_vectors[i, j] == expected_value)
+
 
     def test_occupancy_shape(self):
-        """Test the shape of the occupancy."""
-        assert np.shape(self.occupancy) == (
-            self.resolution[1], self.resolution[0])
+        assert (np.shape(self.occupancy) 
+                == (self.resolution[1], self.resolution[0]))
 
 
     def test_occupancy_values(self):
-        upper_corner = self.occupancy[10:, :2]
-        assert np.all(upper_corner == 1)
+        assert np.allclose(self.occupancy, 0.0006, atol=1e-10)

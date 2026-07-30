@@ -1,10 +1,13 @@
-import numpy as np
 import warnings
+
+import numpy as np
 
 from ..particle_sampling.sample_2d_slice import sample_2d_slice
 
+
 def velocity_vector_field(particle_data, bounds, point, vector_1, 
                           vector_2, plane_thickness, resolution,
+                          weighting_column=None,
                           sample_column=None, 
                           velocity_column="v",
                           append_column="mean_resolved_velocity",
@@ -29,6 +32,18 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
         The thickness of the plane.
     resolution : list
         The resolution of the 2D sample space in the form [m, n].
+    weighting_column: str, optional
+        The column that defines the weighting contribution of each particle 
+        to the mean velocity vector field. If None, the mean velocity vector 
+        field will be calculated as the mean of the particle velocities in 
+        each sample on a number basis and the resulting occupancy will be the 
+        number of particles in each sample. Otherwise, the mean velocity vector 
+        field will be calculated as the mean of the particle velocities in each 
+        sample weighted by the values in the weighting column and the resulting 
+        occupancy will be the sum of the values in the weighting column for 
+        each sample. The weighting column must be a column in the particle data 
+        point data. If the weighting column is not found in the particle data 
+        point data, a ValueError will be raised.
     sample_column : str, optional
         The name of the samples column to append to the particle data,
         by default None. If None, the column name will be
@@ -50,7 +65,10 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
         An array of the mean resolved velocity vectors for particles in the
         sample space.
     occupancy : np.ndarray
-        An array of the number of particles in each sample
+        An array of the total occupancy values for each point in the sample 
+        space. Shape will be (resolution[1], resolution[0]). Units will be 
+        the same as the weighting column if provided, otherwise the units
+        will be the number of particles in each sample.
     samples : ParticleSamples
         The samples object containing the sample information that was
         used to calculate the velocity vector field. if no particles
@@ -80,6 +98,8 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
         If the container data has no points return unedited particle data
         and NaN array for the velocity vectors.
     """
+
+    
     if particle_data.n_points == 0:
         warnings.warn("Cannot sample empty container file."
                       "Returning unedited particle data.", UserWarning)
@@ -87,6 +107,7 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
         velocity_vectors[:] = np.nan
         occupancy = np.zeros((resolution[1], resolution[0]))
         return particle_data, velocity_vectors, occupancy, None
+    
     
     vector_1 = vector_1 / np.linalg.norm(vector_1)
     vector_2 = vector_2 / np.linalg.norm(vector_2)
@@ -102,7 +123,6 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
                                         particle_id_column=particle_id_column
                                         )
 
-    
     cell_ids = particle_data[samples.name].astype(int)
     velocities = particle_data.point_data[velocity_column]
 
@@ -111,15 +131,42 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
     cell_ids_valid = cell_ids[valid_mask]
     velocities_valid = velocities[valid_mask]
 
-    # Compute sum of velocities in each cell
-    sum_vel = np.zeros((resolution[1] * resolution[0], 3))
-    np.add.at(sum_vel, cell_ids_valid, velocities_valid)
+    if weighting_column is None:
+        sum_vel = np.zeros((resolution[1] * resolution[0], 3))
+        np.add.at(sum_vel, cell_ids_valid, velocities_valid)
 
-    mean_vel = np.zeros_like(sum_vel)
-    mean_vel[samples.occupied_cells] = ( 
-                    sum_vel[samples.occupied_cells] 
-                    / samples.particles[samples.occupied_cells, None]
-                    )
+        weight_totals = samples.particles.astype(float)
+
+        mean_vel = np.zeros_like(sum_vel)
+        mean_vel[samples.occupied_cells] = (
+            sum_vel[samples.occupied_cells]
+            / weight_totals[samples.occupied_cells, None]
+        )
+
+        occupancy = samples.particles.reshape(resolution[1], resolution[0])
+    else:
+
+        if weighting_column not in particle_data.point_data:
+            raise ValueError(f"Weighting column '{weighting_column}' not found "
+                             "in particle data point data.")
+
+        weighting = particle_data.point_data[weighting_column]
+        weighting_valid = weighting[valid_mask]
+
+        sum_vel = np.zeros((resolution[1] * resolution[0], 3))
+        np.add.at(sum_vel, cell_ids_valid,
+                velocities_valid * weighting_valid[:, None])
+
+        weight_totals = np.zeros(resolution[1] * resolution[0])
+        np.add.at(weight_totals, cell_ids_valid, weighting_valid)
+
+        occupancy = weight_totals.reshape(resolution[1], resolution[0])
+
+        mean_vel = np.zeros_like(sum_vel)
+        mean_vel[samples.occupied_cells] = (
+            sum_vel[samples.occupied_cells]
+            / weight_totals[samples.occupied_cells, None]
+        )
 
     # Project onto vector_1 and vector_2
     mean_res_vec_1 = mean_vel @ vector_1
@@ -141,7 +188,5 @@ def velocity_vector_field(particle_data, bounds, point, vector_1,
                                                 resolution[0], 2)
 
     particle_data[append_column] = cell_velocity
-    occupancy = samples.particles.reshape(resolution[1], 
-                                          resolution[0])
 
     return particle_data, velocity_vectors, occupancy, samples

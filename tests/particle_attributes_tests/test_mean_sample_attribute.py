@@ -1,14 +1,16 @@
-import pyvista as pv
-import numpy as np
 import os
 import sys
 import unittest
 
+import numpy as np
+import pyvista as pv
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
-from DEMToolbox.particle_attributes import mean_sample_attribute
 from DEMToolbox.classes import ParticleAttribute
+from DEMToolbox.particle_attributes import mean_sample_attribute
 from DEMToolbox.particle_sampling import sample_1d
+
 
 def create_cylinder(radius=0.03, height=0.08, resolution=100):
     """Create a container_data mesh."""
@@ -108,7 +110,7 @@ class TestMeanSampleAttribute(unittest.TestCase):
 
         particle_data = self.particle_data.copy()
 
-        partcle_data, samples = sample_1d(
+        _, samples = sample_1d(
             particle_data,
             self.cylinder_data,
             [1, 0, 0],
@@ -134,7 +136,7 @@ class TestMeanSampleAttribute(unittest.TestCase):
         self.assertTrue(np.allclose(particle_data.point_data["radius_mean_2"], expected_mean))
         self.assertTrue(np.allclose(mean.data[:, 1], expected_mean))
 
-        assert "radius_mean_2" in particle_data.point_data.keys()
+        assert "radius_mean_2" in particle_data.point_data
 
 
     def test_mean_sample_attribute_no_particles(self):

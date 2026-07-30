@@ -1,8 +1,10 @@
-import numpy as np
 import warnings
+
+import numpy as np
 
 from ..classes.particle_attribute import ParticleAttribute
 from ..classes.particle_samples import ParticleSamples
+
 
 def mean_sample_attribute(particle_data,
                           attribute:ParticleAttribute, 
@@ -54,7 +56,7 @@ def mean_sample_attribute(particle_data,
         
         return particle_data, mean_attribute
     
-    if attribute.attribute not in particle_data.point_data.keys():
+    if attribute.attribute not in particle_data.point_data:
         warnings.warn("Attribute column not in particle_data vtk. "
                       "Returning unedited particle_data and "
                       "empty mean_attribute.",
@@ -66,7 +68,7 @@ def mean_sample_attribute(particle_data,
         
         return particle_data, mean_attribute
 
-    if samples.name not in particle_data.point_data.keys():
+    if samples.name not in particle_data.point_data:
         warnings.warn("Samples column not in particle_data vtk. "
                       "Returning unedited particle_data and "
                       "empty mean_attribute.",

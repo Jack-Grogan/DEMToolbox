@@ -1,8 +1,10 @@
-import numpy as np
 import warnings
 
-from ..classes.particle_samples import ParticleSamples
+import numpy as np
+
 from ..classes.particle_attribute import ParticleAttribute
+from ..classes.particle_samples import ParticleSamples
+
 
 def sample_1d_volume_cylinder(particle_data, 
                               point, 

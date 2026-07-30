@@ -1,19 +1,23 @@
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir)))
 
-from DEMToolbox.particle_sampling import sample_1d 
-from DEMToolbox.particle_sampling import sample_2d
-from DEMToolbox.particle_sampling import sample_2d_slice
-from DEMToolbox.particle_sampling import sample_3d
-from DEMToolbox.particle_sampling import sample_3d_cylinder
-
-from natsort import natsorted
 import glob
 import re
+
 import pyvista as pv
+from natsort import natsorted
 from tqdm import tqdm
+
+from DEMToolbox.particle_sampling import (
+    sample_1d,
+    sample_2d,
+    sample_2d_slice,
+    sample_3d,
+    sample_3d_cylinder,
+)
 
 # Mesh 1D
 vector_1d = [0, 0, 1]

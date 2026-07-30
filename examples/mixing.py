@@ -1,19 +1,20 @@
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir)))
 
-from DEMToolbox.particle_sampling import sample_3d_cylinder
-from DEMToolbox.particle_sampling import sample_1d_volume
-from DEMToolbox.utilities import append_attribute
-from DEMToolbox.mixing import macro_scale_lacey_mixing
-
-from natsort import natsorted
 import glob
 import re
-import pyvista as pv
-from tqdm import tqdm
+
 import pandas as pd
+import pyvista as pv
+from natsort import natsorted
+from tqdm import tqdm
+
+from DEMToolbox.mixing import macro_scale_lacey_mixing
+from DEMToolbox.particle_sampling import sample_1d_volume, sample_3d_cylinder
+from DEMToolbox.utilities import append_attribute
 
 # Sample parameters
 cylinder_prefix = "mesh_"

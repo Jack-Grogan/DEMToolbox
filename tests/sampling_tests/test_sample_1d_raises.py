@@ -1,13 +1,14 @@
-import pyvista as pv
 import os
 import sys
 import unittest
+
 import numpy as np
+import pyvista as pv
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                 os.pardir, os.pardir)))
+from DEMToolbox.classes import ParticleAttribute, ParticleSamples
 from DEMToolbox.particle_sampling import sample_1d
-from DEMToolbox.classes import ParticleSamples, ParticleAttribute
 
 
 def set_up_sample_1d_test():
@@ -61,7 +62,7 @@ class TestSample1D(unittest.TestCase):
         sample_vector = [8, 1, 4]
         resolution = "invalid"
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_1d(
                 self.particle_data,
                 self.cylinder_data,
@@ -183,7 +184,7 @@ class TestSample1D(unittest.TestCase):
         # test with invalid bounds type
         bounds = [0, 1, 2, 3, 4, "invalid"] 
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_1d(
                 self.particle_data,
                 bounds,
@@ -287,7 +288,7 @@ class TestSample1D(unittest.TestCase):
         # test with invalid bounds type
         bounds = "invalid" 
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             sample_1d(
                 self.particle_data,
                 bounds,

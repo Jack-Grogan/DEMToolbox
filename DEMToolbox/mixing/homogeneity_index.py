@@ -1,7 +1,9 @@
-import numpy as np
 import warnings
 
+import numpy as np
+
 from ..classes.particle_samples import ParticleSamples
+
 
 def homogeneity_index(particle_data, 
                       attribute_column, 
@@ -73,12 +75,12 @@ def homogeneity_index(particle_data,
                        "particle file."), UserWarning)
         return particle_data, np.nan
     
-    if attribute_column not in particle_data.point_data.keys():
+    if attribute_column not in particle_data.point_data:
         warnings.warn((f"{attribute_column} not found in particle file, "
                        "returning NaN."), UserWarning)
         return particle_data, np.nan
     
-    if samples.name not in particle_data.point_data.keys():
+    if samples.name not in particle_data.point_data:
         warnings.warn((f"{samples.name} not found in particle file, "
                        "returning NaN."), UserWarning)
         return particle_data, np.nan

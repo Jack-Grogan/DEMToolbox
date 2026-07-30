@@ -47,6 +47,9 @@ lint = [
     "ruff >= 0.6.0",
 ]
 
+[tool.ruff.lint]
+ignore = ["N999"]
+
 [project.urls]
 Homepage = "https://github.com/Jack-Grogan/DEMToolbox/"
 Issues = "https://github.com/Jack-Grogan/DEMToolbox/issues"

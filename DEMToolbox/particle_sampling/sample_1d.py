@@ -1,9 +1,11 @@
+import warnings
+
 import numpy as np
-import warnings 
 import pyvista as pv
 
-from ..classes.particle_samples import ParticleSamples
 from ..classes.particle_attribute import ParticleAttribute
+from ..classes.particle_samples import ParticleSamples
+
 
 def sample_1d(particle_data, 
               bounds,
@@ -51,14 +53,14 @@ def sample_1d(particle_data,
     ------
     ValueError
         If vector is not a 3 element list.
-    ValueError
+    TypeError
         If resolution is not an integer.
     ValueError
         If resolution is less than or equal to 0.
     UserWarning
         If the particle data has no points return unedited particle
         data and an empty samples object.
-    ValueError
+    TypeError
         If bounds is not a 6 element list or np.ndarray of integers or 
         floats or a vtkPolyData.
     ValueError
@@ -72,7 +74,7 @@ def sample_1d(particle_data,
         raise ValueError("Vector must be a 3 element list.")
     
     if not isinstance(resolution, int):
-        raise ValueError("Resolution must be an integer.")
+        raise TypeError("Resolution must be an integer.")
     
     if resolution <= 0:
         raise ValueError("Resolution must be greater than 0.")
@@ -91,7 +93,7 @@ def sample_1d(particle_data,
 
     resolved_particles = np.dot(particle_data.points, vector)
 
-    if isinstance(bounds, list) or isinstance(bounds, np.ndarray):
+    if isinstance(bounds, (list, np.ndarray)):
         if len(bounds) != 6:
             raise ValueError("Bounds must be a list of 6 elements: "
                              "[x_min, x_max, y_min, y_max, z_min, z_max].")
@@ -99,7 +101,7 @@ def sample_1d(particle_data,
         if not all(isinstance(i, 
                               (int, float, np.integer, np.floating)
                             ) for i in bounds):
-            raise ValueError("Bounds must be a list of integers or floats.")
+            raise TypeError("Bounds must be a list of integers or floats.")
         
         # Apply the bounds to the particle data
         x_min, x_max, y_min, y_max, z_min, z_max = bounds
@@ -146,7 +148,7 @@ def sample_1d(particle_data,
                                     resolution + 1)
         
     else:
-        raise ValueError("Bounds must be a list or array of 6 elements "
+        raise TypeError("Bounds must be a list or array of 6 elements "
                          "or a vtkPolyData.")
     
     sample_centers = (sample_bounds[:-1] + np.diff(sample_bounds) / 2)
